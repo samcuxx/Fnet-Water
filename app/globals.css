@@ -1,26 +1,172 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * F Net Water Hub design tokens.
+ *
+ * Tailwind v4 is configured in CSS rather than a JS config file. Everything in
+ * @theme becomes a utility, so `bg-brand-600` and `text-brand-600` are
+ * generated from --color-brand-600 below.
+ *
+ * Brand palette from the approved requirements:
+ *   Primary blue #0057B8 · Light blue #00AEEF · White #FFFFFF
+ */
+
+@theme {
+  /* Primary blue ramp, anchored on #0057B8 at 600. */
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
+  --color-brand-300: #93c5fd;
+  --color-brand-400: #4a90d9;
+  --color-brand-500: #1a6fc4;
+  --color-brand-600: #0057b8;
+  --color-brand-700: #004794;
+  --color-brand-800: #003a78;
+  --color-brand-900: #002d5c;
+  --color-brand-950: #001c3a;
+
+  /* Light blue ramp, anchored on #00AEEF at 500. Used for accents and water motifs. */
+  --color-aqua-50: #ecfbff;
+  --color-aqua-100: #d5f5ff;
+  --color-aqua-200: #aeecff;
+  --color-aqua-300: #6ddfff;
+  --color-aqua-400: #22cbfb;
+  --color-aqua-500: #00aeef;
+  --color-aqua-600: #008bc4;
+  --color-aqua-700: #026f9e;
+  --color-aqua-800: #085b81;
+  --color-aqua-900: #0c4c6c;
+
+  /* Semantic colours for statuses, alerts and financial deltas. */
+  --color-success-50: #ecfdf5;
+  --color-success-100: #d1fae5;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+
+  --color-info-50: #eff6ff;
+  --color-info-100: #dbeafe;
+  --color-info-500: #3b82f6;
+  --color-info-600: #2563eb;
+
+  /* Neutral surfaces. The app canvas is a soft grey so white cards lift off it. */
+  --color-canvas: #f6f8fb;
+  --color-surface: #ffffff;
+  --color-border-subtle: #e8edf3;
+
+  /* Sidebar uses the deep brand tone for a premium, focused feel. */
+  --color-sidebar: #0b2545;
+  --color-sidebar-hover: #14355f;
+  --color-sidebar-active: #0057b8;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
+    monospace;
+
+  /* Softer, wider shadows read as "SaaS card" rather than "1990s bevel". */
+  --shadow-card: 0 1px 2px 0 rgb(16 24 40 / 0.04),
+    0 1px 3px 0 rgb(16 24 40 / 0.06);
+  --shadow-card-hover: 0 4px 8px -2px rgb(16 24 40 / 0.08),
+    0 2px 4px -2px rgb(16 24 40 / 0.04);
+  --shadow-dropdown: 0 12px 16px -4px rgb(16 24 40 / 0.08),
+    0 4px 6px -2px rgb(16 24 40 / 0.03);
+
+  --radius-card: 0.875rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  * {
+    border-color: var(--color-border-subtle);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-slate-900);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Visible, consistent focus ring for keyboard navigation. */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+  }
+
+  /* Hide the spinner on number inputs; quantities use explicit steppers. */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Subtle water-inspired gradient for hero and auth panels. */
+  .bg-water-gradient {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand-700) 0%,
+      var(--color-brand-600) 45%,
+      var(--color-aqua-500) 100%
+    );
+  }
+
+  .bg-water-mesh {
+    background-image:
+      radial-gradient(
+        at 15% 20%,
+        rgb(0 174 239 / 0.18) 0px,
+        transparent 55%
+      ),
+      radial-gradient(at 85% 5%, rgb(0 87 184 / 0.14) 0px, transparent 50%),
+      radial-gradient(at 75% 90%, rgb(0 174 239 / 0.12) 0px, transparent 45%);
+  }
+
+  /* Tabular figures keep money columns aligned down a table. */
+  .tabular-money {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .scrollbar-slim {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-slim::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-slim::-webkit-scrollbar-thumb {
+    background-color: rgb(148 163 184 / 0.5);
+    border-radius: 9999px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

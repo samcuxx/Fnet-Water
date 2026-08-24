@@ -1,0 +1,124 @@
+# F Net Water Hub — development environment
+#
+#   docker compose up -d postgres minio      # dependencies only, app on host
+#   docker compose --profile app up -d       # everything in containers
+#
+# Named volumes keep database and object data across container restarts.
+
+name: fnet-water-hub
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: fnet-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-fnet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fnet_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-fnet_water_hub}
+      # Deterministic collation so ORDER BY behaves identically everywhere.
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fnet} -d ${POSTGRES_DB:-fnet_water_hub}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - fnet
+
+  minio:
+    image: minio/minio:latest
+    container_name: fnet-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-fnet_minio_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-fnet_minio_dev_password}
+    ports:
+      - "${MINIO_PORT:-9000}:9000"   # S3 API
+      - "${MINIO_CONSOLE_PORT:-9001}:9001" # web console
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - fnet
+
+  # Creates the application bucket once MinIO is healthy, then exits.
+  minio-init:
+    image: minio/mc:latest
+    container_name: fnet-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-fnet_minio_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-fnet_minio_dev_password}
+      MINIO_BUCKET: ${MINIO_BUCKET:-fnet-water-hub}
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 \"$${MINIO_ROOT_USER}\" \"$${MINIO_ROOT_PASSWORD}\" &&
+      mc mb --ignore-existing local/\"$${MINIO_BUCKET}\" &&
+      mc anonymous set none local/\"$${MINIO_BUCKET}\" &&
+      echo 'MinIO bucket ready (private).'
+      "
+    networks:
+      - fnet
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: fnet-app
+    restart: unless-stopped
+    profiles: ["app"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fnet}:${POSTGRES_PASSWORD:-fnet_dev_password}@postgres:5432/${POSTGRES_DB:-fnet_water_hub}?schema=public
+      AUTH_SECRET: ${AUTH_SECRET}
+      SESSION_MAX_AGE_DAYS: ${SESSION_MAX_AGE_DAYS:-7}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: "false"
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-fnet_minio_admin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-fnet_minio_dev_password}
+      MINIO_BUCKET: ${MINIO_BUCKET:-fnet-water-hub}
+      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-manual}
+      NOTIFICATIONS_SMS_ENABLED: ${NOTIFICATIONS_SMS_ENABLED:-false}
+      NOTIFICATIONS_EMAIL_ENABLED: ${NOTIFICATIONS_EMAIL_ENABLED:-false}
+      NOTIFICATIONS_WHATSAPP_ENABLED: ${NOTIFICATIONS_WHATSAPP_ENABLED:-false}
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - fnet
+
+volumes:
+  postgres-data:
+  minio-data:
+
+networks:
+  fnet:
+    driver: bridge

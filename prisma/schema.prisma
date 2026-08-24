@@ -1,0 +1,1275 @@
+// F Net Water Hub — database schema
+// See docs/DATABASE.md for the rationale behind each cluster of models
+// and docs/BUSINESS_RULES.md for the invariants the services enforce.
+//
+// Conventions:
+//   - Tables are snake_case via @@map; columns keep Prisma's camelCase.
+//   - All money is Decimal(14, 2). Never Float.
+//   - Ledger tables (inventory movements, payment transactions, bottle and
+//     reward ledgers, audit log) are append-only by policy: services insert,
+//     never update or delete.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  ADMINISTRATOR
+  MANAGER
+  AGENT
+  DRIVER
+  CUSTOMER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_ACTIVATION
+}
+
+enum AddressType {
+  HOME
+  OFFICE
+  SHOP
+  SCHOOL
+  WAREHOUSE
+  OTHER
+}
+
+enum DeliveryInstruction {
+  NONE
+  CALL_ON_ARRIVAL
+  LEAVE_AT_RECEPTION
+  DELIVER_TO_BACK_GATE
+  CONTACT_SECURITY
+  OTHER
+}
+
+enum ProductType {
+  REFILLABLE_BOTTLE
+  TAKEAWAY_BOTTLE
+  BULK_WATER
+  DISPENSER
+  ACCESSORY
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  ASSIGNED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  CANCELLED
+}
+
+enum OrderPaymentStatus {
+  UNPAID
+  PENDING
+  PARTIALLY_PAID
+  PAID
+  REFUNDED
+}
+
+enum OrderSource {
+  CUSTOMER_WEB
+  AGENT
+  STAFF
+}
+
+enum DeliveryStatus {
+  PENDING
+  ASSIGNED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  CANCELLED
+}
+
+enum DeliveryFailureReason {
+  CUSTOMER_UNAVAILABLE
+  CUSTOMER_CANCELLED
+  INCORRECT_LOCATION
+  UNABLE_TO_CONTACT
+  VEHICLE_PROBLEM
+  PAYMENT_ISSUE
+  INSUFFICIENT_STOCK
+  OTHER
+}
+
+/// Where a physical bottle currently sits. Stock is the aggregate of these.
+enum BottleState {
+  FILLED_WAREHOUSE
+  EMPTY_WAREHOUSE
+  ASSIGNED_TO_DRIVER
+  IN_TRANSIT
+  WITH_CUSTOMER
+  DAMAGED
+  LOST
+  UNDER_INVESTIGATION
+}
+
+enum StockHolderType {
+  WAREHOUSE
+  DRIVER
+  CUSTOMER
+}
+
+enum InventoryMovementType {
+  REFILL_PRODUCTION
+  FILLED_DISPATCHED
+  FILLED_DELIVERED
+  EMPTY_COLLECTED
+  EMPTY_RETURNED
+  MOVED_TO_CUSTOMER
+  RETURNED_FROM_CUSTOMER
+  BOTTLE_DAMAGED
+  BOTTLE_LOST
+  FAILED_DELIVERY_RETURN
+  ADJUSTMENT
+}
+
+enum AdjustmentStatus {
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  APPLIED
+}
+
+enum BottleLedgerEntryType {
+  SHORTAGE_RECORDED
+  RETURNED
+  CHARGED
+  WRITTEN_OFF
+  ADJUSTMENT
+}
+
+enum DispenserStatus {
+  AVAILABLE
+  RESERVED
+  INSTALLED
+  UNDER_MAINTENANCE
+  FAULTY
+  RETRIEVED
+  RETIRED
+}
+
+/// Deliberately separate from DispenserStatus: installing a unit at a
+/// customer's premises transfers no ownership (requirements §29.12).
+enum DispenserOwnership {
+  COMPANY_OWNED
+  COMPANY_OWNED_INSTALLMENT
+  CUSTOMER_OWNED
+}
+
+enum MaintenanceStatus {
+  OK
+  SERVICE_DUE
+  UNDER_REPAIR
+  FAULT_REPORTED
+}
+
+enum InstallmentFrequency {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+  QUARTERLY
+}
+
+enum InstallmentPlanStatus {
+  PENDING
+  ACTIVE
+  DUE_SOON
+  OVERDUE
+  FULLY_PAID
+  SUSPENDED
+  DEFAULTED
+  CANCELLED
+}
+
+enum InstallmentStatus {
+  PENDING
+  DUE_SOON
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  WAIVED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  MTN_MOBILE_MONEY
+  TELECEL_CASH
+  AIRTELTIGO_MONEY
+  BANK_TRANSFER
+  CASH
+  CARD
+}
+
+enum PaymentPurpose {
+  ORDER
+  DISPENSER_INSTALLMENT
+  BOTTLE_CHARGE
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  PENDING_RECONCILIATION
+  SUCCESSFUL
+  FAILED
+  CANCELLED
+  REVERSED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum TransactionType {
+  PAYMENT
+  REVERSAL
+  REFUND
+  ADJUSTMENT
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESSFUL
+  FAILED
+}
+
+enum ReferralStatus {
+  PENDING
+  QUALIFIED
+  REVERSED
+  INVALID
+}
+
+enum RewardLedgerType {
+  EARNED
+  REDEEMED
+  REVERSED
+  ADJUSTMENT
+}
+
+enum NotificationCategory {
+  ORDER
+  DELIVERY
+  PAYMENT
+  DISPENSER
+  INVENTORY
+  REFERRAL
+  REWARD
+  BOTTLE
+  TRACKER
+  ACCOUNT
+  SYSTEM
+}
+
+enum NotificationSeverity {
+  INFO
+  SUCCESS
+  WARNING
+  CRITICAL
+}
+
+enum NotificationChannel {
+  IN_APP
+  SMS
+  EMAIL
+  WHATSAPP
+  PUSH
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  SKIPPED
+}
+
+enum TrackerAlertType {
+  LOW_WATER_LEVEL
+  DISPENSER_RELOCATED
+  DEVICE_OFFLINE
+  MAINTENANCE_REQUIRED
+  TAMPERING
+}
+
+enum FileVisibility {
+  PRIVATE
+  AUTHENTICATED
+  PUBLIC
+}
+
+enum SettingValueType {
+  STRING
+  NUMBER
+  DECIMAL
+  BOOLEAN
+  JSON
+}
+
+// ---------------------------------------------------------------------------
+// Identity, sessions, profiles
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String     @id @default(cuid())
+  code         String     @unique
+  email        String     @unique
+  phone        String     @unique
+  passwordHash String
+  fullName     String
+  role         UserRole
+  status       UserStatus @default(ACTIVE)
+  lastLoginAt  DateTime?
+  createdById  String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  createdBy    User?  @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdUsers User[] @relation("UserCreatedBy")
+
+  sessions        Session[]
+  customerProfile CustomerProfile?
+  driverProfile   DriverProfile?
+  agentProfile    AgentProfile?
+  staffProfile    StaffProfile?
+  notifications   Notification[]
+  auditLogs       AuditLog[]
+
+  ordersPlaced          Order[]                @relation("OrderPlacedBy")
+  orderStatusChanges    OrderStatusHistory[]
+  deliveryStatusChanges DeliveryStatusHistory[]
+  deliveriesReconciled  Delivery[]             @relation("DeliveryReconciledBy")
+  inventoryMovements    InventoryMovement[]
+  adjustmentsRequested  InventoryAdjustment[]  @relation("AdjustmentRequestedBy")
+  adjustmentsReviewed   InventoryAdjustment[]  @relation("AdjustmentReviewedBy")
+  bottleLedgerEntries   CustomerBottleLedger[]
+  rewardLedgerEntries   RewardLedger[]
+  paymentsCollected     Payment[]              @relation("PaymentCollectedBy")
+  paymentsConfirmed     Payment[]              @relation("PaymentConfirmedBy")
+  paymentTransactions   PaymentTransaction[]
+  dispenserInstalls     DispenserInstallation[]
+  ownershipApprovals    DispenserPaymentPlan[] @relation("PlanOwnershipApprovedBy")
+  trackerAlertsAcked    TrackerAlert[]
+  settingsUpdated       SystemSetting[]
+  filesUploaded         StoredFile[]
+
+  @@index([role, status])
+  @@index([status])
+  @@map("users")
+}
+
+model Session {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  ipAddress  String?
+  userAgent  String?
+  lastSeenAt DateTime  @default(now())
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model CustomerProfile {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  customerCode         String   @unique
+  ghanaDigitalAddress  String?
+  latitude             Decimal? @db.Decimal(10, 7)
+  longitude            Decimal? @db.Decimal(10, 7)
+  referralCode         String   @unique
+  registeredByAgentId  String?
+  referredByCustomerId String?
+  takeawayBottlesBought Int     @default(0)
+  notes                String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  registeredByAgent  AgentProfile?    @relation(fields: [registeredByAgentId], references: [id], onDelete: SetNull)
+  referredByCustomer CustomerProfile? @relation("CustomerReferredBy", fields: [referredByCustomerId], references: [id], onDelete: SetNull)
+  referredCustomers  CustomerProfile[] @relation("CustomerReferredBy")
+
+  addresses          Address[]
+  orders             Order[]
+  dispensers         Dispenser[]
+  dispenserInstalls  DispenserInstallation[]
+  paymentPlans       DispenserPaymentPlan[]
+  payments           Payment[]
+  bottleBalance      CustomerBottleBalance?
+  bottleLedger       CustomerBottleLedger[]
+  rewardBalance      CustomerRewardBalance?
+  rewardLedger       RewardLedger[]
+  rewardRedemptions  RewardRedemption[]
+  referralsMade      Referral[]             @relation("ReferralReferrer")
+  referralReceived   Referral?              @relation("ReferralReferred")
+  inventoryMovements InventoryMovement[]
+
+  @@index([registeredByAgentId])
+  @@index([referredByCustomerId])
+  @@map("customer_profiles")
+}
+
+model DriverProfile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  driverCode         String   @unique
+  licenseNumber      String?
+  vehicleRegistration String?
+  vehicleType        String?
+  isAvailable        Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  deliveries         Delivery[]
+  inventoryMovements InventoryMovement[]
+
+  @@map("driver_profiles")
+}
+
+model AgentProfile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  agentCode      String   @unique
+  commissionRate Decimal  @default(0) @db.Decimal(5, 4)
+  region         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  registeredCustomers CustomerProfile[]
+  referrals           Referral[]
+
+  @@map("agent_profiles")
+}
+
+/// Administrators and managers share the same attributes, so they share one
+/// table discriminated by User.role (see BUSINESS_RULES.md assumption #9).
+model StaffProfile {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  staffCode  String   @unique
+  department String?
+  jobTitle   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("staff_profiles")
+}
+
+model Address {
+  id                  String              @id @default(cuid())
+  customerId          String
+  label               String
+  type                AddressType         @default(HOME)
+  contactName         String?
+  contactPhone        String?
+  ghanaDigitalAddress String?
+  addressLine         String
+  city                String
+  region              String?
+  landmark            String?
+  latitude            Decimal?            @db.Decimal(10, 7)
+  longitude           Decimal?            @db.Decimal(10, 7)
+  instruction         DeliveryInstruction @default(NONE)
+  instructionNotes    String?
+  isDefault           Boolean             @default(false)
+  isActive            Boolean             @default(true)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  customer   CustomerProfile         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  orders     Order[]
+  dispensers Dispenser[]
+  installs   DispenserInstallation[]
+
+  @@index([customerId, isActive])
+  @@map("addresses")
+}
+
+// ---------------------------------------------------------------------------
+// Catalogue
+// ---------------------------------------------------------------------------
+
+model Product {
+  id                     String      @id @default(cuid())
+  sku                    String      @unique
+  name                   String
+  description            String?
+  type                   ProductType
+  unitPrice              Decimal     @db.Decimal(14, 2)
+  unit                   String      @default("unit")
+  capacityLitres         Decimal?    @db.Decimal(10, 2)
+  /// Refillable containers create an empty-return obligation; take-away and
+  /// bulk products do not (requirements §8, §9).
+  requiresBottleExchange Boolean     @default(false)
+  isRewardEligible       Boolean     @default(false)
+  isActive               Boolean     @default(true)
+  imageObjectKey         String?
+  lowStockThreshold      Int?
+  sortOrder              Int         @default(0)
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+
+  orderItems         OrderItem[]
+  stockPositions     BottleStockPosition[]
+  inventoryMovements InventoryMovement[]
+  adjustments        InventoryAdjustment[]
+  rewardRedemptions  RewardRedemption[]
+
+  @@index([type, isActive])
+  @@map("products")
+}
+
+// ---------------------------------------------------------------------------
+// Orders
+// ---------------------------------------------------------------------------
+
+model Order {
+  id                   String              @id @default(cuid())
+  orderNumber          String              @unique
+  customerId           String
+  addressId            String?
+  status               OrderStatus         @default(PENDING)
+  paymentStatus        OrderPaymentStatus  @default(UNPAID)
+  source               OrderSource         @default(CUSTOMER_WEB)
+  placedByUserId       String?
+  subtotal             Decimal             @db.Decimal(14, 2)
+  deliveryFee          Decimal             @default(0) @db.Decimal(14, 2)
+  discountTotal        Decimal             @default(0) @db.Decimal(14, 2)
+  total                Decimal             @db.Decimal(14, 2)
+  amountPaid           Decimal             @default(0) @db.Decimal(14, 2)
+  currency             String              @default("GHS")
+  /// Empty refillable bottles the customer is expected to hand back.
+  expectedEmptyBottles Int                 @default(0)
+  scheduledFor         DateTime?
+  instruction          DeliveryInstruction @default(NONE)
+  instructionNotes     String?
+  confirmedAt          DateTime?
+  deliveredAt          DateTime?
+  cancelledAt          DateTime?
+  cancellationReason   String?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  customer     CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  address      Address?        @relation(fields: [addressId], references: [id], onDelete: SetNull)
+  placedByUser User?           @relation("OrderPlacedBy", fields: [placedByUserId], references: [id], onDelete: SetNull)
+
+  items              OrderItem[]
+  statusHistory      OrderStatusHistory[]
+  deliveries         Delivery[]
+  payments           Payment[]
+  inventoryMovements InventoryMovement[]
+  bottleLedger       CustomerBottleLedger[]
+  rewardRedemption   RewardRedemption?
+  rewardLedger       RewardLedger[]
+  qualifiedReferrals Referral[]
+
+  @@index([customerId, status])
+  @@index([status, createdAt])
+  @@index([paymentStatus])
+  @@index([createdAt])
+  @@index([scheduledFor])
+  @@map("orders")
+}
+
+model OrderItem {
+  id                     String  @id @default(cuid())
+  orderId                String
+  productId              String
+  productName            String
+  quantity               Int
+  unitPrice              Decimal @db.Decimal(14, 2)
+  lineTotal              Decimal @db.Decimal(14, 2)
+  isRewardItem           Boolean @default(false)
+  requiresBottleExchange Boolean @default(false)
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model OrderStatusHistory {
+  id              String      @id @default(cuid())
+  orderId         String
+  fromStatus      OrderStatus?
+  toStatus        OrderStatus
+  changedByUserId String?
+  reason          String?
+  createdAt       DateTime    @default(now())
+
+  order         Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  changedByUser User? @relation(fields: [changedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+  @@map("order_status_history")
+}
+
+// ---------------------------------------------------------------------------
+// Deliveries
+// ---------------------------------------------------------------------------
+
+model Delivery {
+  id                     String                 @id @default(cuid())
+  deliveryNumber         String                 @unique
+  orderId                String
+  driverId               String?
+  attemptNumber          Int                    @default(1)
+  status                 DeliveryStatus         @default(PENDING)
+  scheduledFor           DateTime?
+  assignedAt             DateTime?
+  dispatchedAt           DateTime?
+  completedAt            DateTime?
+  failedAt               DateTime?
+  failureReason          DeliveryFailureReason?
+  failureNotes           String?
+  remarks                String?
+  bottlesDispatched      Int                    @default(0)
+  bottlesDelivered       Int                    @default(0)
+  emptyBottlesExpected   Int                    @default(0)
+  emptyBottlesCollected  Int                    @default(0)
+  damagedBottlesReturned Int                    @default(0)
+  shortageQuantity       Int                    @default(0)
+  cashCollected          Decimal?               @db.Decimal(14, 2)
+  /// Set when a delivery fails; cleared only by an authorized reconciliation.
+  requiresReconciliation Boolean                @default(false)
+  reconciledAt           DateTime?
+  reconciledByUserId     String?
+  addressSnapshot        Json?
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+
+  order            Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  driver           DriverProfile? @relation(fields: [driverId], references: [id], onDelete: SetNull)
+  reconciledByUser User?          @relation("DeliveryReconciledBy", fields: [reconciledByUserId], references: [id], onDelete: SetNull)
+
+  statusHistory      DeliveryStatusHistory[]
+  inventoryMovements InventoryMovement[]
+  bottleLedger       CustomerBottleLedger[]
+  payments           Payment[]
+
+  @@unique([orderId, attemptNumber])
+  @@index([driverId, status])
+  @@index([status, scheduledFor])
+  @@index([requiresReconciliation])
+  @@index([completedAt])
+  @@map("deliveries")
+}
+
+model DeliveryStatusHistory {
+  id              String          @id @default(cuid())
+  deliveryId      String
+  fromStatus      DeliveryStatus?
+  toStatus        DeliveryStatus
+  changedByUserId String?
+  reason          String?
+  createdAt       DateTime        @default(now())
+
+  delivery      Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  changedByUser User?    @relation(fields: [changedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([deliveryId, createdAt])
+  @@map("delivery_status_history")
+}
+
+// ---------------------------------------------------------------------------
+// Inventory: append-only ledger + materialized positions
+// ---------------------------------------------------------------------------
+
+/// Append-only. Never updated or deleted. Stock is the sum of these rows.
+model InventoryMovement {
+  id                String                @id @default(cuid())
+  reference         String                @unique
+  movementType      InventoryMovementType
+  productId         String
+  quantity          Int
+  fromState         BottleState?
+  toState           BottleState?
+  driverId          String?
+  customerId        String?
+  orderId           String?
+  deliveryId        String?
+  adjustmentId      String?
+  performedByUserId String?
+  reason            String?
+  occurredAt        DateTime              @default(now())
+  createdAt         DateTime              @default(now())
+
+  product         Product              @relation(fields: [productId], references: [id], onDelete: Restrict)
+  driver          DriverProfile?       @relation(fields: [driverId], references: [id], onDelete: SetNull)
+  customer        CustomerProfile?     @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  order           Order?               @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  delivery        Delivery?            @relation(fields: [deliveryId], references: [id], onDelete: SetNull)
+  adjustment      InventoryAdjustment? @relation(fields: [adjustmentId], references: [id], onDelete: SetNull)
+  performedByUser User?                @relation(fields: [performedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([productId, occurredAt])
+  @@index([movementType, occurredAt])
+  @@index([driverId])
+  @@index([customerId])
+  @@index([deliveryId])
+  @@index([occurredAt])
+  @@map("inventory_movements")
+}
+
+/// Materialized quantity per (product, state, holder). The lock target for
+/// concurrent stock writes. holderId is "" for warehouse rows so the unique
+/// index behaves predictably (Postgres treats NULLs as distinct).
+model BottleStockPosition {
+  id         String          @id @default(cuid())
+  productId  String
+  state      BottleState
+  holderType StockHolderType @default(WAREHOUSE)
+  holderId   String          @default("")
+  quantity   Int             @default(0)
+  version    Int             @default(0)
+  updatedAt  DateTime        @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, state, holderType, holderId])
+  @@index([state])
+  @@index([holderType, holderId])
+  @@map("bottle_stock_positions")
+}
+
+model InventoryAdjustment {
+  id                String           @id @default(cuid())
+  reference         String           @unique
+  productId         String
+  state             BottleState
+  holderType        StockHolderType  @default(WAREHOUSE)
+  holderId          String           @default("")
+  previousQuantity  Int
+  newQuantity       Int
+  deltaQuantity     Int
+  reason            String
+  status            AdjustmentStatus @default(PENDING_APPROVAL)
+  requestedByUserId String
+  reviewedByUserId  String?
+  rejectionReason   String?
+  requestedAt       DateTime         @default(now())
+  reviewedAt        DateTime?
+  appliedAt         DateTime?
+
+  product         Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  requestedByUser User    @relation("AdjustmentRequestedBy", fields: [requestedByUserId], references: [id], onDelete: Restrict)
+  reviewedByUser  User?   @relation("AdjustmentReviewedBy", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+
+  movements InventoryMovement[]
+
+  @@index([status, requestedAt])
+  @@index([productId])
+  @@map("inventory_adjustments")
+}
+
+/// Locked cache of the customer's bottle position; the ledger is the truth.
+model CustomerBottleBalance {
+  id                  String   @id @default(cuid())
+  customerId          String   @unique
+  bottlesHeld         Int      @default(0)
+  outstandingShortage Int      @default(0)
+  lifetimeShortage    Int      @default(0)
+  lifetimeReturned    Int      @default(0)
+  version             Int      @default(0)
+  updatedAt           DateTime @updatedAt
+
+  customer CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([outstandingShortage])
+  @@map("customer_bottle_balances")
+}
+
+/// Append-only history of every change to a customer's bottle obligation.
+model CustomerBottleLedger {
+  id                String                @id @default(cuid())
+  customerId        String
+  entryType         BottleLedgerEntryType
+  /// Signed: positive increases the outstanding obligation, negative reduces it.
+  quantity          Int
+  deliveryId        String?
+  orderId           String?
+  paymentId         String?
+  reason            String?
+  performedByUserId String?
+  createdAt         DateTime              @default(now())
+
+  customer        CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  delivery        Delivery?       @relation(fields: [deliveryId], references: [id], onDelete: SetNull)
+  order           Order?          @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  payment         Payment?        @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  performedByUser User?           @relation(fields: [performedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([customerId, createdAt])
+  @@index([entryType])
+  @@map("customer_bottle_ledger")
+}
+
+// ---------------------------------------------------------------------------
+// Dispensers
+// ---------------------------------------------------------------------------
+
+model Dispenser {
+  id                String             @id @default(cuid())
+  assetTag          String             @unique
+  serialNumber      String             @unique
+  model             String
+  status            DispenserStatus    @default(AVAILABLE)
+  ownership         DispenserOwnership @default(COMPANY_OWNED)
+  maintenanceStatus MaintenanceStatus  @default(OK)
+  customerId        String?
+  addressId         String?
+  purchaseCost      Decimal            @db.Decimal(14, 2)
+  salePrice         Decimal            @db.Decimal(14, 2)
+  installedAt       DateTime?
+  retrievedAt       DateTime?
+  imageObjectKey    String?
+  notes             String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  customer CustomerProfile? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  address  Address?         @relation(fields: [addressId], references: [id], onDelete: SetNull)
+
+  installations DispenserInstallation[]
+  paymentPlans  DispenserPaymentPlan[]
+  trackerDevice TrackerDevice?
+
+  @@index([status])
+  @@index([ownership])
+  @@index([customerId])
+  @@map("dispensers")
+}
+
+model DispenserInstallation {
+  id               String    @id @default(cuid())
+  dispenserId      String
+  customerId       String
+  addressId        String?
+  installedAt      DateTime  @default(now())
+  removedAt        DateTime?
+  installedByUserId String
+  notes            String?
+
+  dispenser        Dispenser       @relation(fields: [dispenserId], references: [id], onDelete: Cascade)
+  customer         CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  address          Address?        @relation(fields: [addressId], references: [id], onDelete: SetNull)
+  installedByUser  User            @relation(fields: [installedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([dispenserId])
+  @@index([customerId])
+  @@map("dispenser_installations")
+}
+
+model DispenserPaymentPlan {
+  id                         String                @id @default(cuid())
+  planNumber                 String                @unique
+  dispenserId                String
+  customerId                 String
+  totalCost                  Decimal               @db.Decimal(14, 2)
+  initialPayment             Decimal               @default(0) @db.Decimal(14, 2)
+  installmentAmount          Decimal               @db.Decimal(14, 2)
+  frequency                  InstallmentFrequency  @default(MONTHLY)
+  totalInstallments          Int
+  amountPaid                 Decimal               @default(0) @db.Decimal(14, 2)
+  outstandingBalance         Decimal               @db.Decimal(14, 2)
+  status                     InstallmentPlanStatus @default(PENDING)
+  startDate                  DateTime
+  nextPaymentDate            DateTime?
+  completedAt                DateTime?
+  /// Set when the balance reaches zero. Ownership still needs approval.
+  ownershipEligibleAt        DateTime?
+  ownershipTransferredAt     DateTime?
+  ownershipApprovedByUserId  String?
+  version                    Int                   @default(0)
+  createdAt                  DateTime              @default(now())
+  updatedAt                  DateTime              @updatedAt
+
+  dispenser             Dispenser       @relation(fields: [dispenserId], references: [id], onDelete: Restrict)
+  customer              CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  ownershipApprovedBy   User?           @relation("PlanOwnershipApprovedBy", fields: [ownershipApprovedByUserId], references: [id], onDelete: SetNull)
+
+  installments DispenserInstallment[]
+  payments     Payment[]
+
+  @@index([customerId, status])
+  @@index([status, nextPaymentDate])
+  @@index([dispenserId])
+  @@map("dispenser_payment_plans")
+}
+
+model DispenserInstallment {
+  id          String            @id @default(cuid())
+  planId      String
+  sequence    Int
+  dueDate     DateTime
+  amountDue   Decimal           @db.Decimal(14, 2)
+  amountPaid  Decimal           @default(0) @db.Decimal(14, 2)
+  status      InstallmentStatus @default(PENDING)
+  paidAt      DateTime?
+  overdueDays Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  plan     DispenserPaymentPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  payments Payment[]
+
+  @@unique([planId, sequence])
+  @@index([status, dueDate])
+  @@index([dueDate])
+  @@map("dispenser_installments")
+}
+
+// ---------------------------------------------------------------------------
+// Payments: intent record + append-only transaction ledger
+// ---------------------------------------------------------------------------
+
+model Payment {
+  id                 String         @id @default(cuid())
+  reference          String         @unique
+  customerId         String
+  purpose            PaymentPurpose
+  orderId            String?
+  deliveryId         String?
+  planId             String?
+  installmentId      String?
+  amount             Decimal        @db.Decimal(14, 2)
+  currency           String         @default("GHS")
+  method             PaymentMethod
+  provider           String         @default("manual")
+  status             PaymentStatus  @default(PENDING)
+  providerReference  String?
+  idempotencyKey     String?        @unique
+  collectedByUserId  String?
+  confirmedByUserId  String?
+  confirmedAt        DateTime?
+  evidenceObjectKey  String?
+  notes              String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  customer        CustomerProfile       @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  order           Order?                @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  delivery        Delivery?             @relation(fields: [deliveryId], references: [id], onDelete: SetNull)
+  plan            DispenserPaymentPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+  installment     DispenserInstallment? @relation(fields: [installmentId], references: [id], onDelete: SetNull)
+  collectedByUser User?                 @relation("PaymentCollectedBy", fields: [collectedByUserId], references: [id], onDelete: SetNull)
+  confirmedByUser User?                 @relation("PaymentConfirmedBy", fields: [confirmedByUserId], references: [id], onDelete: SetNull)
+
+  transactions PaymentTransaction[]
+  bottleLedger CustomerBottleLedger[]
+
+  @@unique([provider, providerReference])
+  @@index([customerId, status])
+  @@index([status, createdAt])
+  @@index([purpose])
+  @@index([method])
+  @@index([createdAt])
+  @@map("payments")
+}
+
+/// Append-only financial ledger. Reversals and refunds are entries here, never
+/// edits or deletes of the original (requirements §19, §29.9).
+model PaymentTransaction {
+  id                String            @id @default(cuid())
+  paymentId         String
+  type              TransactionType
+  /// Signed: PAYMENT is positive, REVERSAL and REFUND are negative.
+  amount            Decimal           @db.Decimal(14, 2)
+  status            TransactionStatus @default(SUCCESSFUL)
+  providerReference String?
+  performedByUserId String?
+  reason            String?
+  providerPayload   Json?
+  createdAt         DateTime          @default(now())
+
+  payment         Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  performedByUser User?   @relation(fields: [performedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([paymentId, createdAt])
+  @@index([type])
+  @@map("payment_transactions")
+}
+
+// ---------------------------------------------------------------------------
+// Referrals and rewards
+// ---------------------------------------------------------------------------
+
+model Referral {
+  id                 String         @id @default(cuid())
+  code               String
+  referrerCustomerId String
+  /// Unique: a customer can be referred once, permanently.
+  referredCustomerId String         @unique
+  agentId            String?
+  status             ReferralStatus @default(PENDING)
+  qualifyingOrderId  String?
+  qualifiedAt        DateTime?
+  reversedAt         DateTime?
+  reversalReason     String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  referrerCustomer CustomerProfile @relation("ReferralReferrer", fields: [referrerCustomerId], references: [id], onDelete: Cascade)
+  referredCustomer CustomerProfile @relation("ReferralReferred", fields: [referredCustomerId], references: [id], onDelete: Cascade)
+  agent            AgentProfile?   @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  qualifyingOrder  Order?          @relation(fields: [qualifyingOrderId], references: [id], onDelete: SetNull)
+
+  rewardLedger RewardLedger[]
+
+  @@index([referrerCustomerId, status])
+  @@index([status])
+  @@index([agentId])
+  @@map("referrals")
+}
+
+/// Locked cache of reward entitlement; RewardLedger is the truth.
+model CustomerRewardBalance {
+  id         String   @id @default(cuid())
+  customerId String   @unique
+  earned     Int      @default(0)
+  redeemed   Int      @default(0)
+  reversed   Int      @default(0)
+  adjusted   Int      @default(0)
+  available  Int      @default(0)
+  version    Int      @default(0)
+  updatedAt  DateTime @updatedAt
+
+  customer CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("customer_reward_balances")
+}
+
+model RewardLedger {
+  id                String           @id @default(cuid())
+  customerId        String
+  type              RewardLedgerType
+  /// Signed: EARNED positive, REDEEMED and REVERSED negative.
+  quantity          Int
+  referralId        String?
+  orderId           String?
+  redemptionId      String?
+  reason            String?
+  performedByUserId String?
+  createdAt         DateTime         @default(now())
+
+  customer        CustomerProfile   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  referral        Referral?         @relation(fields: [referralId], references: [id], onDelete: SetNull)
+  order           Order?            @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  redemption      RewardRedemption? @relation(fields: [redemptionId], references: [id], onDelete: SetNull)
+  performedByUser User?             @relation(fields: [performedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([customerId, createdAt])
+  @@index([type])
+  @@map("reward_ledger")
+}
+
+model RewardRedemption {
+  id         String   @id @default(cuid())
+  customerId String
+  /// Unique: one reward redemption per order, enforced by the database.
+  orderId    String   @unique
+  productId  String
+  quantity   Int
+  createdAt  DateTime @default(now())
+
+  customer CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  order    Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product  Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  rewardLedger RewardLedger[]
+
+  @@index([customerId])
+  @@map("reward_redemptions")
+}
+
+// ---------------------------------------------------------------------------
+// Notifications
+// ---------------------------------------------------------------------------
+
+model Notification {
+  id         String               @id @default(cuid())
+  userId     String
+  category   NotificationCategory
+  severity   NotificationSeverity @default(INFO)
+  channel    NotificationChannel  @default(IN_APP)
+  status     NotificationStatus   @default(SENT)
+  title      String
+  body       String
+  entityType String?
+  entityId   String?
+  actionUrl  String?
+  readAt     DateTime?
+  sentAt     DateTime?
+  meta       Json?
+  createdAt  DateTime             @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+  @@index([category])
+  @@map("notifications")
+}
+
+// ---------------------------------------------------------------------------
+// Smart dispenser tracking (Phase 1: schema + UI only, no live hardware)
+// ---------------------------------------------------------------------------
+
+model TrackerDevice {
+  id                String    @id @default(cuid())
+  deviceCode        String    @unique
+  dispenserId       String?   @unique
+  simNumber         String?
+  /// True for seeded demonstration devices. Phase 1 ships no real hardware.
+  isSimulated       Boolean   @default(true)
+  isOnline          Boolean   @default(false)
+  batteryPercent    Int?
+  waterLevelPercent Int?
+  latitude          Decimal?  @db.Decimal(10, 7)
+  longitude         Decimal?  @db.Decimal(10, 7)
+  lastRefillAt      DateTime?
+  lastSeenAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  dispenser Dispenser? @relation(fields: [dispenserId], references: [id], onDelete: SetNull)
+
+  readings TrackerReading[]
+  alerts   TrackerAlert[]
+
+  @@index([isOnline])
+  @@map("tracker_devices")
+}
+
+model TrackerReading {
+  id                String   @id @default(cuid())
+  deviceId          String
+  recordedAt        DateTime @default(now())
+  waterLevelPercent Int?
+  dailyUsageLitres  Decimal? @db.Decimal(10, 2)
+  latitude          Decimal? @db.Decimal(10, 7)
+  longitude         Decimal? @db.Decimal(10, 7)
+  batteryPercent    Int?
+  isOnline          Boolean  @default(true)
+
+  device TrackerDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId, recordedAt])
+  @@map("tracker_readings")
+}
+
+model TrackerAlert {
+  id                  String               @id @default(cuid())
+  deviceId            String
+  type                TrackerAlertType
+  severity            NotificationSeverity @default(WARNING)
+  message             String
+  isResolved          Boolean              @default(false)
+  acknowledgedAt      DateTime?
+  acknowledgedByUserId String?
+  resolvedAt          DateTime?
+  createdAt           DateTime             @default(now())
+
+  device              TrackerDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  acknowledgedByUser  User?         @relation(fields: [acknowledgedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([deviceId, isResolved])
+  @@index([isResolved, createdAt])
+  @@map("tracker_alerts")
+}
+
+// ---------------------------------------------------------------------------
+// Audit, settings, files
+// ---------------------------------------------------------------------------
+
+/// Append-only. Not editable through ordinary application operations.
+model AuditLog {
+  id             String   @id @default(cuid())
+  userId         String?
+  action         String
+  entityType     String
+  entityId       String?
+  previousValues Json?
+  newValues      Json?
+  reason         String?
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([userId, createdAt])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model SystemSetting {
+  id              String           @id @default(cuid())
+  key             String           @unique
+  value           Json
+  valueType       SettingValueType @default(STRING)
+  category        String           @default("general")
+  label           String
+  description     String?
+  isEditable      Boolean          @default(true)
+  updatedByUserId String?
+  updatedAt       DateTime         @updatedAt
+  createdAt       DateTime         @default(now())
+
+  updatedByUser User? @relation(fields: [updatedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([category])
+  @@map("system_settings")
+}
+
+model StoredFile {
+  id               String         @id @default(cuid())
+  objectKey        String         @unique
+  bucket           String
+  originalName     String
+  contentType      String
+  size             Int
+  visibility       FileVisibility @default(PRIVATE)
+  entityType       String?
+  entityId         String?
+  uploadedByUserId String?
+  createdAt        DateTime       @default(now())
+
+  uploadedByUser User? @relation(fields: [uploadedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@map("stored_files")
+}
