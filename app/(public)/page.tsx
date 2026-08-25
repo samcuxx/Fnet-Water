@@ -505,85 +505,93 @@ export default function HomePage() {
           </div>
 
           <div className="mt-12 grid gap-6 sm:gap-7 lg:mt-16 lg:grid-cols-3 lg:gap-8">
-            {PRICING.map(({ name, price, unit, note, features, featured }) => (
-              <article
-                key={name}
-                className={`relative flex flex-col bg-white px-7 pb-8 pt-0 sm:px-8 sm:pb-9 ${
-                  featured
-                    ? "border-2 border-[#0056D2] shadow-[0_18px_40px_-28px_rgba(0,86,210,0.45)]"
-                    : "border border-slate-300 shadow-[0_12px_28px_-24px_rgba(15,23,42,0.35)]"
-                }`}
-              >
-                {/* Classic top rail */}
-                <div
-                  className={`mx-auto h-1 w-16 ${
-                    featured ? "bg-[#0056D2]" : "bg-slate-300"
-                  }`}
-                  aria-hidden
-                />
+            {PRICING.map(({ name, price, unit, note, features, featured }) => {
+              const ctaLabel =
+                price === "Custom" ? "Request a quote" : "Order now";
 
-                <div className="mt-7 text-center">
-                  {featured ? (
-                    <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#0056D2]">
-                      Most popular
-                    </p>
-                  ) : (
-                    <div className="mb-3 h-[15px]" aria-hidden />
-                  )}
-
-                  <h3 className="text-lg font-semibold tracking-tight text-[#0A1931]">
-                    {name}
-                  </h3>
-
-                  <p className="mt-5 text-[2rem] font-bold tracking-tight text-[#0A1931] sm:text-[2.25rem]">
-                    {price}
-                  </p>
-                  <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                    {unit}
-                  </p>
-
-                  <div
-                    className="mx-auto mt-5 flex w-full max-w-[9rem] items-center gap-2"
-                    aria-hidden
-                  >
-                    <span className="h-px flex-1 bg-slate-200" />
-                    <span className="size-1 rotate-45 bg-[#0056D2]/50" />
-                    <span className="h-px flex-1 bg-slate-200" />
-                  </div>
-
-                  <p className="mx-auto mt-5 max-w-[16rem] text-sm leading-relaxed text-slate-500">
-                    {note}
-                  </p>
-                </div>
-
-                <ul className="mt-7 flex-1 space-y-3.5 border-t border-slate-200 pt-6">
-                  {features.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-3 text-sm text-slate-600"
-                    >
-                      <Check
-                        className="mt-0.5 size-4 shrink-0 text-[#0056D2]"
-                        strokeWidth={2.25}
-                        aria-hidden
-                      />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-
+              return (
                 <Link
+                  key={name}
                   href="/register"
-                  className={`mt-8 inline-flex h-11 w-full items-center justify-center text-sm font-semibold tracking-wide transition-colors ${
+                  aria-label={`${name} — ${price}. ${ctaLabel}`}
+                  className={`group relative flex flex-col bg-white px-7 pb-8 pt-0 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056D2] sm:px-8 sm:pb-9 ${
                     featured
-                      ? "bg-[#0056D2] text-white hover:bg-[#0047b0]"
-                      : "border border-[#0A1931] text-[#0A1931] hover:border-[#0056D2] hover:text-[#0056D2]"
+                      ? "border-2 border-[#0056D2] shadow-[0_18px_40px_-28px_rgba(0,86,210,0.45)] hover:shadow-[0_22px_48px_-24px_rgba(0,86,210,0.5)]"
+                      : "border border-slate-300 shadow-[0_12px_28px_-24px_rgba(15,23,42,0.35)] hover:border-[#0056D2]/40 hover:shadow-[0_16px_36px_-22px_rgba(15,23,42,0.4)]"
                   }`}
                 >
-                  {price === "Custom" ? "Request a quote" : "Order now"}
+                  {/* Classic top rail */}
+                  <div
+                    className={`mx-auto h-1 w-16 transition-colors duration-200 ${
+                      featured
+                        ? "bg-[#0056D2]"
+                        : "bg-slate-300 group-hover:bg-[#0056D2]/60"
+                    }`}
+                    aria-hidden
+                  />
+
+                  <div className="mt-7 text-center">
+                    {featured ? (
+                      <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#0056D2]">
+                        Most popular
+                      </p>
+                    ) : (
+                      <div className="mb-3 h-[15px]" aria-hidden />
+                    )}
+
+                    <h3 className="text-lg font-semibold tracking-tight text-[#0A1931]">
+                      {name}
+                    </h3>
+
+                    <p className="mt-5 text-[2rem] font-bold tracking-tight text-[#0A1931] sm:text-[2.25rem]">
+                      {price}
+                    </p>
+                    <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                      {unit}
+                    </p>
+
+                    <div
+                      className="mx-auto mt-5 flex w-full max-w-[9rem] items-center gap-2"
+                      aria-hidden
+                    >
+                      <span className="h-px flex-1 bg-slate-200" />
+                      <span className="size-1 rotate-45 bg-[#0056D2]/50" />
+                      <span className="h-px flex-1 bg-slate-200" />
+                    </div>
+
+                    <p className="mx-auto mt-5 max-w-[16rem] text-sm leading-relaxed text-slate-500">
+                      {note}
+                    </p>
+                  </div>
+
+                  <ul className="mt-7 flex-1 space-y-3.5 border-t border-slate-200 pt-6">
+                    {features.map((item) => (
+                      <li
+                        key={item}
+                        className="flex items-start gap-3 text-sm text-slate-600"
+                      >
+                        <Check
+                          className="mt-0.5 size-4 shrink-0 text-[#0056D2]"
+                          strokeWidth={2.25}
+                          aria-hidden
+                        />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <span
+                    className={`mt-8 inline-flex h-11 w-full items-center justify-center text-sm font-semibold tracking-wide transition-colors ${
+                      featured
+                        ? "bg-[#0056D2] text-white group-hover:bg-[#0047b0]"
+                        : "border border-[#0A1931] text-[#0A1931] group-hover:border-[#0056D2] group-hover:text-[#0056D2]"
+                    }`}
+                  >
+                    {ctaLabel}
+                  </span>
                 </Link>
-              </article>
-            ))}
+              );
+            })}
           </div>
 
           <p className="mx-auto mt-8 max-w-xl text-center text-sm text-slate-500">
