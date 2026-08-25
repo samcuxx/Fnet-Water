@@ -16,8 +16,6 @@ import {
   Users,
 } from "lucide-react";
 
-import { buttonClasses } from "@/components/ui";
-
 const IMAGES = {
   /**
    * Full-bleed hero section background.
@@ -31,9 +29,9 @@ const IMAGES = {
   statsBg: "/landing/stats-bg.jpg",
   /**
    * Delivery person holding a jug for the CTA card.
-   * Source: public/landing/cta-delivery.jpg
+   * Source: public/landing/cta-delivery-v2.jpg (white studio background)
    */
-  ctaDelivery: "/landing/cta-delivery.jpg",
+  ctaDelivery: "/landing/cta-delivery-v2.jpg",
   dispenser:
     "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=85",
 } as const;
@@ -118,18 +116,33 @@ const PRICING = [
   {
     name: "Refillable 20L",
     price: "GH₵ 25",
-    note: "Per filled bottle · empties returned",
+    unit: "per filled bottle",
+    note: "Ideal for homes and small offices. Empties returned on the next delivery.",
+    features: ["Bottle exchange tracking", "Scheduled delivery", "Mobile Money & cash"],
+    featured: false,
   },
   {
     name: "Take-away pack",
     price: "From GH₵ 8",
-    note: "500ml & 1.5L packs available",
+    unit: "500ml & 1.5L packs",
+    note: "Convenient packs for events, travel and everyday hydration.",
+    features: ["Multiple pack sizes", "Same-day slots", "Easy reordering"],
+    featured: true,
   },
   {
     name: "Bulk supply",
     price: "Custom",
-    note: "Homes, offices & institutions",
+    unit: "quote on request",
+    note: "Reliable volume supply for institutions, estates and businesses.",
+    features: ["Volume pricing", "Dedicated scheduling", "Account management"],
+    featured: false,
   },
+] as const;
+
+const ABOUT_PILLARS = [
+  { label: "Our promise", text: "Clean, safe water — delivered with care every time." },
+  { label: "Our platform", text: "Orders, bottles, payments and rewards in one place." },
+  { label: "Our people", text: "Drivers, agents and managers working as one team." },
 ] as const;
 
 export default function HomePage() {
@@ -138,9 +151,8 @@ export default function HomePage() {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section
         id="home"
-        className="relative overflow-hidden bg-[#eaf3ff]"
+        className="relative min-h-[min(88dvh,40rem)] overflow-hidden bg-[#eaf3ff] sm:min-h-0"
       >
-        {/* Full-section background — replace public/landing/hero.png later */}
         <Image
           src={IMAGES.hero}
           alt=""
@@ -148,50 +160,54 @@ export default function HomePage() {
           priority
           unoptimized
           sizes="100vw"
-          className="object-cover object-[72%_center] sm:object-right"
+          className="object-cover object-[80%_center] sm:object-right"
           aria-hidden
         />
-        {/* Soft left wash for text only — products stay sharp on the right */}
+        {/* Stronger wash on phones so copy stays readable over the products */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-0 w-[min(100%,36rem)] bg-gradient-to-r from-white/70 via-white/35 to-transparent"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/90 via-white/80 to-white/60 sm:bg-none"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 hidden bg-gradient-to-r from-white/75 via-white/35 to-transparent sm:block"
         />
 
-        <div className="relative mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24 xl:py-28">
+        <div className="relative mx-auto flex w-full max-w-7xl flex-col justify-center px-4 py-12 pb-16 sm:px-6 sm:py-16 lg:px-8 lg:py-24 xl:py-28">
           <div className="max-w-xl">
-            <h1 className="text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-[3.5rem]">
+            <h1 className="text-[2.15rem] font-bold leading-[1.12] tracking-tight sm:text-5xl lg:text-[3.5rem]">
               <span className="block text-[#0A1931]">Pure Water.</span>
               <span className="block text-[#0A1931]">Delivered.</span>
               <span className="block text-[#0056D2]">Every Time.</span>
             </h1>
 
-            <p className="mt-5 max-w-md text-base leading-relaxed text-[#4A5568] sm:text-lg">
+            <p className="mt-4 max-w-md text-[15px] leading-relaxed text-[#4A5568] sm:mt-5 sm:text-lg">
               F Net Water Hub provides clean, safe and reliable water delivery
               at your convenience. Order, track and manage all your water needs
               in one place.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
               <Link
                 href="/register"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[#0056D2] px-6 text-base font-semibold text-white transition-colors hover:bg-[#0047b0]"
+                className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#0056D2] px-6 text-base font-semibold text-white transition-colors hover:bg-[#0047b0] sm:w-auto sm:rounded-lg"
               >
                 Order Water Now
                 <ArrowRight className="size-4" aria-hidden />
               </Link>
               <Link
                 href="/register"
-                className="inline-flex h-12 items-center justify-center rounded-lg border border-[#0056D2] bg-white/90 px-6 text-base font-semibold text-[#0056D2] backdrop-blur-sm transition-colors hover:bg-white"
+                className="inline-flex h-12 w-full items-center justify-center rounded-xl border border-[#0056D2] bg-white/95 px-6 text-base font-semibold text-[#0056D2] transition-colors hover:bg-white sm:w-auto sm:rounded-lg"
               >
                 Create Account
               </Link>
             </div>
 
-            <ul className="mt-9 flex flex-wrap gap-x-7 gap-y-3">
+            <ul className="mt-8 grid grid-cols-1 gap-3 sm:mt-9 sm:flex sm:flex-wrap sm:gap-x-7 sm:gap-y-3">
               {HERO_TRUST.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
-                  className="flex items-center gap-2 text-sm font-medium text-[#4A5568]"
+                  className="flex items-center gap-2.5 text-sm font-medium text-[#4A5568]"
                 >
                   <Icon className="size-4 shrink-0 text-[#0056D2]" aria-hidden />
                   {label}
@@ -203,30 +219,30 @@ export default function HomePage() {
       </section>
 
       {/* ── Why Choose Us ────────────────────────────────────────────────── */}
-      <section id="services" className="scroll-mt-24 bg-white py-16 sm:py-20 lg:py-24">
+      <section id="services" className="scroll-mt-20 bg-white py-12 sm:scroll-mt-24 sm:py-20 lg:py-24">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
               Why choose F Net Water Hub?
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-[#0A1931] sm:text-4xl">
+            <h2 className="mt-3 text-[1.65rem] font-bold tracking-tight text-[#0A1931] sm:text-4xl">
               Quality Water. Exceptional Service.
             </h2>
           </div>
 
-          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4 xl:gap-5">
+          <div className="mt-8 grid gap-4 sm:mt-12 sm:grid-cols-2 sm:gap-5 lg:grid-cols-5 lg:gap-4 xl:gap-5">
             {FEATURES.map(({ icon: Icon, title, body }) => (
               <article
                 key={title}
-                className="rounded-2xl border border-slate-200/80 bg-white px-5 py-8 text-center shadow-[0_4px_20px_-8px_rgba(15,23,42,0.12)] transition-shadow hover:shadow-[0_12px_28px_-12px_rgba(0,86,210,0.22)]"
+                className="rounded-2xl border border-slate-200/80 bg-white px-5 py-6 text-center shadow-[0_4px_20px_-8px_rgba(15,23,42,0.12)] sm:py-8"
               >
-                <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-[#E8F1FF] text-[#0056D2]">
-                  <Icon className="size-6 stroke-[1.75]" aria-hidden />
+                <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#E8F1FF] text-[#0056D2] sm:size-14">
+                  <Icon className="size-5 stroke-[1.75] sm:size-6" aria-hidden />
                 </span>
-                <h3 className="mt-5 text-[0.95rem] font-bold leading-snug text-[#0A1931]">
+                <h3 className="mt-4 text-[0.95rem] font-bold leading-snug text-[#0A1931] sm:mt-5">
                   {title}
                 </h3>
-                <p className="mt-2.5 text-[13px] leading-relaxed text-slate-500">
+                <p className="mt-2 text-[13px] leading-relaxed text-slate-500 sm:mt-2.5">
                   {body}
                 </p>
               </article>
@@ -238,20 +254,19 @@ export default function HomePage() {
       {/* ── How It Works ─────────────────────────────────────────────────── */}
       <section
         id="how-it-works"
-        className="scroll-mt-24 bg-white py-16 sm:py-20 lg:py-24"
+        className="scroll-mt-20 bg-white py-12 sm:scroll-mt-24 sm:py-20 lg:py-24"
       >
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
               How it works
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-[#0A1931] sm:text-4xl">
+            <h2 className="mt-3 text-[1.65rem] font-bold tracking-tight text-[#0A1931] sm:text-4xl">
               Ordering water has never been this easy
             </h2>
           </div>
 
-          <ol className="relative mt-14 grid gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
-            {/* Dashed connector with arrow tips — desktop only */}
+          <ol className="relative mt-10 grid gap-10 sm:mt-14 sm:grid-cols-2 sm:gap-12 lg:grid-cols-4 lg:gap-4">
             <div
               aria-hidden
               className="pointer-events-none absolute left-[12.5%] right-[12.5%] top-10 hidden items-center lg:flex"
@@ -266,16 +281,16 @@ export default function HomePage() {
             {STEPS.map(({ no, title, body, Icon, iconWrap, badge }) => (
               <li key={no} className="relative z-10 text-center">
                 <span
-                  className={`mx-auto flex size-[4.75rem] items-center justify-center rounded-full ${iconWrap}`}
+                  className={`mx-auto flex size-16 items-center justify-center rounded-full sm:size-[4.75rem] ${iconWrap}`}
                 >
-                  <Icon className="size-8 stroke-[1.75]" aria-hidden />
+                  <Icon className="size-7 stroke-[1.75] sm:size-8" aria-hidden />
                 </span>
                 <p
-                  className={`mt-5 inline-flex size-7 items-center justify-center rounded-full text-xs font-bold text-white ${badge}`}
+                  className={`mt-4 inline-flex size-7 items-center justify-center rounded-full text-xs font-bold text-white sm:mt-5 ${badge}`}
                 >
                   {no}
                 </p>
-                <h3 className="mt-3 text-lg font-bold text-[#0A1931]">
+                <h3 className="mt-3 text-base font-bold text-[#0A1931] sm:text-lg">
                   {title}
                 </h3>
                 <p className="mx-auto mt-2 max-w-[16rem] text-sm leading-relaxed text-slate-500">
@@ -288,21 +303,19 @@ export default function HomePage() {
       </section>
 
       {/* ── Stats + CTA (mockup band) ─────────────────────────────────────── */}
-      <section id="contact" className="scroll-mt-24">
-        {/* Stats band — background is a replaceable image */}
-        <div className="relative overflow-hidden bg-[#003A8C] pb-28 pt-16 text-white sm:pb-32 sm:pt-20">
+      <section id="contact" className="scroll-mt-20 sm:scroll-mt-24">
+        <div className="relative overflow-hidden bg-[#003A8C] py-12 text-white sm:py-20">
           <Image
             src={IMAGES.statsBg}
             alt=""
             fill
             unoptimized
             sizes="100vw"
-            className="object-cover object-right"
+            className="object-cover object-[70%_center] sm:object-right"
             aria-hidden
           />
-          {/* Light left/center wash for white text — jug stays crisp on the right */}
           <div
-            className="absolute inset-0 bg-gradient-to-r from-[#003A8C]/55 via-[#0056D2]/25 to-transparent"
+            className="absolute inset-0 bg-[#003A8C]/70 sm:bg-gradient-to-r sm:from-[#003A8C]/55 sm:via-[#0056D2]/25 sm:to-transparent"
             aria-hidden
           />
 
@@ -310,86 +323,94 @@ export default function HomePage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/85">
               Trusted by thousands
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="mt-3 text-[1.65rem] font-bold tracking-tight sm:text-4xl">
               Delivering Happiness Every Day
             </h2>
 
-            <div className="mt-12 grid grid-cols-2 gap-y-10 lg:grid-cols-4 lg:gap-0">
+            <div className="mt-8 grid grid-cols-2 gap-y-8 sm:mt-12 sm:gap-y-10 lg:grid-cols-4 lg:gap-0">
               {STATS.map(({ value, label, icon: Icon }, index) => (
                 <div
                   key={label}
-                  className={`flex flex-col items-center px-4 ${
+                  className={`flex flex-col items-center px-2 sm:px-4 ${
                     index < STATS.length - 1
                       ? "lg:border-r lg:border-white/25"
                       : ""
                   }`}
                 >
-                  <Icon className="size-7 stroke-[1.5] text-white" aria-hidden />
-                  <p className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                  <Icon className="size-6 stroke-[1.5] text-white sm:size-7" aria-hidden />
+                  <p className="mt-3 text-2xl font-bold tracking-tight sm:mt-4 sm:text-4xl">
                     {value}
                   </p>
-                  <p className="mt-1 text-sm text-white/90">{label}</p>
+                  <p className="mt-1 text-xs text-white/90 sm:text-sm">{label}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Overlapping CTA card */}
-        <div className="relative z-10 -mt-20 bg-white pb-16 sm:-mt-24 sm:pb-20">
+        <div className="border-t border-slate-200/80 bg-[#fafbfc] py-14 sm:py-20">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="overflow-hidden rounded-t-[1.75rem] border border-slate-100 bg-white shadow-[0_24px_48px_-24px_rgba(15,23,42,0.28)] sm:rounded-[1.75rem]">
-              <div className="grid items-stretch lg:grid-cols-[1.05fr_0.85fr_0.95fr]">
-                <div className="flex flex-col justify-center p-8 sm:p-10 lg:p-12">
-                  <h2 className="text-3xl font-bold tracking-tight text-[#0A1931] sm:text-4xl">
-                    Ready to get started?
-                  </h2>
-                  <p className="mt-4 max-w-sm text-base leading-relaxed text-slate-500">
-                    Join thousands of satisfied customers and experience the
-                    best water delivery service.
-                  </p>
-                  <div className="mt-8 flex flex-wrap gap-3">
-                    <Link
-                      href="/register"
-                      className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[#0056D2] px-6 text-base font-semibold text-white transition-colors hover:bg-[#0047b0]"
-                    >
-                      Create Your Account
-                      <ArrowRight className="size-4" aria-hidden />
-                    </Link>
-                    <Link
-                      href="#about"
-                      className="inline-flex h-12 items-center justify-center rounded-lg border border-[#0056D2] bg-white px-6 text-base font-semibold text-[#0056D2] transition-colors hover:bg-[#0056D2]/5"
-                    >
-                      Learn More
-                    </Link>
-                  </div>
-                </div>
+            <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#0056D2]">
+                  Get started
+                </p>
+                <h2 className="mt-3 text-[1.75rem] font-bold tracking-tight text-[#0A1931] sm:text-4xl">
+                  Ready when you are
+                </h2>
+                <div className="mt-5 h-px w-12 bg-[#0056D2]/40" aria-hidden />
+                <p className="mt-6 max-w-md text-[15px] leading-relaxed text-slate-600 sm:text-base sm:leading-8">
+                  Open an account, place your first order, and let our team
+                  handle the rest — clear pricing, reliable delivery, and
+                  careful service from the first bottle onward.
+                </p>
 
-                <div className="relative min-h-[280px] bg-black lg:min-h-[360px]">
-                  <Image
-                    src={IMAGES.ctaDelivery}
-                    alt="F Net delivery professional with a water jug"
-                    fill
-                    unoptimized
-                    sizes="(max-width: 1024px) 100vw, 30vw"
-                    className="object-cover object-center"
-                  />
-                </div>
-
-                <div className="flex items-center justify-center p-8 sm:p-10">
-                  <div className="w-full max-w-xs rounded-2xl border border-slate-100 bg-white p-6 shadow-[0_12px_32px_-16px_rgba(15,23,42,0.25)]">
-                    <span className="flex size-12 items-center justify-center rounded-full bg-[#E8F1FF] text-[#0056D2]">
-                      <ShieldCheck className="size-6" aria-hidden />
-                    </span>
-                    <h3 className="mt-4 text-lg font-bold text-[#0A1931]">
-                      100% Satisfaction
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-500">
-                      We are committed to providing you the best water delivery
-                      experience.
+                <ul className="mt-8 divide-y divide-slate-200 border-y border-slate-200">
+                  <li className="grid gap-1 py-4 sm:grid-cols-[7.5rem_1fr] sm:gap-6 sm:py-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#0056D2]">
+                      Promise
                     </p>
-                  </div>
+                    <p className="text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+                      100% satisfaction commitment on every delivery.
+                    </p>
+                  </li>
+                  <li className="grid gap-1 py-4 sm:grid-cols-[7.5rem_1fr] sm:gap-6 sm:py-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#0056D2]">
+                      Support
+                    </p>
+                    <p className="text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+                      Local team ready to help with orders, schedules and plans.
+                    </p>
+                  </li>
+                </ul>
+
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <Link
+                    href="/register"
+                    className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#0056D2] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#0047b0] sm:w-auto"
+                  >
+                    Create your account
+                    <ArrowRight className="size-4" aria-hidden />
+                  </Link>
+                  <Link
+                    href="#about"
+                    className="inline-flex h-11 w-full items-center justify-center rounded-lg border border-slate-300 px-6 text-sm font-semibold text-[#0A1931] transition-colors hover:border-[#0056D2] hover:text-[#0056D2] sm:w-auto"
+                  >
+                    Learn more
+                  </Link>
                 </div>
+              </div>
+
+              <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+                <Image
+                  src={IMAGES.ctaDelivery}
+                  alt="F Net delivery professional with a water jug"
+                  width={720}
+                  height={900}
+                  unoptimized
+                  sizes="(max-width: 1024px) 100vw, 45vw"
+                  className="h-auto w-full object-contain"
+                />
               </div>
             </div>
           </div>
@@ -397,72 +418,153 @@ export default function HomePage() {
       </section>
 
       {/* ── About ────────────────────────────────────────────────────────── */}
-      <section id="about" className="scroll-mt-24 bg-white py-16 sm:py-20">
-        <div className="mx-auto grid w-full max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+      <section
+        id="about"
+        className="scroll-mt-20 border-t border-slate-200/80 bg-[#fafbfc] py-14 sm:scroll-mt-24 sm:py-24"
+      >
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#0056D2]">
               About us
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-[#0A1931] sm:text-4xl">
-              Water delivery built for Ghana
+            <h2 className="mt-3 text-[1.75rem] font-bold tracking-tight text-[#0A1931] sm:text-4xl">
+              A trusted water partner
             </h2>
-            <p className="mt-5 text-base leading-relaxed text-slate-600">
-              F Net Water Hub brings together ordering, refillable bottle
-              exchange, dispenser installment plans, payments and rewards in one
-              trusted platform — so every drop and every cedi is accounted for.
-            </p>
-            <p className="mt-4 text-base leading-relaxed text-slate-600">
-              Customers order from their phone. Drivers deliver with mobile
-              tools. Managers and administrators keep operations running
-              smoothly.
+            <div className="mx-auto mt-5 h-px w-12 bg-[#0056D2]/40" aria-hidden />
+            <p className="mt-6 text-[15px] leading-relaxed text-slate-600 sm:text-lg">
+              F Net Water Hub delivers purified water with the precision of a
+              modern service and the care of a local partner — for homes,
+              offices and institutions across Ghana.
             </p>
           </div>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-[1.75rem] bg-slate-100 shadow-lg ring-1 ring-slate-100">
-            <Image
-              src={IMAGES.dispenser}
-              alt="Modern water dispenser setup"
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover"
-            />
+
+          <div className="mt-12 grid items-center gap-10 lg:mt-16 lg:grid-cols-2 lg:gap-16">
+            <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 sm:aspect-[5/4]">
+              <Image
+                src={IMAGES.dispenser}
+                alt="Clean water service for the home and office"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5"
+              />
+            </div>
+
+            <div>
+              <p className="text-[15px] leading-7 text-slate-600 sm:text-base sm:leading-8">
+                From your first order to every bottle returned, we keep
+                deliveries, refillable exchange, dispenser plans and payments
+                fully accounted for — so you always know where your water stands.
+              </p>
+              <p className="mt-4 text-[15px] leading-7 text-slate-600 sm:text-base sm:leading-8">
+                Customers order from their phone. Drivers deliver with care.
+                Our team keeps operations running smoothly behind the scenes.
+              </p>
+
+              <ul className="mt-8 divide-y divide-slate-200 border-y border-slate-200">
+                {ABOUT_PILLARS.map(({ label, text }) => (
+                  <li
+                    key={label}
+                    className="grid gap-1 py-4 sm:grid-cols-[7.5rem_1fr] sm:gap-6 sm:py-5"
+                  >
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#0056D2]">
+                      {label}
+                    </p>
+                    <p className="text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+                      {text}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── Pricing ──────────────────────────────────────────────────────── */}
-      <section id="pricing" className="scroll-mt-24 border-t border-slate-100 bg-[#f7fbff] py-16 sm:py-20">
+      <section
+        id="pricing"
+        className="scroll-mt-20 bg-white py-14 sm:scroll-mt-24 sm:py-24"
+      >
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#0056D2]">
               Pricing
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-[#0A1931] sm:text-4xl">
-              Simple packages for every need
+            <h2 className="mt-3 text-[1.75rem] font-bold tracking-tight text-[#0A1931] sm:text-4xl">
+              Clear packages. No surprises.
             </h2>
+            <div className="mx-auto mt-5 h-px w-12 bg-[#0056D2]/40" aria-hidden />
+            <p className="mt-6 text-[15px] leading-relaxed text-slate-600 sm:text-base">
+              Choose the option that fits your household or business. Every
+              package includes reliable delivery and transparent payment options.
+            </p>
           </div>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {PRICING.map(({ name, price, note }) => (
+          <div className="mt-12 grid gap-6 lg:mt-16 lg:grid-cols-3 lg:gap-0 lg:border lg:border-slate-200">
+            {PRICING.map(({ name, price, unit, note, features, featured }) => (
               <article
                 key={name}
-                className="rounded-2xl border border-slate-100 bg-white p-8 text-center shadow-sm"
+                className={`relative flex flex-col border border-slate-200 bg-white p-7 sm:p-9 lg:border-0 lg:border-r lg:border-slate-200 lg:last:border-r-0 ${
+                  featured ? "lg:bg-[#f8fafc]" : ""
+                }`}
               >
+                {featured && (
+                  <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0056D2]">
+                    Most popular
+                  </p>
+                )}
+                {!featured && <div className="mb-5 hidden h-[17px] lg:block" aria-hidden />}
+
                 <h3 className="text-lg font-semibold text-[#0A1931]">{name}</h3>
-                <p className="mt-4 text-3xl font-bold text-[#0056D2]">{price}</p>
-                <p className="mt-2 text-sm text-slate-500">{note}</p>
+                <p className="mt-5 flex items-baseline gap-1.5">
+                  <span className="text-3xl font-bold tracking-tight text-[#0A1931] sm:text-4xl">
+                    {price}
+                  </span>
+                </p>
+                <p className="mt-1 text-xs font-medium uppercase tracking-[0.12em] text-slate-400">
+                  {unit}
+                </p>
+                <p className="mt-5 text-sm leading-relaxed text-slate-500">
+                  {note}
+                </p>
+
+                <ul className="mt-7 flex-1 space-y-3 border-t border-slate-100 pt-6">
+                  {features.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-start gap-2.5 text-sm text-slate-600"
+                    >
+                      <Check
+                        className="mt-0.5 size-4 shrink-0 text-[#0056D2]"
+                        aria-hidden
+                      />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
                 <Link
                   href="/register"
-                  className={buttonClasses({
-                    className: "mt-6",
-                    variant: "outline",
-                    size: "sm",
-                  })}
+                  className={`mt-8 inline-flex h-11 w-full items-center justify-center rounded-lg text-sm font-semibold transition-colors ${
+                    featured
+                      ? "bg-[#0056D2] text-white hover:bg-[#0047b0]"
+                      : "border border-slate-300 text-[#0A1931] hover:border-[#0056D2] hover:text-[#0056D2]"
+                  }`}
                 >
-                  Order now
+                  {price === "Custom" ? "Request a quote" : "Order now"}
                 </Link>
               </article>
             ))}
           </div>
+
+          <p className="mx-auto mt-8 max-w-xl text-center text-sm text-slate-500">
+            Prices may vary by location and delivery schedule. Sign up to see
+            options available in your area.
+          </p>
         </div>
       </section>
     </>

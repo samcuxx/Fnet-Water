@@ -4,8 +4,6 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { buttonClasses } from "@/components/ui";
-
 import { LandingLogo } from "./landing-logo";
 
 const NAV_LINKS = [
@@ -32,10 +30,30 @@ export function LandingNav({
     const onScroll = () => {
       setScrolled(window.scrollY > 8);
 
-      let current = "#home";
-      for (const { href } of NAV_LINKS) {
+      // Use document order (not nav order) so later page sections win correctly.
+      const sections = NAV_LINKS.map(({ href }) => {
         const el = document.getElementById(href.slice(1));
-        if (!el) continue;
+        return el ? { href, el } : null;
+      })
+        .filter(
+          (s): s is { href: (typeof NAV_LINKS)[number]["href"]; el: HTMLElement } =>
+            s !== null,
+        )
+        .sort((a, b) => a.el.offsetTop - b.el.offsetTop);
+
+      if (sections.length === 0) return;
+
+      const nearBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 80;
+
+      if (nearBottom) {
+        setActive(sections[sections.length - 1].href);
+        return;
+      }
+
+      let current: (typeof NAV_LINKS)[number]["href"] = "#home";
+      for (const { href, el } of sections) {
         if (el.getBoundingClientRect().top <= 120) current = href;
       }
       setActive(current);
@@ -55,15 +73,15 @@ export function LandingNav({
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-white transition-shadow duration-300 ${
-        scrolled ? "shadow-[0_1px_0_0_rgba(15,23,42,0.06)]" : ""
+      className={`sticky top-0 z-50 bg-white/95 backdrop-blur-md transition-shadow duration-300 ${
+        scrolled ? "shadow-[0_1px_0_0_rgba(15,23,42,0.08)]" : ""
       }`}
     >
-      <div className="mx-auto flex h-[4.5rem] w-full max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6 lg:px-8">
         <Link
           href="/#home"
           aria-label="F Net Water Hub home"
-          className="shrink-0"
+          className="min-w-0 shrink"
           onClick={() => setMenuOpen(false)}
         >
           <LandingLogo />
@@ -79,6 +97,7 @@ export function LandingNav({
               <a
                 key={href}
                 href={href}
+                onClick={() => setActive(href)}
                 className={`relative pb-1 text-[0.95rem] font-semibold transition-colors ${
                   isActive
                     ? "text-[#0057B8]"
@@ -97,15 +116,12 @@ export function LandingNav({
           })}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-2.5">
+        <div className="flex shrink-0 items-center gap-2">
+          {/* Desktop auth */}
           {signedIn && dashboardHref ? (
             <Link
               href={dashboardHref}
-              className={buttonClasses({
-                size: "sm",
-                className:
-                  "h-10 rounded-lg bg-[#0057B8] px-5 text-sm font-semibold text-white hover:bg-[#004794]",
-              })}
+              className="hidden h-10 items-center justify-center rounded-lg bg-[#0057B8] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#004794] lg:inline-flex"
             >
               Dashboard
             </Link>
@@ -113,22 +129,39 @@ export function LandingNav({
             <>
               <Link
                 href="/login"
-                className="inline-flex h-10 items-center justify-center rounded-lg border border-[#4A90E2] bg-transparent px-5 text-sm font-semibold text-[#4A90E2] transition-colors hover:bg-[#4A90E2]/10"
+                className="hidden h-10 items-center justify-center rounded-lg border border-[#4A90E2] bg-transparent px-5 text-sm font-semibold text-[#4A90E2] transition-colors hover:bg-[#4A90E2]/10 sm:inline-flex"
               >
                 Login
               </Link>
               <Link
                 href="/register"
-                className="inline-flex h-10 items-center justify-center rounded-lg bg-[#0057B8] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#004794]"
+                className="hidden h-10 items-center justify-center rounded-lg bg-[#0057B8] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#004794] sm:inline-flex sm:px-5"
               >
                 Sign Up
               </Link>
             </>
           )}
 
+          {/* Compact mobile primary action */}
+          {signedIn && dashboardHref ? (
+            <Link
+              href={dashboardHref}
+              className="inline-flex h-9 items-center justify-center rounded-lg bg-[#0057B8] px-3 text-xs font-semibold text-white lg:hidden"
+            >
+              App
+            </Link>
+          ) : (
+            <Link
+              href="/register"
+              className="inline-flex h-9 items-center justify-center rounded-lg bg-[#0057B8] px-3 text-xs font-semibold text-white sm:hidden"
+            >
+              Sign Up
+            </Link>
+          )}
+
           <button
             type="button"
-            className="inline-flex size-10 items-center justify-center rounded-lg text-[#002060] hover:bg-slate-50 lg:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-lg text-[#002060] hover:bg-slate-50 lg:hidden"
             aria-expanded={menuOpen}
             aria-controls="landing-mobile-nav"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -146,17 +179,23 @@ export function LandingNav({
       {menuOpen && (
         <div
           id="landing-mobile-nav"
-          className="border-t border-slate-100 bg-white lg:hidden"
+          className="max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-t border-slate-100 bg-white lg:hidden"
         >
-          <nav aria-label="Mobile" className="mx-auto flex max-w-7xl flex-col px-4 py-3 sm:px-6">
+          <nav
+            aria-label="Mobile"
+            className="mx-auto flex max-w-7xl flex-col px-4 py-2 pb-[max(1rem,env(safe-area-inset-bottom))]"
+          >
             {NAV_LINKS.map(({ href, label }) => {
               const isActive = active === href;
               return (
                 <a
                   key={href}
                   href={href}
-                  onClick={() => setMenuOpen(false)}
-                  className={`rounded-lg px-3 py-3 text-base font-semibold ${
+                  onClick={() => {
+                    setActive(href);
+                    setMenuOpen(false);
+                  }}
+                  className={`rounded-xl px-4 py-3.5 text-base font-semibold ${
                     isActive ? "bg-brand-50 text-[#0057B8]" : "text-[#002060]"
                   }`}
                 >
@@ -164,6 +203,35 @@ export function LandingNav({
                 </a>
               );
             })}
+
+            <div className="mt-3 grid gap-2 border-t border-slate-100 pt-4">
+              {signedIn && dashboardHref ? (
+                <Link
+                  href={dashboardHref}
+                  onClick={() => setMenuOpen(false)}
+                  className="inline-flex h-12 items-center justify-center rounded-xl bg-[#0057B8] text-base font-semibold text-white"
+                >
+                  Go to dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/register"
+                    onClick={() => setMenuOpen(false)}
+                    className="inline-flex h-12 items-center justify-center rounded-xl bg-[#0057B8] text-base font-semibold text-white"
+                  >
+                    Sign Up
+                  </Link>
+                  <Link
+                    href="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="inline-flex h-12 items-center justify-center rounded-xl border border-[#4A90E2] text-base font-semibold text-[#4A90E2]"
+                  >
+                    Login
+                  </Link>
+                </>
+              )}
+            </div>
           </nav>
         </div>
       )}

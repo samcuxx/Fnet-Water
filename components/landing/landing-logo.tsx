@@ -39,13 +39,13 @@ export function LandingLogoMark({ className }: { className?: string }) {
 
 export function LandingLogo({ className }: { className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <LandingLogoMark />
-      <span className="flex flex-col leading-none">
-        <span className="text-[1.05rem] font-extrabold tracking-tight text-[#002060]">
+    <span className={cn("inline-flex items-center gap-2 sm:gap-2.5", className)}>
+      <LandingLogoMark className="size-8 sm:size-10" />
+      <span className="flex min-w-0 flex-col leading-none">
+        <span className="text-[0.95rem] font-extrabold tracking-tight text-[#002060] sm:text-[1.05rem]">
           F NET
         </span>
-        <span className="mt-0.5 text-[0.68rem] font-semibold tracking-[0.14em] text-[#002060]">
+        <span className="mt-0.5 text-[0.6rem] font-semibold tracking-[0.14em] text-[#002060] sm:text-[0.68rem]">
           WATER HUB
         </span>
       </span>
