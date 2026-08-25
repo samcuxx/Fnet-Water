@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import Cubes from "@/components/landing/cubes";
 import {
   ArrowRight,
   BadgeCheck,
@@ -32,8 +33,6 @@ const IMAGES = {
    * Source: public/landing/cta-delivery-v2.jpg (white studio background)
    */
   ctaDelivery: "/landing/cta-delivery-v2.jpg",
-  dispenser:
-    "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=85",
 } as const;
 
 const HERO_TRUST = [
@@ -230,24 +229,21 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:mt-12 sm:grid-cols-2 sm:gap-5 lg:grid-cols-5 lg:gap-4 xl:gap-5">
+          <ul className="mt-10 grid gap-10 sm:mt-14 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12 lg:grid-cols-5 lg:gap-x-6 lg:gap-y-0">
             {FEATURES.map(({ icon: Icon, title, body }) => (
-              <article
-                key={title}
-                className="rounded-2xl border border-slate-200/80 bg-white px-5 py-6 text-center shadow-[0_4px_20px_-8px_rgba(15,23,42,0.12)] sm:py-8"
-              >
-                <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#E8F1FF] text-[#0056D2] sm:size-14">
-                  <Icon className="size-5 stroke-[1.75] sm:size-6" aria-hidden />
+              <li key={title} className="text-center">
+                <span className="mx-auto flex size-12 items-center justify-center text-[#0056D2] sm:size-14">
+                  <Icon className="size-7 stroke-[1.5] sm:size-8" aria-hidden />
                 </span>
                 <h3 className="mt-4 text-[0.95rem] font-bold leading-snug text-[#0A1931] sm:mt-5">
                   {title}
                 </h3>
-                <p className="mt-2 text-[13px] leading-relaxed text-slate-500 sm:mt-2.5">
+                <p className="mx-auto mt-2 max-w-[14rem] text-[13px] leading-relaxed text-slate-500 sm:mt-2.5">
                   {body}
                 </p>
-              </article>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
@@ -446,18 +442,20 @@ export default function HomePage() {
           </div>
 
           <div className="mt-12 grid items-center gap-10 lg:mt-16 lg:grid-cols-2 lg:gap-16">
-            <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 sm:aspect-[5/4]">
-              <Image
-                src={IMAGES.dispenser}
-                alt="Clean water service for the home and office"
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-              />
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5"
-              />
+            <div className="relative mx-auto flex w-full max-w-md items-center justify-center lg:max-w-none">
+              <div className="relative aspect-square w-full max-w-[420px] lg:max-w-none">
+                <Cubes
+                  gridSize={8}
+                  maxAngle={60}
+                  radius={4}
+                  borderStyle="1px solid rgba(0, 86, 210, 0.35)"
+                  faceColor="#E8F1FF"
+                  rippleColor="#0056D2"
+                  rippleSpeed={1.5}
+                  autoAnimate
+                  rippleOnClick
+                />
+              </div>
             </div>
 
             <div>
