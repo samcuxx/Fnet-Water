@@ -158,6 +158,12 @@
     background-color: rgb(148 163 184 / 0.5);
     border-radius: 9999px;
   }
+
+  /* Classic serif display type for public marketing pages. */
+  .font-display {
+    font-family: var(--font-display), "Cormorant Garamond", ui-serif, Georgia,
+      "Times New Roman", serif;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

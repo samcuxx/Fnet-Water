@@ -15,9 +15,15 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["minio", "bcryptjs"],
 
   images: {
-    // Product, dispenser and evidence images are streamed through our own
-    // authorized route rather than fetched from a third-party origin.
-    remotePatterns: [],
+    // Product and evidence files use our authorized storage route. Marketing
+    // imagery on the public landing page is loaded from Unsplash.
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+    ],
   },
 };
 
