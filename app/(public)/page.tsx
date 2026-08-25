@@ -229,16 +229,16 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <ul className="mt-10 grid gap-10 sm:mt-14 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12 lg:grid-cols-5 lg:gap-x-6 lg:gap-y-0">
+          <ul className="mt-10 grid grid-cols-2 gap-x-4 gap-y-8 sm:mt-14 sm:gap-x-8 sm:gap-y-12 lg:grid-cols-5 lg:gap-x-6 lg:gap-y-0">
             {FEATURES.map(({ icon: Icon, title, body }) => (
               <li key={title} className="text-center">
-                <span className="mx-auto flex size-12 items-center justify-center text-[#0056D2] sm:size-14">
-                  <Icon className="size-7 stroke-[1.5] sm:size-8" aria-hidden />
+                <span className="mx-auto flex size-10 items-center justify-center text-[#0056D2] sm:size-14">
+                  <Icon className="size-6 stroke-[1.5] sm:size-8" aria-hidden />
                 </span>
-                <h3 className="mt-4 text-[0.95rem] font-bold leading-snug text-[#0A1931] sm:mt-5">
+                <h3 className="mt-3 text-sm font-bold leading-snug text-[#0A1931] sm:mt-5 sm:text-[0.95rem]">
                   {title}
                 </h3>
-                <p className="mx-auto mt-2 max-w-[14rem] text-[13px] leading-relaxed text-slate-500 sm:mt-2.5">
+                <p className="mx-auto mt-1.5 max-w-[14rem] text-xs leading-relaxed text-slate-500 sm:mt-2.5 sm:text-[13px]">
                   {body}
                 </p>
               </li>
