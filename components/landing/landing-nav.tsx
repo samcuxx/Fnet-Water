@@ -113,59 +113,76 @@ export function LandingNav({
           </span>
         </Link>
 
-        <div className="flex shrink-0 items-center gap-2 sm:min-w-[9rem] sm:justify-end">
+        <div className="flex shrink-0 items-center gap-2 sm:min-w-[11rem] sm:justify-end">
           {signedIn && dashboardHref ? (
             <Link
               href={dashboardHref}
-              className="hidden h-9 items-center justify-center border border-[#0A1931] px-4 text-[11px] font-semibold tracking-[0.12em] uppercase text-[#0A1931] transition-colors hover:border-[#0056D2] hover:text-[#0056D2] sm:inline-flex"
+              className="hidden items-center gap-2 border border-slate-300 bg-white px-3.5 py-2 text-[13px] font-medium text-[#0A1931] transition-colors hover:border-[#0056D2] hover:text-[#0056D2] sm:inline-flex"
             >
-              Dashboard
+              <span
+                aria-hidden
+                className="size-1.5 rotate-45 bg-[#0056D2]"
+              />
+              Open dashboard
             </Link>
           ) : (
-            <>
+            <div className="hidden overflow-hidden border border-slate-300 bg-white sm:flex">
               <Link
                 href="/login"
-                className="hidden text-[11px] font-semibold tracking-[0.12em] uppercase text-[#0A1931]/70 transition-colors hover:text-[#0056D2] sm:inline"
+                className="inline-flex items-center px-3.5 py-2 text-[13px] font-medium text-[#0A1931]/80 transition-colors hover:bg-[#f7f9fc] hover:text-[#0056D2]"
               >
-                Login
+                Log in
               </Link>
+              <span aria-hidden className="w-px self-stretch bg-slate-300" />
               <Link
                 href="/register"
-                className="hidden h-9 items-center justify-center bg-[#0A1931] px-4 text-[11px] font-semibold tracking-[0.12em] uppercase text-white transition-colors hover:bg-[#0056D2] sm:inline-flex"
+                className="inline-flex items-center gap-2 bg-[#0056D2] px-3.5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#0047b0]"
               >
-                Sign up
+                Join us
+                <span
+                  aria-hidden
+                  className="size-1 rotate-45 bg-white/80"
+                />
               </Link>
-            </>
+            </div>
           )}
 
           {signedIn && dashboardHref ? (
             <Link
               href={dashboardHref}
-              className="inline-flex h-9 items-center justify-center bg-[#0A1931] px-3 text-[11px] font-semibold tracking-[0.1em] uppercase text-white sm:hidden"
+              className="inline-flex items-center gap-1.5 border border-slate-300 bg-white px-2.5 py-1.5 text-[12px] font-medium text-[#0A1931] sm:hidden"
             >
+              <span
+                aria-hidden
+                className="size-1.5 rotate-45 bg-[#0056D2]"
+              />
               App
             </Link>
           ) : (
             <Link
               href="/register"
-              className="inline-flex h-9 items-center justify-center bg-[#0A1931] px-3 text-[11px] font-semibold tracking-[0.1em] uppercase text-white sm:hidden"
+              className="inline-flex items-center gap-1.5 bg-[#0056D2] px-2.5 py-1.5 text-[12px] font-semibold text-white sm:hidden"
             >
-              Sign up
+              Join us
+              <span
+                aria-hidden
+                className="size-1 rotate-45 bg-white/80"
+              />
             </Link>
           )}
 
           <button
             type="button"
-            className="inline-flex size-9 items-center justify-center text-[#0A1931] lg:hidden"
+            className="inline-flex size-9 items-center justify-center border border-slate-300 bg-white text-[#0A1931] transition-colors hover:border-[#0056D2] hover:text-[#0056D2] lg:hidden"
             aria-expanded={menuOpen}
             aria-controls="landing-mobile-nav"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             onClick={() => setMenuOpen((open) => !open)}
           >
             {menuOpen ? (
-              <X className="size-5" aria-hidden />
+              <X className="size-4" aria-hidden />
             ) : (
-              <Menu className="size-5" aria-hidden />
+              <Menu className="size-4" aria-hidden />
             )}
           </button>
         </div>
@@ -253,32 +270,40 @@ export function LandingNav({
               );
             })}
 
-            <div className="mt-4 grid gap-2.5 pb-2">
+            <div className="mt-4 overflow-hidden border border-slate-300 pb-2">
               {signedIn && dashboardHref ? (
                 <Link
                   href={dashboardHref}
                   onClick={() => setMenuOpen(false)}
-                  className="inline-flex h-11 items-center justify-center bg-[#0A1931] text-xs font-semibold tracking-[0.12em] uppercase text-white"
+                  className="flex items-center justify-center gap-2 bg-[#0056D2] py-3.5 text-[13px] font-semibold text-white"
                 >
-                  Go to dashboard
+                  <span
+                    aria-hidden
+                    className="size-1.5 rotate-45 bg-white/80"
+                  />
+                  Open dashboard
                 </Link>
               ) : (
-                <>
-                  <Link
-                    href="/register"
-                    onClick={() => setMenuOpen(false)}
-                    className="inline-flex h-11 items-center justify-center bg-[#0A1931] text-xs font-semibold tracking-[0.12em] uppercase text-white"
-                  >
-                    Sign up
-                  </Link>
+                <div className="grid grid-cols-2">
                   <Link
                     href="/login"
                     onClick={() => setMenuOpen(false)}
-                    className="inline-flex h-11 items-center justify-center border border-[#0A1931] text-xs font-semibold tracking-[0.12em] uppercase text-[#0A1931]"
+                    className="flex items-center justify-center border-r border-slate-300 bg-white py-3.5 text-[13px] font-medium text-[#0A1931]"
                   >
-                    Login
+                    Log in
                   </Link>
-                </>
+                  <Link
+                    href="/register"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 bg-[#0056D2] py-3.5 text-[13px] font-semibold text-white"
+                  >
+                    Join us
+                    <span
+                      aria-hidden
+                      className="size-1 rotate-45 bg-white/80"
+                    />
+                  </Link>
+                </div>
               )}
             </div>
           </nav>
