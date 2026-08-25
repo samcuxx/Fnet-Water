@@ -266,34 +266,41 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <ol className="relative mt-10 grid gap-10 sm:mt-14 sm:grid-cols-2 sm:gap-12 lg:grid-cols-4 lg:gap-4">
+          <ol className="relative mt-10 grid grid-cols-4 gap-2 sm:mt-14 sm:gap-6 lg:gap-4">
             <div
               aria-hidden
-              className="pointer-events-none absolute left-[12.5%] right-[12.5%] top-10 hidden items-center lg:flex"
+              className="pointer-events-none absolute left-[12.5%] right-[12.5%] top-6 flex items-center sm:top-10"
             >
               <div className="h-0 flex-1 border-t-2 border-dashed border-slate-200" />
-              <span className="mx-1 text-slate-300">›</span>
+              <span className="mx-0.5 text-[10px] text-slate-300 sm:mx-1 sm:text-base">
+                ›
+              </span>
               <div className="h-0 flex-1 border-t-2 border-dashed border-slate-200" />
-              <span className="mx-1 text-slate-300">›</span>
+              <span className="mx-0.5 text-[10px] text-slate-300 sm:mx-1 sm:text-base">
+                ›
+              </span>
               <div className="h-0 flex-1 border-t-2 border-dashed border-slate-200" />
             </div>
 
             {STEPS.map(({ no, title, body, Icon, iconWrap, badge }) => (
-              <li key={no} className="relative z-10 text-center">
+              <li key={no} className="relative z-10 min-w-0 text-center">
                 <span
-                  className={`mx-auto flex size-16 items-center justify-center rounded-full sm:size-[4.75rem] ${iconWrap}`}
+                  className={`mx-auto flex size-11 items-center justify-center rounded-full sm:size-[4.75rem] ${iconWrap}`}
                 >
-                  <Icon className="size-7 stroke-[1.75] sm:size-8" aria-hidden />
+                  <Icon
+                    className="size-5 stroke-[1.75] sm:size-8"
+                    aria-hidden
+                  />
                 </span>
                 <p
-                  className={`mt-4 inline-flex size-7 items-center justify-center rounded-full text-xs font-bold text-white sm:mt-5 ${badge}`}
+                  className={`mt-2 inline-flex size-6 items-center justify-center rounded-full text-[10px] font-bold text-white sm:mt-5 sm:size-7 sm:text-xs ${badge}`}
                 >
                   {no}
                 </p>
-                <h3 className="mt-3 text-base font-bold text-[#0A1931] sm:text-lg">
+                <h3 className="mt-2 text-[11px] font-bold leading-tight text-[#0A1931] sm:mt-3 sm:text-lg">
                   {title}
                 </h3>
-                <p className="mx-auto mt-2 max-w-[16rem] text-sm leading-relaxed text-slate-500">
+                <p className="mx-auto mt-1.5 hidden text-sm leading-relaxed text-slate-500 sm:mt-2 sm:block sm:max-w-[16rem]">
                   {body}
                 </p>
               </li>
