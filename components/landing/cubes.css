@@ -1,7 +1,7 @@
 :root {
   --col-gap: 5%;
   --row-gap: 5%;
-  --cube-perspective: 99999999px;
+  --cube-perspective: 1200px;
   --cube-face-border: 1px solid #fff;
   --cube-face-bg: #120f17;
 }
@@ -11,6 +11,9 @@
   width: 100%;
   aspect-ratio: 1 / 1;
   height: auto;
+  overflow: hidden;
+  touch-action: pan-y;
+  contain: layout paint;
 }
 
 .default-animation--scene {
@@ -21,6 +24,7 @@
   row-gap: var(--row-gap);
   perspective: var(--cube-perspective);
   grid-auto-rows: 1fr;
+  touch-action: pan-y;
 }
 
 .cube {
@@ -29,15 +33,7 @@
   height: 100%;
   aspect-ratio: 1 / 1;
   transform-style: preserve-3d;
-}
-
-.cube::before {
-  content: "";
-  position: absolute;
-  top: -36px;
-  right: -36px;
-  bottom: -36px;
-  left: -36px;
+  will-change: transform;
 }
 
 .default-animation .cube-face {
@@ -50,6 +46,7 @@
   background: var(--cube-face-bg);
   border: var(--cube-face-border);
   opacity: 1;
+  backface-visibility: hidden;
 }
 
 .default-animation .cube-face--top {
@@ -71,4 +68,16 @@
 .default-animation .cube-face--back,
 .default-animation .cube-face--front {
   transform: rotateY(-90deg) translateX(50%) rotateY(90deg);
+}
+
+@media (max-width: 640px) {
+  .cube {
+    will-change: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cube {
+    transform: none !important;
+  }
 }

@@ -4,15 +4,15 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { LandingLogo } from "./landing-logo";
+import { LandingLogoMark } from "./landing-logo";
 
 const NAV_LINKS = [
   { href: "#home", label: "Home" },
-  { href: "#about", label: "About Us" },
+  { href: "#about", label: "About" },
   { href: "#services", label: "Services" },
-  { href: "#how-it-works", label: "How It Works" },
+  { href: "#how-it-works", label: "How it works" },
   { href: "#pricing", label: "Pricing" },
-  { href: "#contact", label: "Contact Us" },
+  { href: "#contact", label: "Contact" },
 ] as const;
 
 export function LandingNav({
@@ -27,36 +27,47 @@ export function LandingNav({
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
+    let ticking = false;
+
     const onScroll = () => {
-      setScrolled(window.scrollY > 8);
+      if (ticking) return;
+      ticking = true;
 
-      // Use document order (not nav order) so later page sections win correctly.
-      const sections = NAV_LINKS.map(({ href }) => {
-        const el = document.getElementById(href.slice(1));
-        return el ? { href, el } : null;
-      })
-        .filter(
-          (s): s is { href: (typeof NAV_LINKS)[number]["href"]; el: HTMLElement } =>
-            s !== null,
-        )
-        .sort((a, b) => a.el.offsetTop - b.el.offsetTop);
+      requestAnimationFrame(() => {
+        ticking = false;
+        setScrolled(window.scrollY > 8);
 
-      if (sections.length === 0) return;
+        const sections = NAV_LINKS.map(({ href }) => {
+          const el = document.getElementById(href.slice(1));
+          return el ? { href, el } : null;
+        })
+          .filter(
+            (
+              s,
+            ): s is {
+              href: (typeof NAV_LINKS)[number]["href"];
+              el: HTMLElement;
+            } => s !== null,
+          )
+          .sort((a, b) => a.el.offsetTop - b.el.offsetTop);
 
-      const nearBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 80;
+        if (sections.length === 0) return;
 
-      if (nearBottom) {
-        setActive(sections[sections.length - 1].href);
-        return;
-      }
+        const nearBottom =
+          window.innerHeight + window.scrollY >=
+          document.documentElement.scrollHeight - 80;
 
-      let current: (typeof NAV_LINKS)[number]["href"] = "#home";
-      for (const { href, el } of sections) {
-        if (el.getBoundingClientRect().top <= 120) current = href;
-      }
-      setActive(current);
+        let next: (typeof NAV_LINKS)[number]["href"] = "#home";
+        if (nearBottom) {
+          next = sections[sections.length - 1].href;
+        } else {
+          for (const { href, el } of sections) {
+            if (el.getBoundingClientRect().top <= 120) next = href;
+          }
+        }
+
+        setActive((prev) => (prev === next ? prev : next));
+      });
     };
 
     onScroll();
@@ -73,55 +84,40 @@ export function LandingNav({
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-white/95 backdrop-blur-md transition-shadow duration-300 ${
-        scrolled ? "shadow-[0_1px_0_0_rgba(15,23,42,0.08)]" : ""
+      className={`sticky top-0 z-50 bg-[#f7f9fc] transition-[background-color,box-shadow] duration-300 ${
+        scrolled ? "bg-white shadow-[0_10px_30px_-24px_rgba(10,25,49,0.45)]" : ""
       }`}
     >
-      <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6 lg:px-8">
+      {/* Masthead — brand led */}
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
+        <p className="hidden min-w-[9rem] text-[11px] leading-snug text-slate-500 lg:block">
+          Pure water,
+          <br />
+          delivered with care
+        </p>
+
         <Link
           href="/#home"
           aria-label="F Net Water Hub home"
-          className="min-w-0 shrink"
+          className="mx-auto flex min-w-0 items-center gap-3 sm:gap-3.5 lg:mx-0"
           onClick={() => setMenuOpen(false)}
         >
-          <LandingLogo />
+          <LandingLogoMark className="size-9 sm:size-11" />
+          <span className="min-w-0 leading-none">
+            <span className="block text-[1.35rem] font-bold tracking-[-0.03em] text-[#0A1931] sm:text-[1.65rem]">
+              F Net
+            </span>
+            <span className="mt-1 block text-[0.65rem] font-medium tracking-[0.28em] text-[#0056D2] sm:text-[0.7rem]">
+              WATER HUB
+            </span>
+          </span>
         </Link>
 
-        <nav
-          aria-label="Primary"
-          className="hidden items-center gap-5 lg:flex xl:gap-7"
-        >
-          {NAV_LINKS.map(({ href, label }) => {
-            const isActive = active === href;
-            return (
-              <a
-                key={href}
-                href={href}
-                onClick={() => setActive(href)}
-                className={`relative pb-1 text-[0.95rem] font-semibold transition-colors ${
-                  isActive
-                    ? "text-[#0057B8]"
-                    : "text-[#002060] hover:text-[#0057B8]"
-                }`}
-              >
-                {label}
-                {isActive && (
-                  <span
-                    aria-hidden
-                    className="absolute inset-x-0 -bottom-0.5 mx-auto h-[2px] w-full rounded-full bg-[#4A90E2]"
-                  />
-                )}
-              </a>
-            );
-          })}
-        </nav>
-
-        <div className="flex shrink-0 items-center gap-2">
-          {/* Desktop auth */}
+        <div className="flex shrink-0 items-center gap-2 sm:min-w-[9rem] sm:justify-end">
           {signedIn && dashboardHref ? (
             <Link
               href={dashboardHref}
-              className="hidden h-10 items-center justify-center rounded-lg bg-[#0057B8] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#004794] lg:inline-flex"
+              className="hidden h-9 items-center justify-center border border-[#0A1931] px-4 text-[11px] font-semibold tracking-[0.12em] uppercase text-[#0A1931] transition-colors hover:border-[#0056D2] hover:text-[#0056D2] sm:inline-flex"
             >
               Dashboard
             </Link>
@@ -129,39 +125,38 @@ export function LandingNav({
             <>
               <Link
                 href="/login"
-                className="hidden h-10 items-center justify-center rounded-lg border border-[#4A90E2] bg-transparent px-5 text-sm font-semibold text-[#4A90E2] transition-colors hover:bg-[#4A90E2]/10 sm:inline-flex"
+                className="hidden text-[11px] font-semibold tracking-[0.12em] uppercase text-[#0A1931]/70 transition-colors hover:text-[#0056D2] sm:inline"
               >
                 Login
               </Link>
               <Link
                 href="/register"
-                className="hidden h-10 items-center justify-center rounded-lg bg-[#0057B8] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#004794] sm:inline-flex sm:px-5"
+                className="hidden h-9 items-center justify-center bg-[#0A1931] px-4 text-[11px] font-semibold tracking-[0.12em] uppercase text-white transition-colors hover:bg-[#0056D2] sm:inline-flex"
               >
-                Sign Up
+                Sign up
               </Link>
             </>
           )}
 
-          {/* Compact mobile primary action */}
           {signedIn && dashboardHref ? (
             <Link
               href={dashboardHref}
-              className="inline-flex h-9 items-center justify-center rounded-lg bg-[#0057B8] px-3 text-xs font-semibold text-white lg:hidden"
+              className="inline-flex h-9 items-center justify-center bg-[#0A1931] px-3 text-[11px] font-semibold tracking-[0.1em] uppercase text-white sm:hidden"
             >
               App
             </Link>
           ) : (
             <Link
               href="/register"
-              className="inline-flex h-9 items-center justify-center rounded-lg bg-[#0057B8] px-3 text-xs font-semibold text-white sm:hidden"
+              className="inline-flex h-9 items-center justify-center bg-[#0A1931] px-3 text-[11px] font-semibold tracking-[0.1em] uppercase text-white sm:hidden"
             >
-              Sign Up
+              Sign up
             </Link>
           )}
 
           <button
             type="button"
-            className="inline-flex size-11 items-center justify-center rounded-lg text-[#002060] hover:bg-slate-50 lg:hidden"
+            className="inline-flex size-9 items-center justify-center text-[#0A1931] lg:hidden"
             aria-expanded={menuOpen}
             aria-controls="landing-mobile-nav"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -176,10 +171,56 @@ export function LandingNav({
         </div>
       </div>
 
+      {/* Navigation rail */}
+      <div className="border-y border-slate-200/90 bg-white">
+        <nav
+          aria-label="Primary"
+          className="mx-auto hidden max-w-7xl items-center justify-center gap-1 px-6 lg:flex xl:gap-2"
+        >
+          {NAV_LINKS.map(({ href, label }, index) => {
+            const isActive = active === href;
+            return (
+              <span key={href} className="flex items-center">
+                {index > 0 && (
+                  <span
+                    aria-hidden
+                    className="mx-1 size-1 rotate-45 bg-slate-300 xl:mx-2"
+                  />
+                )}
+                <a
+                  href={href}
+                  onClick={() => setActive(href)}
+                  className={`relative px-3 py-3.5 text-[0.9rem] transition-colors ${
+                    isActive
+                      ? "font-semibold text-[#0056D2]"
+                      : "font-medium text-[#0A1931]/70 hover:text-[#0056D2]"
+                  }`}
+                >
+                  {label}
+                  {isActive && (
+                    <span
+                      aria-hidden
+                      className="absolute inset-x-3 -bottom-px h-[2px] bg-[#0056D2]"
+                    />
+                  )}
+                </a>
+              </span>
+            );
+          })}
+        </nav>
+
+        {/* Compact mobile section cue */}
+        <div className="flex h-10 items-center justify-center px-4 lg:hidden">
+          <p className="truncate text-[11px] font-medium tracking-[0.18em] uppercase text-slate-500">
+            {NAV_LINKS.find((l) => l.href === active)?.label ?? "Home"}
+          </p>
+        </div>
+      </div>
+
       {menuOpen && (
         <div
           id="landing-mobile-nav"
-          className="max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-t border-slate-100 bg-white lg:hidden"
+          className="max-h-[calc(100dvh-7rem)] overflow-y-auto border-b border-slate-200 bg-white lg:hidden"
         >
           <nav
             aria-label="Mobile"
@@ -195,21 +236,29 @@ export function LandingNav({
                     setActive(href);
                     setMenuOpen(false);
                   }}
-                  className={`rounded-xl px-4 py-3.5 text-base font-semibold ${
-                    isActive ? "bg-brand-50 text-[#0057B8]" : "text-[#002060]"
+                  className={`flex items-center gap-3 border-b border-slate-100 py-3.5 text-[1.05rem] ${
+                    isActive
+                      ? "font-semibold text-[#0056D2]"
+                      : "font-medium text-[#0A1931]"
                   }`}
                 >
+                  <span
+                    aria-hidden
+                    className={`size-1.5 rotate-45 ${
+                      isActive ? "bg-[#0056D2]" : "bg-slate-300"
+                    }`}
+                  />
                   {label}
                 </a>
               );
             })}
 
-            <div className="mt-3 grid gap-2 border-t border-slate-100 pt-4">
+            <div className="mt-4 grid gap-2.5 pb-2">
               {signedIn && dashboardHref ? (
                 <Link
                   href={dashboardHref}
                   onClick={() => setMenuOpen(false)}
-                  className="inline-flex h-12 items-center justify-center rounded-xl bg-[#0057B8] text-base font-semibold text-white"
+                  className="inline-flex h-11 items-center justify-center bg-[#0A1931] text-xs font-semibold tracking-[0.12em] uppercase text-white"
                 >
                   Go to dashboard
                 </Link>
@@ -218,14 +267,14 @@ export function LandingNav({
                   <Link
                     href="/register"
                     onClick={() => setMenuOpen(false)}
-                    className="inline-flex h-12 items-center justify-center rounded-xl bg-[#0057B8] text-base font-semibold text-white"
+                    className="inline-flex h-11 items-center justify-center bg-[#0A1931] text-xs font-semibold tracking-[0.12em] uppercase text-white"
                   >
-                    Sign Up
+                    Sign up
                   </Link>
                   <Link
                     href="/login"
                     onClick={() => setMenuOpen(false)}
-                    className="inline-flex h-12 items-center justify-center rounded-xl border border-[#4A90E2] text-base font-semibold text-[#4A90E2]"
+                    className="inline-flex h-11 items-center justify-center border border-[#0A1931] text-xs font-semibold tracking-[0.12em] uppercase text-[#0A1931]"
                   >
                     Login
                   </Link>

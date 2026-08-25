@@ -8,7 +8,7 @@ export default async function PublicLayout({ children }: LayoutProps<"/">) {
   const actor = await getActor();
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col overflow-x-clip bg-white">
       <LandingNav
         signedIn={Boolean(actor)}
         dashboardHref={actor ? ROLE_HOME[actor.role] : undefined}

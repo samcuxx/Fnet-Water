@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import gsap from "gsap";
 
 import "./cubes.css";
@@ -23,7 +23,7 @@ type CubesProps = {
 };
 
 export default function Cubes({
-  gridSize = 10,
+  gridSize: gridSizeProp = 10,
   cubeSize,
   maxAngle = 45,
   radius = 3,
@@ -38,6 +38,7 @@ export default function Cubes({
   rippleColor = "#fff",
   rippleSpeed = 2,
 }: CubesProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -45,6 +46,28 @@ export default function Cubes({
   const simPosRef = useRef({ x: 0, y: 0 });
   const simTargetRef = useRef({ x: 0, y: 0 });
   const simRAFRef = useRef<number | null>(null);
+  const visibleRef = useRef(true);
+
+  const [gridSize, setGridSize] = useState(gridSizeProp);
+  const [motionEnabled, setMotionEnabled] = useState(true);
+
+  useEffect(() => {
+    const mqReduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mqNarrow = window.matchMedia("(max-width: 640px)");
+
+    const sync = () => {
+      setMotionEnabled(!mqReduce.matches);
+      setGridSize(mqNarrow.matches ? Math.min(gridSizeProp, 6) : gridSizeProp);
+    };
+
+    sync();
+    mqReduce.addEventListener("change", sync);
+    mqNarrow.addEventListener("change", sync);
+    return () => {
+      mqReduce.removeEventListener("change", sync);
+      mqNarrow.removeEventListener("change", sync);
+    };
+  }, [gridSizeProp]);
 
   const colGap =
     typeof cellGap === "number"
@@ -93,9 +116,38 @@ export default function Cubes({
     [radius, maxAngle, enterDur, leaveDur, easing],
   );
 
+  const resetAll = useCallback(() => {
+    if (!sceneRef.current) return;
+    sceneRef.current.querySelectorAll<HTMLElement>(".cube").forEach((cube) =>
+      gsap.to(cube, {
+        duration: leaveDur,
+        rotateX: 0,
+        rotateY: 0,
+        ease: "power3.out",
+      }),
+    );
+  }, [leaveDur]);
+
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visibleRef.current = entry.isIntersecting;
+        if (!entry.isIntersecting) resetAll();
+      },
+      { rootMargin: "80px", threshold: 0.05 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [resetAll]);
+
   const onPointerMove = useCallback(
     (e: PointerEvent) => {
-      if (!sceneRef.current) return;
+      // Touch/pen should not fight page scrolling — pointermove from mouse only.
+      if (e.pointerType !== "mouse" || !sceneRef.current) return;
+
       userActiveRef.current = true;
       if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
 
@@ -117,74 +169,15 @@ export default function Cubes({
     [gridSize, tiltAt],
   );
 
-  const resetAll = useCallback(() => {
-    if (!sceneRef.current) return;
-    sceneRef.current.querySelectorAll<HTMLElement>(".cube").forEach((cube) =>
-      gsap.to(cube, {
-        duration: leaveDur,
-        rotateX: 0,
-        rotateY: 0,
-        ease: "power3.out",
-      }),
-    );
-  }, [leaveDur]);
-
-  const onTouchMove = useCallback(
-    (e: TouchEvent) => {
-      if (!sceneRef.current) return;
-      e.preventDefault();
-      userActiveRef.current = true;
-      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-
-      const rect = sceneRef.current.getBoundingClientRect();
-      const cellW = rect.width / gridSize;
-      const cellH = rect.height / gridSize;
-
-      const touch = e.touches[0];
-      const colCenter = (touch.clientX - rect.left) / cellW;
-      const rowCenter = (touch.clientY - rect.top) / cellH;
-
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() =>
-        tiltAt(rowCenter, colCenter),
-      );
-
-      idleTimerRef.current = setTimeout(() => {
-        userActiveRef.current = false;
-      }, 3000);
-    },
-    [gridSize, tiltAt],
-  );
-
-  const onTouchStart = useCallback(() => {
-    userActiveRef.current = true;
-  }, []);
-
-  const onTouchEnd = useCallback(() => {
-    if (!sceneRef.current) return;
-    resetAll();
-  }, [resetAll]);
-
   const onClick = useCallback(
-    (e: MouseEvent | TouchEvent) => {
-      if (!rippleOnClick || !sceneRef.current) return;
+    (e: MouseEvent) => {
+      if (!rippleOnClick || !sceneRef.current || !motionEnabled) return;
       const rect = sceneRef.current.getBoundingClientRect();
       const cellW = rect.width / gridSize;
       const cellH = rect.height / gridSize;
 
-      const clientX =
-        "clientX" in e
-          ? e.clientX
-          : e.touches?.[0]?.clientX;
-      const clientY =
-        "clientY" in e
-          ? e.clientY
-          : e.touches?.[0]?.clientY;
-
-      if (clientX == null || clientY == null) return;
-
-      const colHit = Math.floor((clientX - rect.left) / cellW);
-      const rowHit = Math.floor((clientY - rect.top) / cellH);
+      const colHit = Math.floor((e.clientX - rect.left) / cellW);
+      const rowHit = Math.floor((e.clientY - rect.top) / cellH);
 
       const baseRingDelay = 0.15;
       const baseAnimDur = 0.3;
@@ -227,11 +220,11 @@ export default function Cubes({
           });
         });
     },
-    [rippleOnClick, gridSize, faceColor, rippleColor, rippleSpeed],
+    [rippleOnClick, gridSize, faceColor, rippleColor, rippleSpeed, motionEnabled],
   );
 
   useEffect(() => {
-    if (!autoAnimate || !sceneRef.current) return;
+    if (!autoAnimate || !motionEnabled || !sceneRef.current) return;
     simPosRef.current = {
       x: Math.random() * gridSize,
       y: Math.random() * gridSize,
@@ -242,7 +235,7 @@ export default function Cubes({
     };
     const speed = 0.02;
     const loop = () => {
-      if (!userActiveRef.current) {
+      if (visibleRef.current && !userActiveRef.current) {
         const pos = simPosRef.current;
         const tgt = simTargetRef.current;
         pos.x += (tgt.x - pos.x) * speed;
@@ -263,7 +256,7 @@ export default function Cubes({
         cancelAnimationFrame(simRAFRef.current);
       }
     };
-  }, [autoAnimate, gridSize, tiltAt]);
+  }, [autoAnimate, gridSize, tiltAt, motionEnabled]);
 
   useEffect(() => {
     const el = sceneRef.current;
@@ -273,23 +266,15 @@ export default function Cubes({
     el.addEventListener("pointerleave", resetAll);
     el.addEventListener("click", onClick);
 
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchend", onTouchEnd, { passive: true });
-
     return () => {
       el.removeEventListener("pointermove", onPointerMove);
       el.removeEventListener("pointerleave", resetAll);
       el.removeEventListener("click", onClick);
 
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchend", onTouchEnd);
-
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
       if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
     };
-  }, [onPointerMove, resetAll, onClick, onTouchMove, onTouchStart, onTouchEnd]);
+  }, [onPointerMove, resetAll, onClick]);
 
   const cells = Array.from({ length: gridSize });
   const sceneStyle = {
@@ -316,7 +301,7 @@ export default function Cubes({
   } as CSSProperties;
 
   return (
-    <div className="default-animation" style={wrapperStyle}>
+    <div ref={wrapperRef} className="default-animation" style={wrapperStyle}>
       <div
         ref={sceneRef}
         className="default-animation--scene"

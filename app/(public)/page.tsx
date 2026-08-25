@@ -150,7 +150,7 @@ export default function HomePage() {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section
         id="home"
-        className="relative min-h-[min(88dvh,40rem)] overflow-hidden bg-[#eaf3ff] sm:min-h-0"
+        className="relative min-h-[34rem] overflow-hidden bg-[#eaf3ff] sm:min-h-0"
       >
         <Image
           src={IMAGES.hero}
@@ -218,7 +218,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Why Choose Us ────────────────────────────────────────────────── */}
-      <section id="services" className="scroll-mt-20 bg-white py-12 sm:scroll-mt-24 sm:py-20 lg:py-24">
+      <section id="services" className="scroll-mt-28 bg-white py-12 sm:scroll-mt-32 sm:py-20 lg:py-24">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
@@ -250,7 +250,7 @@ export default function HomePage() {
       {/* ── How It Works ─────────────────────────────────────────────────── */}
       <section
         id="how-it-works"
-        className="scroll-mt-20 bg-white py-12 sm:scroll-mt-24 sm:py-20 lg:py-24"
+        className="scroll-mt-28 bg-white py-12 sm:scroll-mt-32 sm:py-20 lg:py-24"
       >
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
@@ -306,7 +306,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Stats + CTA (mockup band) ─────────────────────────────────────── */}
-      <section id="contact" className="scroll-mt-20 sm:scroll-mt-24">
+      <section id="contact" className="scroll-mt-28 sm:scroll-mt-32">
         <div className="relative overflow-hidden bg-[#003A8C] py-12 text-white sm:py-20">
           <Image
             src={IMAGES.statsBg}
@@ -423,7 +423,7 @@ export default function HomePage() {
       {/* ── About ────────────────────────────────────────────────────────── */}
       <section
         id="about"
-        className="scroll-mt-20 border-t border-slate-200/80 bg-[#fafbfc] py-14 sm:scroll-mt-24 sm:py-24"
+        className="scroll-mt-28 border-t border-slate-200/80 bg-[#fafbfc] py-14 sm:scroll-mt-32 sm:py-24"
       >
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
@@ -443,11 +443,11 @@ export default function HomePage() {
 
           <div className="mt-12 grid items-center gap-10 lg:mt-16 lg:grid-cols-2 lg:gap-16">
             <div className="relative mx-auto flex w-full max-w-md items-center justify-center lg:max-w-none">
-              <div className="relative aspect-square w-full max-w-[420px] lg:max-w-none">
+              <div className="relative aspect-square w-full max-w-[min(100%,420px)] overflow-hidden lg:max-w-none">
                 <Cubes
                   gridSize={8}
-                  maxAngle={60}
-                  radius={4}
+                  maxAngle={45}
+                  radius={3}
                   borderStyle="1px solid rgba(0, 86, 210, 0.35)"
                   faceColor="#E8F1FF"
                   rippleColor="#0056D2"
@@ -492,7 +492,7 @@ export default function HomePage() {
       {/* ── Pricing ──────────────────────────────────────────────────────── */}
       <section
         id="pricing"
-        className="scroll-mt-20 border-t border-slate-200/80 bg-[#fafbfc] py-14 sm:scroll-mt-24 sm:py-24"
+        className="scroll-mt-28 border-t border-slate-200/80 bg-[#fafbfc] py-14 sm:scroll-mt-32 sm:py-24"
       >
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
@@ -519,10 +519,10 @@ export default function HomePage() {
                   key={name}
                   href="/register"
                   aria-label={`${name} — ${price}. ${ctaLabel}`}
-                  className={`group relative flex flex-col bg-white px-7 pb-8 pt-0 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056D2] sm:px-8 sm:pb-9 ${
+                  className={`group relative flex flex-col bg-white px-7 pb-8 pt-0 transition-[border-color,box-shadow] duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056D2] sm:px-8 sm:pb-9 sm:transition-[border-color,box-shadow,transform] sm:hover:-translate-y-0.5 ${
                     featured
-                      ? "border-2 border-[#0056D2] shadow-[0_18px_40px_-28px_rgba(0,86,210,0.45)] hover:shadow-[0_22px_48px_-24px_rgba(0,86,210,0.5)]"
-                      : "border border-slate-300 shadow-[0_12px_28px_-24px_rgba(15,23,42,0.35)] hover:border-[#0056D2]/40 hover:shadow-[0_16px_36px_-22px_rgba(15,23,42,0.4)]"
+                      ? "border-2 border-[#0056D2] shadow-[0_18px_40px_-28px_rgba(0,86,210,0.45)] sm:hover:shadow-[0_22px_48px_-24px_rgba(0,86,210,0.5)]"
+                      : "border border-slate-300 shadow-[0_12px_28px_-24px_rgba(15,23,42,0.35)] hover:border-[#0056D2]/40 sm:hover:shadow-[0_16px_36px_-22px_rgba(15,23,42,0.4)]"
                   }`}
                 >
                   {/* Classic top rail */}
