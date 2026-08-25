@@ -84,16 +84,16 @@ export function LandingFooter() {
         </div>
 
         {/* Link columns */}
-        <div className="mt-12 grid gap-10 border-y border-white/10 py-10 sm:mt-14 sm:grid-cols-3 sm:gap-8 sm:py-12">
+        <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-10 border-y border-white/10 py-10 sm:mt-14 sm:grid-cols-3 sm:gap-8 sm:py-12">
           <FooterColumn title="Company" links={COMPANY} />
           <FooterColumn title="Account" links={ACCOUNT} />
 
-          <div>
+          <div className="col-span-2 sm:col-span-1">
             <p className="text-[11px] font-semibold tracking-[0.22em] uppercase text-white/55">
               Promise
             </p>
             <div className="mt-3 h-px w-8 bg-[#4A90E2]/70" aria-hidden />
-            <p className="mt-5 text-[15px] leading-relaxed text-white/70">
+            <p className="mt-5 max-w-sm text-[15px] leading-relaxed text-white/70">
               Clean water. Clear pricing. Careful delivery — every time.
             </p>
             <Link
