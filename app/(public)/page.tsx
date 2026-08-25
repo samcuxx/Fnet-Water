@@ -21,20 +21,19 @@ import { buttonClasses } from "@/components/ui";
 const IMAGES = {
   /**
    * Full-bleed hero section background.
-   * Drop your final artwork at `public/landing/hero.png`
-   * and change this path to "/landing/hero.png".
+   * Source: public/landing/hero.jpg
    */
-  hero: "/landing/hero.svg",
+  hero: "/landing/hero.jpg",
   /**
    * Blue stats-band background (wave + product splash).
-   * Replace with `public/landing/stats-bg.png` when ready.
+   * Source: public/landing/stats-bg.jpg
    */
-  statsBg: "/landing/stats-bg.svg",
+  statsBg: "/landing/stats-bg.jpg",
   /**
    * Delivery person holding a jug for the CTA card.
-   * Replace with `public/landing/cta-delivery.png` when ready.
+   * Source: public/landing/cta-delivery.jpg
    */
-  ctaDelivery: "/landing/cta-delivery.svg",
+  ctaDelivery: "/landing/cta-delivery.jpg",
   dispenser:
     "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=85",
 } as const;
@@ -147,14 +146,15 @@ export default function HomePage() {
           alt=""
           fill
           priority
+          unoptimized
           sizes="100vw"
-          className="object-cover object-center"
+          className="object-cover object-[72%_center] sm:object-right"
           aria-hidden
         />
-        {/* Soft wash so left-side copy stays readable over any future photo */}
+        {/* Soft left wash for text only — products stay sharp on the right */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-r from-white/92 via-white/75 to-white/20 sm:via-white/70 sm:to-transparent"
+          className="pointer-events-none absolute inset-y-0 left-0 w-[min(100%,36rem)] bg-gradient-to-r from-white/70 via-white/35 to-transparent"
         />
 
         <div className="relative mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24 xl:py-28">
@@ -290,20 +290,24 @@ export default function HomePage() {
       {/* ── Stats + CTA (mockup band) ─────────────────────────────────────── */}
       <section id="contact" className="scroll-mt-24">
         {/* Stats band — background is a replaceable image */}
-        <div className="relative overflow-hidden bg-[#0056D2] pb-28 pt-16 text-white sm:pb-32 sm:pt-20">
+        <div className="relative overflow-hidden bg-[#003A8C] pb-28 pt-16 text-white sm:pb-32 sm:pt-20">
           <Image
             src={IMAGES.statsBg}
             alt=""
             fill
+            unoptimized
             sizes="100vw"
-            className="object-cover object-center"
+            className="object-cover object-right"
             aria-hidden
           />
-          {/* Ensure text stays readable over any future background photo */}
-          <div className="absolute inset-0 bg-[#0056D2]/55" aria-hidden />
+          {/* Light left/center wash for white text — jug stays crisp on the right */}
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-[#003A8C]/55 via-[#0056D2]/25 to-transparent"
+            aria-hidden
+          />
 
           <div className="relative mx-auto w-full max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/80">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/85">
               Trusted by thousands
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -324,7 +328,7 @@ export default function HomePage() {
                   <p className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
                     {value}
                   </p>
-                  <p className="mt-1 text-sm text-white/85">{label}</p>
+                  <p className="mt-1 text-sm text-white/90">{label}</p>
                 </div>
               ))}
             </div>
@@ -361,13 +365,14 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <div className="relative min-h-[280px] bg-[#E8F1FF] lg:min-h-[360px]">
+                <div className="relative min-h-[280px] bg-black lg:min-h-[360px]">
                   <Image
                     src={IMAGES.ctaDelivery}
                     alt="F Net delivery professional with a water jug"
                     fill
+                    unoptimized
                     sizes="(max-width: 1024px) 100vw, 30vw"
-                    className="object-cover object-top"
+                    className="object-cover object-center"
                   />
                 </div>
 
