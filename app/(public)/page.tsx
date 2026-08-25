@@ -487,7 +487,7 @@ export default function HomePage() {
       {/* ── Pricing ──────────────────────────────────────────────────────── */}
       <section
         id="pricing"
-        className="scroll-mt-20 bg-white py-14 sm:scroll-mt-24 sm:py-24"
+        className="scroll-mt-20 border-t border-slate-200/80 bg-[#fafbfc] py-14 sm:scroll-mt-24 sm:py-24"
       >
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
@@ -504,42 +504,67 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="mt-12 grid gap-6 lg:mt-16 lg:grid-cols-3 lg:gap-0 lg:border lg:border-slate-200">
+          <div className="mt-12 grid gap-6 sm:gap-7 lg:mt-16 lg:grid-cols-3 lg:gap-8">
             {PRICING.map(({ name, price, unit, note, features, featured }) => (
               <article
                 key={name}
-                className={`relative flex flex-col border border-slate-200 bg-white p-7 sm:p-9 lg:border-0 lg:border-r lg:border-slate-200 lg:last:border-r-0 ${
-                  featured ? "lg:bg-[#f8fafc]" : ""
+                className={`relative flex flex-col bg-white px-7 pb-8 pt-0 sm:px-8 sm:pb-9 ${
+                  featured
+                    ? "border-2 border-[#0056D2] shadow-[0_18px_40px_-28px_rgba(0,86,210,0.45)]"
+                    : "border border-slate-300 shadow-[0_12px_28px_-24px_rgba(15,23,42,0.35)]"
                 }`}
               >
-                {featured && (
-                  <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0056D2]">
-                    Most popular
-                  </p>
-                )}
-                {!featured && <div className="mb-5 hidden h-[17px] lg:block" aria-hidden />}
+                {/* Classic top rail */}
+                <div
+                  className={`mx-auto h-1 w-16 ${
+                    featured ? "bg-[#0056D2]" : "bg-slate-300"
+                  }`}
+                  aria-hidden
+                />
 
-                <h3 className="text-lg font-semibold text-[#0A1931]">{name}</h3>
-                <p className="mt-5 flex items-baseline gap-1.5">
-                  <span className="text-3xl font-bold tracking-tight text-[#0A1931] sm:text-4xl">
+                <div className="mt-7 text-center">
+                  {featured ? (
+                    <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#0056D2]">
+                      Most popular
+                    </p>
+                  ) : (
+                    <div className="mb-3 h-[15px]" aria-hidden />
+                  )}
+
+                  <h3 className="text-lg font-semibold tracking-tight text-[#0A1931]">
+                    {name}
+                  </h3>
+
+                  <p className="mt-5 text-[2rem] font-bold tracking-tight text-[#0A1931] sm:text-[2.25rem]">
                     {price}
-                  </span>
-                </p>
-                <p className="mt-1 text-xs font-medium uppercase tracking-[0.12em] text-slate-400">
-                  {unit}
-                </p>
-                <p className="mt-5 text-sm leading-relaxed text-slate-500">
-                  {note}
-                </p>
+                  </p>
+                  <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    {unit}
+                  </p>
 
-                <ul className="mt-7 flex-1 space-y-3 border-t border-slate-100 pt-6">
+                  <div
+                    className="mx-auto mt-5 flex w-full max-w-[9rem] items-center gap-2"
+                    aria-hidden
+                  >
+                    <span className="h-px flex-1 bg-slate-200" />
+                    <span className="size-1 rotate-45 bg-[#0056D2]/50" />
+                    <span className="h-px flex-1 bg-slate-200" />
+                  </div>
+
+                  <p className="mx-auto mt-5 max-w-[16rem] text-sm leading-relaxed text-slate-500">
+                    {note}
+                  </p>
+                </div>
+
+                <ul className="mt-7 flex-1 space-y-3.5 border-t border-slate-200 pt-6">
                   {features.map((item) => (
                     <li
                       key={item}
-                      className="flex items-start gap-2.5 text-sm text-slate-600"
+                      className="flex items-start gap-3 text-sm text-slate-600"
                     >
                       <Check
                         className="mt-0.5 size-4 shrink-0 text-[#0056D2]"
+                        strokeWidth={2.25}
                         aria-hidden
                       />
                       {item}
@@ -549,10 +574,10 @@ export default function HomePage() {
 
                 <Link
                   href="/register"
-                  className={`mt-8 inline-flex h-11 w-full items-center justify-center rounded-lg text-sm font-semibold transition-colors ${
+                  className={`mt-8 inline-flex h-11 w-full items-center justify-center text-sm font-semibold tracking-wide transition-colors ${
                     featured
                       ? "bg-[#0056D2] text-white hover:bg-[#0047b0]"
-                      : "border border-slate-300 text-[#0A1931] hover:border-[#0056D2] hover:text-[#0056D2]"
+                      : "border border-[#0A1931] text-[#0A1931] hover:border-[#0056D2] hover:text-[#0056D2]"
                   }`}
                 >
                   {price === "Custom" ? "Request a quote" : "Order now"}
