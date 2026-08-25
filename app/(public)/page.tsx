@@ -20,7 +20,8 @@ import { buttonClasses } from "@/components/ui";
 
 const IMAGES = {
   /**
-   * Hero product collage. Drop your final artwork at `public/landing/hero.png`
+   * Full-bleed hero section background.
+   * Drop your final artwork at `public/landing/hero.png`
    * and change this path to "/landing/hero.png".
    */
   hero: "/landing/hero.svg",
@@ -138,27 +139,25 @@ export default function HomePage() {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section
         id="home"
-        className="relative overflow-hidden bg-gradient-to-b from-white via-[#f5f9ff] to-[#e8f2fc]"
+        className="relative overflow-hidden bg-[#eaf3ff]"
       >
-        {/* Soft water-splash accents */}
+        {/* Full-section background — replace public/landing/hero.png later */}
+        <Image
+          src={IMAGES.hero}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+          aria-hidden
+        />
+        {/* Soft wash so left-side copy stays readable over any future photo */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-24 top-0 size-[28rem] rounded-full bg-[#cfe4fb]/50 blur-3xl"
+          className="absolute inset-0 bg-gradient-to-r from-white/92 via-white/75 to-white/20 sm:via-white/70 sm:to-transparent"
         />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -left-20 bottom-0 size-80 rounded-full bg-[#d7ecff]/60 blur-3xl"
-        />
-        <svg
-          aria-hidden
-          className="pointer-events-none absolute right-[8%] top-[12%] hidden h-40 w-40 text-brand-200/40 lg:block"
-          viewBox="0 0 120 120"
-          fill="currentColor"
-        >
-          <path d="M60 8c12 24 36 44 36 68a36 36 0 1 1-72 0c0-24 24-44 36-68Z" />
-        </svg>
 
-        <div className="relative mx-auto grid w-full max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:gap-12 lg:px-8 lg:py-16 xl:py-20">
+        <div className="relative mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24 xl:py-28">
           <div className="max-w-xl">
             <h1 className="text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-[3.5rem]">
               <span className="block text-[#0A1931]">Pure Water.</span>
@@ -182,7 +181,7 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/register"
-                className="inline-flex h-12 items-center justify-center rounded-lg border border-[#0056D2] bg-white px-6 text-base font-semibold text-[#0056D2] transition-colors hover:bg-[#0056D2]/5"
+                className="inline-flex h-12 items-center justify-center rounded-lg border border-[#0056D2] bg-white/90 px-6 text-base font-semibold text-[#0056D2] backdrop-blur-sm transition-colors hover:bg-white"
               >
                 Create Account
               </Link>
@@ -200,24 +199,9 @@ export default function HomePage() {
               ))}
             </ul>
           </div>
-
-          {/* Hero image slot — replace public/landing/hero.png later */}
-          <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
-            <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[1.5rem] bg-[#e8f2fc] ring-1 ring-brand-100/80">
-              <Image
-                src={IMAGES.hero}
-                alt="F Net Water Hub products — dispenser, bottles and jugs"
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-contain object-center p-2 sm:p-4"
-              />
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* ── Why Choose Us ────────────────────────────────────────────────── */}
       {/* ── Why Choose Us ────────────────────────────────────────────────── */}
       <section id="services" className="scroll-mt-24 bg-white py-16 sm:py-20 lg:py-24">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
