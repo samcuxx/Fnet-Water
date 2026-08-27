@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -137,25 +136,8 @@ export function ProductCarousel() {
         </div>
 
         <div className="relative mt-10 sm:mt-14">
-          <button
-            type="button"
-            onClick={goPrev}
-            aria-label="Previous products"
-            className="absolute left-0 top-1/2 z-20 hidden size-11 -translate-y-1/2 items-center justify-center text-[#0A1931]/45 transition-colors hover:text-[#0056D2] sm:-left-2 sm:flex lg:-left-4"
-          >
-            <ChevronLeft className="size-8 stroke-[1.25]" aria-hidden />
-          </button>
-          <button
-            type="button"
-            onClick={goNext}
-            aria-label="Next products"
-            className="absolute right-0 top-1/2 z-20 hidden size-11 -translate-y-1/2 items-center justify-center text-[#0A1931]/45 transition-colors hover:text-[#0056D2] sm:-right-2 sm:flex lg:-right-4"
-          >
-            <ChevronRight className="size-8 stroke-[1.25]" aria-hidden />
-          </button>
-
           <div
-            className="overflow-hidden px-2 sm:px-8"
+            className="overflow-hidden px-2 sm:px-4"
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           >
@@ -213,25 +195,6 @@ export function ProductCarousel() {
                 }`}
               />
             ))}
-          </div>
-
-          <div className="mt-6 flex justify-center gap-3 sm:hidden">
-            <button
-              type="button"
-              onClick={goPrev}
-              aria-label="Previous products"
-              className="inline-flex size-10 items-center justify-center border border-slate-300 bg-white text-[#0A1931]"
-            >
-              <ChevronLeft className="size-5" aria-hidden />
-            </button>
-            <button
-              type="button"
-              onClick={goNext}
-              aria-label="Next products"
-              className="inline-flex size-10 items-center justify-center border border-slate-300 bg-white text-[#0A1931]"
-            >
-              <ChevronRight className="size-5" aria-hidden />
-            </button>
           </div>
         </div>
       </div>
