@@ -15,36 +15,42 @@ const PRODUCTS = [
     label: "19L",
     name: "Dispenser jug",
     image: "/landing/products/19l.jpg",
+    scale: 1.55,
   },
   {
     id: "5l",
     label: "5L",
     name: "Family jug",
     image: "/landing/products/5l.jpg",
+    scale: 1.48,
   },
   {
     id: "1-5l",
     label: "1.5L",
     name: "Everyday bottle",
     image: "/landing/products/1-5l.jpg",
+    scale: 1.42,
   },
   {
     id: "750ml",
     label: "750ML",
     name: "Premium spring",
     image: "/landing/products/750ml.png",
+    scale: 0.72,
   },
   {
     id: "600ml",
     label: "600ML",
     name: "On the go",
     image: "/landing/products/600ml.jpg",
+    scale: 0.68,
   },
   {
     id: "330ml",
     label: "330ML",
     name: "Personal size",
     image: "/landing/products/330ml.jpg",
+    scale: 0.62,
   },
 ] as const;
 
@@ -166,15 +172,20 @@ export function ProductCarousel() {
                   style={{ width: `${slidePct}%` }}
                 >
                   <article className="flex flex-col items-center text-center">
-                    <div className="relative h-[360px] w-full max-w-[280px] sm:h-[420px] sm:max-w-[320px] lg:h-[460px] lg:max-w-[340px]">
-                      <Image
-                        src={product.image}
-                        alt={`F Net ${product.label} — ${product.name}`}
-                        fill
-                        unoptimized
-                        sizes="(max-width: 640px) 80vw, 340px"
-                        className="object-contain object-bottom"
-                      />
+                    <div className="relative flex h-[400px] w-full max-w-[320px] items-end justify-center overflow-visible sm:h-[480px] sm:max-w-[380px] lg:h-[520px] lg:max-w-[400px]">
+                      <div
+                        className="relative h-full w-full origin-bottom"
+                        style={{ transform: `scale(${product.scale})` }}
+                      >
+                        <Image
+                          src={product.image}
+                          alt={`F Net ${product.label} — ${product.name}`}
+                          fill
+                          unoptimized
+                          sizes="(max-width: 640px) 90vw, 400px"
+                          className="object-contain object-bottom"
+                        />
+                      </div>
                     </div>
 
                     <p className="mt-5 text-lg font-bold tracking-[0.08em] text-[#0056D2] sm:text-xl">
