@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import Cubes from "@/components/landing/cubes";
+import { ProductCarousel } from "@/components/landing/product-carousel";
 import {
   ArrowRight,
   BadgeCheck,
@@ -246,6 +247,8 @@ export default function HomePage() {
           </ul>
         </div>
       </section>
+
+      <ProductCarousel />
 
       {/* ── How It Works ─────────────────────────────────────────────────── */}
       <section
