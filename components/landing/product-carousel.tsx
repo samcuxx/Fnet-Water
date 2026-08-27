@@ -36,21 +36,21 @@ const PRODUCTS = [
     label: "750ML",
     name: "Premium spring",
     image: "/landing/products/750ml.png",
-    scale: 0.72,
+    scale: 0.62,
   },
   {
     id: "600ml",
     label: "600ML",
     name: "On the go",
     image: "/landing/products/600ml.jpg",
-    scale: 0.68,
+    scale: 0.58,
   },
   {
     id: "330ml",
     label: "330ML",
     name: "Personal size",
     image: "/landing/products/330ml.jpg",
-    scale: 0.62,
+    scale: 0.54,
   },
 ] as const;
 
