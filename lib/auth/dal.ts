@@ -142,20 +142,22 @@ export async function requireCustomer(): Promise<Actor & { customerId: string }>
 }
 
 export async function requireDriver(): Promise<Actor & { driverId: string }> {
-  const actor = await requireRole(UserRole.DRIVER, UserRole.ADMINISTRATOR);
+  const actor = await requireRole(UserRole.DRIVER);
 
   if (!actor.driverId) {
-    forbidden();
+    // A driver account without a profile is a data integrity fault.
+    throw new Error(`Driver user ${actor.userId} has no driver profile.`);
   }
 
   return actor as Actor & { driverId: string };
 }
 
 export async function requireAgent(): Promise<Actor & { agentId: string }> {
-  const actor = await requireRole(UserRole.AGENT, UserRole.ADMINISTRATOR);
+  const actor = await requireRole(UserRole.AGENT);
 
   if (!actor.agentId) {
-    forbidden();
+    // An agent account without a profile is a data integrity fault.
+    throw new Error(`Agent user ${actor.userId} has no agent profile.`);
   }
 
   return actor as Actor & { agentId: string };

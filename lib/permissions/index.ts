@@ -266,9 +266,11 @@ export const ROLE_HOME: Record<UserRole, string> = {
 /** Route prefix ownership, used by proxy.ts for optimistic gating. */
 export const ROLE_ROUTE_PREFIX: Record<string, UserRole[]> = {
   "/admin": [UserRole.ADMINISTRATOR],
+  // Administrators may enter the manager portal; agent/driver portals are
+  // role-owned (they require those profiles). Staff management stays under /admin.
   "/manager": [UserRole.ADMINISTRATOR, UserRole.MANAGER],
-  "/agent": [UserRole.ADMINISTRATOR, UserRole.AGENT],
-  "/driver": [UserRole.ADMINISTRATOR, UserRole.DRIVER],
+  "/agent": [UserRole.AGENT],
+  "/driver": [UserRole.DRIVER],
   "/customer": [UserRole.CUSTOMER],
 };
 

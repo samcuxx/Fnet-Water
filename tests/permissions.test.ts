@@ -123,11 +123,30 @@ describe("route access", () => {
     expect(canAccessPathname(UserRole.MANAGER, "/customer")).toBe(false);
     expect(canAccessPathname(UserRole.DRIVER, "/customer")).toBe(false);
     expect(canAccessPathname(UserRole.AGENT, "/customer")).toBe(false);
+    expect(canAccessPathname(UserRole.ADMINISTRATOR, "/customer")).toBe(false);
+  });
+
+  it("keeps an administrator out of agent and driver portals", () => {
+    // Those portals require agent/driver profiles. Admin manages them from /admin.
+    expect(canAccessPathname(UserRole.ADMINISTRATOR, "/agent")).toBe(false);
+    expect(canAccessPathname(UserRole.ADMINISTRATOR, "/driver")).toBe(false);
+    expect(canAccessPathname(UserRole.ADMINISTRATOR, "/admin")).toBe(true);
+    expect(canAccessPathname(UserRole.ADMINISTRATOR, "/manager")).toBe(true);
+  });
+
+  it("keeps each staff role in its own portal", () => {
+    expect(canAccessPathname(UserRole.MANAGER, "/admin")).toBe(false);
+    expect(canAccessPathname(UserRole.MANAGER, "/agent")).toBe(false);
+    expect(canAccessPathname(UserRole.AGENT, "/driver")).toBe(false);
+    expect(canAccessPathname(UserRole.DRIVER, "/agent")).toBe(false);
   });
 
   it("applies the prefix to nested routes, not just the root", () => {
     expect(canAccessPathname(UserRole.DRIVER, "/admin/settings")).toBe(false);
     expect(canAccessPathname(UserRole.DRIVER, "/driver/assigned")).toBe(true);
+    expect(canAccessPathname(UserRole.ADMINISTRATOR, "/driver/assigned")).toBe(
+      false,
+    );
   });
 
   it("does not gate routes outside the role prefixes", () => {

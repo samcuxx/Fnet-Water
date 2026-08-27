@@ -122,20 +122,20 @@ export function ProductCarousel() {
   return (
     <section
       id="products"
-      className="scroll-mt-28 overflow-hidden bg-white py-14 sm:scroll-mt-32 sm:py-20 lg:py-24"
+      className="scroll-mt-28 overflow-hidden bg-white py-8 sm:scroll-mt-32 sm:py-12 lg:py-14"
     >
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-[1.75rem] font-bold tracking-tight text-[#0A1931] sm:text-4xl">
+          <h2 className="text-[2.15rem] font-bold tracking-tight text-[#0A1931] sm:text-5xl">
             Our Products
           </h2>
-          <p className="mt-4 text-[15px] leading-relaxed text-slate-600 sm:text-base">
+          <p className="mt-3 text-[15px] leading-relaxed text-slate-600 sm:mt-4 sm:text-base">
             F Net products provide clean hydration for every occasion — from
             portable bottles to refillable dispenser jugs for home and office.
           </p>
         </div>
 
-        <div className="relative mt-10 sm:mt-14">
+        <div className="relative mt-6 sm:mt-8">
           <div
             className="overflow-hidden px-2 sm:px-4"
             onTouchStart={onTouchStart}
@@ -180,7 +180,7 @@ export function ProductCarousel() {
             </ul>
           </div>
 
-          <div className="mt-8 flex items-center justify-center gap-2.5 sm:mt-10">
+          <div className="mt-5 flex items-center justify-center gap-2.5 sm:mt-6">
             {Array.from({ length: maxIndex + 1 }).map((_, i) => (
               <button
                 key={i}
