@@ -8,6 +8,12 @@ import { Alert, Button, Field, Input } from "@/components/ui";
 
 import { login, type AuthFormState } from "../actions";
 
+const FIELD_LABEL =
+  "[&_label]:text-xs [&_label]:font-semibold [&_label]:uppercase [&_label]:tracking-[0.12em] [&_label]:text-[#0A1931]";
+
+const CLASSIC_INPUT =
+  "rounded-sm border-slate-300 shadow-none focus:border-[#0056D2] focus:ring-[#0056D2]/15";
+
 /**
  * `useActionState` gives the pending flag and the action's return value, so
  * server-side validation errors render without any client-side duplication of
@@ -20,7 +26,7 @@ export function LoginForm({ next }: { next?: string }) {
   );
 
   return (
-    <form action={formAction} className="space-y-5" noValidate>
+    <form action={formAction} className="space-y-6" noValidate>
       {next && <input type="hidden" name="next" value={next} />}
 
       {state?.message && (
@@ -32,6 +38,7 @@ export function LoginForm({ next }: { next?: string }) {
       <Field
         id="identifier"
         label="Email or phone number"
+        className={FIELD_LABEL}
         errors={state?.fieldErrors?.identifier}
         required
       >
@@ -41,6 +48,7 @@ export function LoginForm({ next }: { next?: string }) {
           type="text"
           autoComplete="username"
           placeholder="you@example.com or 0244123456"
+          className={CLASSIC_INPUT}
           hasError={Boolean(state?.fieldErrors?.identifier)}
           required
         />
@@ -49,6 +57,7 @@ export function LoginForm({ next }: { next?: string }) {
       <Field
         id="password"
         label="Password"
+        className={FIELD_LABEL}
         errors={state?.fieldErrors?.password}
         required
       >
@@ -58,6 +67,7 @@ export function LoginForm({ next }: { next?: string }) {
           type="password"
           autoComplete="current-password"
           placeholder="Enter your password"
+          className={CLASSIC_INPUT}
           hasError={Boolean(state?.fieldErrors?.password)}
           required
         />
@@ -69,15 +79,16 @@ export function LoginForm({ next }: { next?: string }) {
         fullWidth
         isLoading={pending}
         loadingText="Signing in…"
+        className="rounded-sm bg-[#0056D2] text-sm font-semibold uppercase tracking-[0.08em] shadow-none hover:bg-[#0047b0] active:bg-[#003d99] disabled:bg-[#0056D2]/40"
       >
         Sign in
       </Button>
 
-      <p className="text-center text-sm text-slate-600">
+      <p className="border-t border-slate-200 pt-6 text-center text-sm text-slate-600">
         New customer?{" "}
         <Link
           href="/register"
-          className="font-medium text-brand-600 hover:text-brand-700 hover:underline"
+          className="font-semibold text-[#0056D2] underline-offset-4 hover:underline"
         >
           Create an account
         </Link>

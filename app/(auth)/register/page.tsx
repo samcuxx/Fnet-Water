@@ -15,14 +15,19 @@ export default async function RegisterPage(props: PageProps<"/register">) {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+      <header className="border-b border-slate-200 pb-8">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#0056D2]">
+          Join us
+        </p>
+        <h1 className="mt-3 text-[1.75rem] font-bold tracking-tight text-[#0A1931] sm:text-[2rem]">
           Create your account
         </h1>
-        <p className="mt-2 text-sm text-slate-600">
-          Order water, track deliveries and manage payments in one place.
+        <div className="mt-5 h-px w-12 bg-[#0056D2]/40" aria-hidden />
+        <p className="mt-5 max-w-md text-sm leading-relaxed text-slate-600">
+          Register as a customer to order water, track deliveries and manage
+          payments — all in one place.
         </p>
-      </div>
+      </header>
 
       <RegisterForm referralCode={referralCode} />
     </div>

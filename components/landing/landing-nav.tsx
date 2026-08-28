@@ -157,7 +157,7 @@ export function LandingNav({
                 aria-hidden
                 className="size-1.5 rotate-45 bg-[#0056D2]"
               />
-              App
+              Dashboard
             </Link>
           ) : (
             <Link
