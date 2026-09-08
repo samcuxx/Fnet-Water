@@ -23,7 +23,13 @@ export type MenuUser = {
  * Sign-out posts to a Server Action rather than a client fetch, so the session
  * row is revoked server-side and the cookie is cleared in the same response.
  */
-export function UserMenu({ user }: { user: MenuUser }) {
+export function UserMenu({
+  user,
+  inverted = false,
+}: {
+  user: MenuUser;
+  inverted?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -56,7 +62,10 @@ export function UserMenu({ user }: { user: MenuUser }) {
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="flex items-center gap-2 rounded-lg p-1.5 text-left transition-colors hover:bg-slate-100"
+        className={cn(
+          "flex items-center gap-2 rounded-lg p-1.5 text-left transition-colors",
+          inverted ? "hover:bg-white/10" : "hover:bg-slate-100",
+        )}
       >
         <span
           aria-hidden
@@ -66,17 +75,28 @@ export function UserMenu({ user }: { user: MenuUser }) {
         </span>
 
         <span className="hidden min-w-0 sm:block">
-          <span className="block truncate text-sm font-medium text-slate-900">
+          <span
+            className={cn(
+              "block truncate text-sm font-medium",
+              inverted ? "text-white" : "text-slate-900",
+            )}
+          >
             {user.fullName}
           </span>
-          <span className="block truncate text-xs text-slate-500">
+          <span
+            className={cn(
+              "block truncate text-xs",
+              inverted ? "text-white/55" : "text-slate-500",
+            )}
+          >
             {user.roleLabel}
           </span>
         </span>
 
         <ChevronDown
           className={cn(
-            "size-4 shrink-0 text-slate-400 transition-transform",
+            "size-4 shrink-0 transition-transform",
+            inverted ? "text-white/60" : "text-slate-400",
             open && "rotate-180",
           )}
           aria-hidden

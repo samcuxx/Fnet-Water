@@ -23,7 +23,14 @@ const LABELS: Record<Theme, string> = {
  * Cycles light → dark → system. The current mode is announced for
  * assistive tech; the icon shows what is active.
  */
-export function ThemeToggle({ className }: { className?: string }) {
+export function ThemeToggle({
+  className,
+  inverted = false,
+}: {
+  className?: string;
+  /** Light icon treatment for navy surfaces such as the portal header. */
+  inverted?: boolean;
+}) {
   const { theme, setTheme } = useTheme();
   const Icon = ICONS[theme];
 
@@ -37,14 +44,16 @@ export function ThemeToggle({ className }: { className?: string }) {
       type="button"
       onClick={cycle}
       className={cn(
-        "inline-flex size-9 cursor-pointer items-center justify-center rounded-lg text-slate-500 transition-colors",
-        "hover:bg-slate-100 hover:text-slate-900",
+        "inline-flex size-9 cursor-pointer items-center justify-center rounded-lg transition-colors",
+        inverted
+          ? "text-white/80 hover:bg-white/10 hover:text-white"
+          : "text-slate-500 hover:bg-slate-100 hover:text-slate-900",
         className,
       )}
       aria-label={`Theme: ${LABELS[theme]}. Click to switch`}
       title={`Theme: ${LABELS[theme]}`}
     >
-      <Icon className="size-4" aria-hidden />
+      <Icon className="size-5" aria-hidden />
     </button>
   );
 }

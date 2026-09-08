@@ -103,26 +103,26 @@ export function AppShell({
       )}
 
       <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-slate-200 bg-surface/90 px-4 backdrop-blur sm:px-6">
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-white/10 bg-sidebar px-4 sm:px-6">
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
             aria-expanded={drawerOpen}
-            className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden"
+            className="rounded-lg p-2 text-white/80 hover:bg-white/10 hover:text-white lg:hidden"
           >
             <Menu className="size-5" aria-hidden />
             <span className="sr-only">Open navigation</span>
           </button>
 
           <Link href="/" className="lg:hidden" aria-label="F Net Water Hub home">
-            <Logo showWordmark={false} />
+            <Logo inverted showWordmark={false} />
           </Link>
 
           <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
-            <ThemeToggle />
+            <ThemeToggle inverted />
             <Link
               href="/notifications"
-              className="relative rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+              className="relative rounded-lg p-2 text-white/80 hover:bg-white/10 hover:text-white"
             >
               <Bell className="size-5" aria-hidden />
               {notificationCount > 0 && (
@@ -141,7 +141,7 @@ export function AppShell({
               </span>
             </Link>
 
-            <UserMenu user={user} />
+            <UserMenu user={user} inverted />
           </div>
         </header>
 
