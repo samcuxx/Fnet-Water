@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import Link from "next/link";
+
 import {
   Banknote,
   CircleCheck,
@@ -120,10 +122,11 @@ export default async function DriverDashboardPage() {
                 const customer = delivery.order.customer;
 
                 return (
-                  <li
-                    key={delivery.id}
-                    className="rounded-xl border border-slate-200 p-4"
-                  >
+                  <li key={delivery.id}>
+                    <Link
+                      href={`/driver/assigned/${delivery.id}`}
+                      className="block rounded-xl border border-slate-200 p-4 hover:border-brand-300"
+                    >
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
                         <p className="font-semibold text-slate-900">
@@ -156,12 +159,9 @@ export default async function DriverDashboardPage() {
 
                     <p className="mt-2 flex items-center gap-2 text-sm text-slate-600">
                       <Phone className="size-4 shrink-0 text-slate-400" aria-hidden />
-                      <a
-                        href={`tel:${customer.user.phone}`}
-                        className="font-medium text-brand-700 hover:underline"
-                      >
+                      <span className="font-medium text-brand-700">
                         {customer.user.phone}
-                      </a>
+                      </span>
                     </p>
 
                     <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
@@ -188,6 +188,7 @@ export default async function DriverDashboardPage() {
                         ? `Scheduled ${formatFriendlyDateTime(delivery.scheduledFor)}`
                         : "No scheduled time"}
                     </p>
+                    </Link>
                   </li>
                 );
               })}
