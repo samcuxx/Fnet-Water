@@ -13,7 +13,7 @@ export default function Loading() {
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}
-            className="h-32 rounded-xl border border-slate-200 bg-white"
+            className="h-32 rounded-xl border border-slate-200 bg-surface"
           />
         ))}
       </div>
@@ -22,12 +22,12 @@ export default function Loading() {
         {Array.from({ length: 3 }).map((_, index) => (
           <div
             key={index}
-            className="h-72 rounded-xl border border-slate-200 bg-white"
+            className="h-72 rounded-xl border border-slate-200 bg-surface"
           />
         ))}
       </div>
 
-      <div className="mt-3 h-24 rounded-xl border border-slate-200 bg-white" />
+      <div className="mt-3 h-24 rounded-xl border border-slate-200 bg-surface" />
 
       <span className="sr-only">Loading…</span>
     </div>

@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * F Net Water Hub design tokens.
  *
@@ -65,6 +67,7 @@
   --color-canvas: #f6f8fb;
   --color-surface: #ffffff;
   --color-border-subtle: #e8edf3;
+  --color-landing-ink: #0a1931;
 
   /* Sidebar uses the deep brand tone for a premium, focused feel. */
   --color-sidebar: #0b2545;
@@ -95,6 +98,47 @@
   html {
     -webkit-text-size-adjust: 100%;
     overflow-x: clip;
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+
+    --color-canvas: #0b0f16;
+    --color-surface: #151b26;
+    --color-border-subtle: #2a3448;
+    --color-landing-ink: #e8eef6;
+
+    --color-slate-50: #111827;
+    --color-slate-100: #1c2433;
+    --color-slate-200: #2a3448;
+    --color-slate-300: #3d4b63;
+    --color-slate-400: #7c8aa0;
+    --color-slate-500: #9aa8bd;
+    --color-slate-600: #c5d0de;
+    --color-slate-700: #dbe3ee;
+    --color-slate-800: #edf2f7;
+    --color-slate-900: #f7f9fc;
+    --color-slate-950: #ffffff;
+
+    --color-brand-50: #0d2138;
+    --color-brand-100: #12304d;
+    --color-aqua-50: #062430;
+    --color-aqua-100: #0a3344;
+    --color-success-50: #0c241c;
+    --color-success-100: #123528;
+    --color-warning-50: #2a1d08;
+    --color-warning-100: #3d2a0c;
+    --color-danger-50: #2a1212;
+    --color-danger-100: #3f1a1a;
+    --color-info-50: #0d2138;
+    --color-info-100: #12304d;
+
+    --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.35),
+      0 1px 3px 0 rgb(0 0 0 / 0.25);
+    --shadow-card-hover: 0 4px 8px -2px rgb(0 0 0 / 0.4);
+    --shadow-dropdown: 0 12px 16px -4px rgb(0 0 0 / 0.45),
+      0 4px 6px -2px rgb(0 0 0 / 0.3);
   }
 
   body {

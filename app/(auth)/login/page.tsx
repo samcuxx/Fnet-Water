@@ -18,7 +18,7 @@ export default async function LoginPage(props: PageProps<"/login">) {
         <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#0056D2]">
           Welcome back
         </p>
-        <h1 className="mt-3 text-[1.75rem] font-bold tracking-tight text-[#0A1931] sm:text-[2rem]">
+        <h1 className="mt-3 text-[1.75rem] font-bold tracking-tight text-landing-ink sm:text-[2rem]">
           Sign in
         </h1>
         <div className="mt-5 h-px w-12 bg-[#0056D2]/40" aria-hidden />

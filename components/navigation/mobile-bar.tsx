@@ -20,7 +20,7 @@ export function MobileBar({ items }: { items: NavItem[] }) {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
     >
       <ul className="grid" style={{ gridTemplateColumns: `repeat(${items.length}, 1fr)` }}>
         {items.map((item) => {

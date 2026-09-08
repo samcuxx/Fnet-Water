@@ -9,7 +9,7 @@ import { Alert, Button, Checkbox, Field, Input } from "@/components/ui";
 import { register, type AuthFormState } from "../actions";
 
 const FIELD_LABEL =
-  "[&_label]:text-xs [&_label]:font-semibold [&_label]:uppercase [&_label]:tracking-[0.12em] [&_label]:text-[#0A1931]";
+  "[&_label]:text-xs [&_label]:font-semibold [&_label]:uppercase [&_label]:tracking-[0.12em] [&_label]:text-landing-ink";
 
 const CLASSIC_INPUT =
   "rounded-sm border-slate-300 shadow-none focus:border-[#0056D2] focus:ring-[#0056D2]/15";

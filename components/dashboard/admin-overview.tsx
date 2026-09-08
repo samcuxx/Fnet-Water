@@ -108,7 +108,7 @@ export function AdminOverview({ summary }: { summary: AdminSummary }) {
           </p>
         </div>
 
-        <div className="inline-flex w-fit items-center rounded-lg border border-slate-200 bg-white p-1 text-xs font-medium">
+        <div className="inline-flex w-fit items-center rounded-lg border border-slate-200 bg-surface p-1 text-xs font-medium">
           <span className="px-2.5 py-1.5 text-slate-400">Period</span>
           {PERIODS.map((period) => {
             const active = period === "All time";
@@ -260,7 +260,7 @@ export function AdminOverview({ summary }: { summary: AdminSummary }) {
         </Panel>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white px-5 py-5">
+      <section className="rounded-xl border border-slate-200 bg-surface px-5 py-5">
         <div className="flex items-start gap-3">
           <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
             <Boxes className="size-4" aria-hidden />
@@ -305,7 +305,7 @@ function MetricCard({
   icon: LucideIcon;
 }) {
   return (
-    <article className="rounded-xl border border-slate-200 bg-white px-4 py-4 transition-colors hover:border-slate-300">
+    <article className="rounded-xl border border-slate-200 bg-surface px-4 py-4 transition-colors hover:border-slate-300">
       <div className="flex items-start justify-between gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-slate-500">
           {label}
@@ -333,7 +333,7 @@ function Panel({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white px-5 py-5">
+    <section className="rounded-xl border border-slate-200 bg-surface px-5 py-5">
       <header className="mb-5 flex items-start justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold text-slate-900">{title}</h2>

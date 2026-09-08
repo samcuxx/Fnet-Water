@@ -122,11 +122,11 @@ export function ProductCarousel() {
   return (
     <section
       id="products"
-      className="scroll-mt-28 overflow-hidden bg-white py-8 sm:scroll-mt-32 sm:py-12 lg:py-14"
+      className="scroll-mt-28 overflow-hidden bg-surface py-8 sm:scroll-mt-32 sm:py-12 lg:py-14"
     >
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-[2.15rem] font-bold tracking-tight text-[#0A1931] sm:text-5xl">
+          <h2 className="text-[2.15rem] font-bold tracking-tight text-landing-ink sm:text-5xl">
             Our Products
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-slate-600 sm:mt-4 sm:text-base">

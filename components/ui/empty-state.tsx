@@ -79,7 +79,7 @@ export function TableSkeleton({ rows = 5, columns = 5 }: { rows?: number; column
 
 export function StatCardSkeleton() {
   return (
-    <div className="rounded-card border border-slate-200/70 bg-white p-5 shadow-card">
+    <div className="rounded-card border border-slate-200/70 bg-surface p-5 shadow-card">
       <Skeleton className="h-3 w-24" />
       <Skeleton className="mt-3 h-7 w-32" />
       <Skeleton className="mt-3 h-3 w-20" />

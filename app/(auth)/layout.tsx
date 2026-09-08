@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { LandingLogo } from "@/components/landing/landing-logo";
+import { ThemeToggle } from "@/components/theme";
 
 const PROMISES = [
   {
@@ -23,12 +24,13 @@ const PROMISES = [
  */
 export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (
-    <div className="flex min-h-screen flex-col bg-[#fafbfc] lg:flex-row">
-      <div className="flex w-full flex-col border-b border-slate-200 bg-white px-6 py-8 sm:px-10 lg:w-1/2 lg:border-b-0 lg:border-r lg:px-16">
-        <header className="border-b border-slate-200 pb-6">
+    <div className="flex min-h-screen flex-col bg-canvas lg:flex-row">
+      <div className="flex w-full flex-col border-b border-slate-200 bg-surface px-6 py-8 sm:px-10 lg:w-1/2 lg:border-b-0 lg:border-r lg:px-16">
+        <header className="flex items-center justify-between border-b border-slate-200 pb-6">
           <Link href="/" aria-label="F Net Water Hub home">
             <LandingLogo />
           </Link>
+          <ThemeToggle />
         </header>
 
         <main className="flex flex-1 items-start justify-center py-10 lg:items-center">

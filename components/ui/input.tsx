@@ -3,7 +3,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils/cn";
 
 const FIELD_BASE =
-  "w-full rounded-lg border bg-white px-3 text-sm text-slate-900 transition-colors " +
+  "w-full rounded-lg border bg-surface px-3 text-sm text-slate-900 transition-colors " +
   "placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-600/20 " +
   "disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500";
 

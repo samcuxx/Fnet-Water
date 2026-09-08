@@ -13,7 +13,7 @@ export function DashboardSkeleton({ tiles = 4 }: { tiles?: number }) {
         ))}
       </div>
 
-      <div className="mt-6 rounded-card border border-slate-200/70 bg-white shadow-card">
+      <div className="mt-6 rounded-card border border-slate-200/70 bg-surface shadow-card">
         <TableSkeleton rows={6} columns={6} />
       </div>
 

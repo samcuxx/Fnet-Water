@@ -20,7 +20,7 @@ const VARIANTS: Record<ButtonVariant, string> = {
   secondary:
     "bg-brand-50 text-brand-700 hover:bg-brand-100 active:bg-brand-200 disabled:text-brand-400",
   outline:
-    "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 active:bg-slate-100 disabled:text-slate-400",
+    "border border-slate-300 bg-surface text-slate-700 hover:bg-slate-50 active:bg-slate-100 disabled:text-slate-400",
   ghost:
     "text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:bg-slate-200",
   danger:

@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { Bell, Menu, X } from "lucide-react";
 
+import { ThemeToggle } from "@/components/theme";
 import { Logo } from "@/components/ui/logo";
 import type { UserRole } from "@/lib/generated/prisma/enums";
 import { cn } from "@/lib/utils/cn";
@@ -72,7 +73,7 @@ export function AppShell({
             type="button"
             aria-label="Close navigation"
             onClick={() => setDrawerOpen(false)}
-            className="absolute inset-0 bg-slate-900/60"
+            className="absolute inset-0 bg-black/60"
           />
 
           <div
@@ -102,7 +103,7 @@ export function AppShell({
       )}
 
       <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-slate-200 bg-white/90 px-4 backdrop-blur sm:px-6">
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-slate-200 bg-surface/90 px-4 backdrop-blur sm:px-6">
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
@@ -118,6 +119,7 @@ export function AppShell({
           </Link>
 
           <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
+            <ThemeToggle />
             <Link
               href="/notifications"
               className="relative rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900"

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { ThemeToggle } from "@/components/theme";
+
 import { LandingLogoMark } from "./landing-logo";
 
 const NAV_LINKS = [
@@ -85,8 +87,8 @@ export function LandingNav({
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-[#f7f9fc] transition-[background-color,box-shadow] duration-300 ${
-        scrolled ? "bg-white shadow-[0_10px_30px_-24px_rgba(10,25,49,0.45)]" : ""
+      className={`sticky top-0 z-50 bg-canvas transition-[background-color,box-shadow] duration-300 ${
+        scrolled ? "bg-surface shadow-[0_10px_30px_-24px_rgba(10,25,49,0.45)] dark:shadow-[0_10px_30px_-18px_rgba(0,0,0,0.65)]" : ""
       }`}
     >
       {/* Masthead — brand led */}
@@ -105,7 +107,7 @@ export function LandingNav({
         >
           <LandingLogoMark className="size-9 sm:size-11" />
           <span className="min-w-0 leading-none">
-            <span className="block text-[1.35rem] font-bold tracking-[-0.03em] text-[#0A1931] sm:text-[1.65rem]">
+            <span className="block text-[1.35rem] font-bold tracking-[-0.03em] text-landing-ink sm:text-[1.65rem]">
               F Net
             </span>
             <span className="mt-1 block text-[0.65rem] font-medium tracking-[0.28em] text-[#0056D2] sm:text-[0.7rem]">
@@ -115,10 +117,11 @@ export function LandingNav({
         </Link>
 
         <div className="flex shrink-0 items-center gap-2 sm:min-w-[11rem] sm:justify-end">
+          <ThemeToggle className="border border-slate-300 bg-surface" />
           {signedIn && dashboardHref ? (
             <Link
               href={dashboardHref}
-              className="hidden items-center gap-2 border border-slate-300 bg-white px-3.5 py-2 text-[13px] font-medium text-[#0A1931] transition-colors hover:border-[#0056D2] hover:text-[#0056D2] sm:inline-flex"
+              className="hidden items-center gap-2 border border-slate-300 bg-surface px-3.5 py-2 text-[13px] font-medium text-landing-ink transition-colors hover:border-[#0056D2] hover:text-[#0056D2] sm:inline-flex"
             >
               <span
                 aria-hidden
@@ -127,10 +130,10 @@ export function LandingNav({
               Open dashboard
             </Link>
           ) : (
-            <div className="hidden overflow-hidden border border-slate-300 bg-white sm:flex">
+            <div className="hidden overflow-hidden border border-slate-300 bg-surface sm:flex">
               <Link
                 href="/login"
-                className="inline-flex items-center px-3.5 py-2 text-[13px] font-medium text-[#0A1931]/80 transition-colors hover:bg-[#f7f9fc] hover:text-[#0056D2]"
+                className="inline-flex items-center px-3.5 py-2 text-[13px] font-medium text-landing-ink/80 transition-colors hover:bg-canvas hover:text-[#0056D2]"
               >
                 Log in
               </Link>
@@ -151,7 +154,7 @@ export function LandingNav({
           {signedIn && dashboardHref ? (
             <Link
               href={dashboardHref}
-              className="inline-flex items-center gap-1.5 border border-slate-300 bg-white px-2.5 py-1.5 text-[12px] font-medium text-[#0A1931] sm:hidden"
+              className="inline-flex items-center gap-1.5 border border-slate-300 bg-surface px-2.5 py-1.5 text-[12px] font-medium text-landing-ink sm:hidden"
             >
               <span
                 aria-hidden
@@ -174,7 +177,7 @@ export function LandingNav({
 
           <button
             type="button"
-            className="inline-flex size-9 items-center justify-center border border-slate-300 bg-white text-[#0A1931] transition-colors hover:border-[#0056D2] hover:text-[#0056D2] lg:hidden"
+            className="inline-flex size-9 items-center justify-center border border-slate-300 bg-surface text-landing-ink transition-colors hover:border-[#0056D2] hover:text-[#0056D2] lg:hidden"
             aria-expanded={menuOpen}
             aria-controls="landing-mobile-nav"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -190,7 +193,7 @@ export function LandingNav({
       </div>
 
       {/* Navigation rail */}
-      <div className="border-y border-slate-200/90 bg-white">
+      <div className="border-y border-slate-200/90 bg-surface">
         <nav
           aria-label="Primary"
           className="mx-auto hidden max-w-7xl items-center justify-center gap-1 px-6 lg:flex xl:gap-2"
@@ -211,7 +214,7 @@ export function LandingNav({
                   className={`relative px-3 py-3.5 text-[0.9rem] transition-colors ${
                     isActive
                       ? "font-semibold text-[#0056D2]"
-                      : "font-medium text-[#0A1931]/70 hover:text-[#0056D2]"
+                      : "font-medium text-landing-ink/70 hover:text-[#0056D2]"
                   }`}
                 >
                   {label}
@@ -238,7 +241,7 @@ export function LandingNav({
       {menuOpen && (
         <div
           id="landing-mobile-nav"
-          className="max-h-[calc(100dvh-7rem)] overflow-y-auto border-b border-slate-200 bg-white lg:hidden"
+          className="max-h-[calc(100dvh-7rem)] overflow-y-auto border-b border-slate-200 bg-surface lg:hidden"
         >
           <nav
             aria-label="Mobile"
@@ -257,7 +260,7 @@ export function LandingNav({
                   className={`flex items-center gap-3 border-b border-slate-100 py-3.5 text-[1.05rem] ${
                     isActive
                       ? "font-semibold text-[#0056D2]"
-                      : "font-medium text-[#0A1931]"
+                      : "font-medium text-landing-ink"
                   }`}
                 >
                   <span
@@ -289,7 +292,7 @@ export function LandingNav({
                   <Link
                     href="/login"
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-center border-r border-slate-300 bg-white py-3.5 text-[13px] font-medium text-[#0A1931]"
+                    className="flex items-center justify-center border-r border-slate-300 bg-surface py-3.5 text-[13px] font-medium text-landing-ink"
                   >
                     Log in
                   </Link>

@@ -176,8 +176,8 @@ export default function HomePage() {
         <div className="relative mx-auto flex w-full max-w-7xl flex-col justify-center px-4 py-12 pb-16 sm:px-6 sm:py-16 lg:px-8 lg:py-24 xl:py-28">
           <div className="max-w-xl">
             <h1 className="text-[2.15rem] font-bold leading-[1.12] tracking-tight sm:text-5xl lg:text-[3.5rem]">
-              <span className="block text-[#0A1931]">Pure Water.</span>
-              <span className="block text-[#0A1931]">Delivered.</span>
+              <span className="block text-landing-ink">Pure Water.</span>
+              <span className="block text-landing-ink">Delivered.</span>
               <span className="block text-[#0056D2]">Every Time.</span>
             </h1>
 
@@ -197,7 +197,7 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/register"
-                className="inline-flex h-12 w-full items-center justify-center rounded-xl border border-[#0056D2] bg-white/95 px-6 text-base font-semibold text-[#0056D2] transition-colors hover:bg-white sm:w-auto sm:rounded-lg"
+                className="inline-flex h-12 w-full items-center justify-center rounded-xl border border-[#0056D2] bg-surface/95 px-6 text-base font-semibold text-[#0056D2] transition-colors hover:bg-surface sm:w-auto sm:rounded-lg"
               >
                 Create Account
               </Link>
@@ -219,13 +219,13 @@ export default function HomePage() {
       </section>
 
       {/* ── Why Choose Us ────────────────────────────────────────────────── */}
-      <section id="services" className="scroll-mt-28 bg-white py-12 sm:scroll-mt-32 sm:py-20 lg:py-24">
+      <section id="services" className="scroll-mt-28 bg-surface py-12 sm:scroll-mt-32 sm:py-20 lg:py-24">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
               Why choose F Net Water Hub?
             </p>
-            <h2 className="mt-3 text-[1.65rem] font-bold tracking-tight text-[#0A1931] sm:text-4xl">
+            <h2 className="mt-3 text-[1.65rem] font-bold tracking-tight text-landing-ink sm:text-4xl">
               Quality Water. Exceptional Service.
             </h2>
           </div>
@@ -236,7 +236,7 @@ export default function HomePage() {
                 <span className="mx-auto flex size-10 items-center justify-center text-[#0056D2] sm:size-14">
                   <Icon className="size-6 stroke-[1.5] sm:size-8" aria-hidden />
                 </span>
-                <h3 className="mt-3 text-sm font-bold leading-snug text-[#0A1931] sm:mt-5 sm:text-[0.95rem]">
+                <h3 className="mt-3 text-sm font-bold leading-snug text-landing-ink sm:mt-5 sm:text-[0.95rem]">
                   {title}
                 </h3>
                 <p className="mx-auto mt-1.5 max-w-[14rem] text-xs leading-relaxed text-slate-500 sm:mt-2.5 sm:text-[13px]">
@@ -253,14 +253,14 @@ export default function HomePage() {
       {/* ── How It Works ─────────────────────────────────────────────────── */}
       <section
         id="how-it-works"
-        className="scroll-mt-28 bg-white py-12 sm:scroll-mt-32 sm:py-20 lg:py-24"
+        className="scroll-mt-28 bg-surface py-12 sm:scroll-mt-32 sm:py-20 lg:py-24"
       >
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
               How it works
             </p>
-            <h2 className="mt-3 text-[1.65rem] font-bold tracking-tight text-[#0A1931] sm:text-4xl">
+            <h2 className="mt-3 text-[1.65rem] font-bold tracking-tight text-landing-ink sm:text-4xl">
               Ordering water has never been this easy
             </h2>
           </div>
@@ -296,7 +296,7 @@ export default function HomePage() {
                 >
                   {no}
                 </p>
-                <h3 className="mt-2 text-[11px] font-bold leading-tight text-[#0A1931] sm:mt-3 sm:text-lg">
+                <h3 className="mt-2 text-[11px] font-bold leading-tight text-landing-ink sm:mt-3 sm:text-lg">
                   {title}
                 </h3>
                 <p className="mx-auto mt-1.5 hidden text-sm leading-relaxed text-slate-500 sm:mt-2 sm:block sm:max-w-[16rem]">
@@ -354,14 +354,14 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="border-t border-slate-200/80 bg-[#fafbfc] py-14 sm:py-20">
+        <div className="border-t border-slate-200/80 bg-canvas py-14 sm:py-20">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#0056D2]">
                   Get started
                 </p>
-                <h2 className="mt-3 text-[1.75rem] font-bold tracking-tight text-[#0A1931] sm:text-4xl">
+                <h2 className="mt-3 text-[1.75rem] font-bold tracking-tight text-landing-ink sm:text-4xl">
                   Ready when you are
                 </h2>
                 <div className="mt-5 h-px w-12 bg-[#0056D2]/40" aria-hidden />
@@ -400,7 +400,7 @@ export default function HomePage() {
                   </Link>
                   <Link
                     href="#about"
-                    className="inline-flex h-11 w-full items-center justify-center rounded-lg border border-slate-300 px-6 text-sm font-semibold text-[#0A1931] transition-colors hover:border-[#0056D2] hover:text-[#0056D2] sm:w-auto"
+                    className="inline-flex h-11 w-full items-center justify-center rounded-lg border border-slate-300 px-6 text-sm font-semibold text-landing-ink transition-colors hover:border-[#0056D2] hover:text-[#0056D2] sm:w-auto"
                   >
                     Learn more
                   </Link>
@@ -426,14 +426,14 @@ export default function HomePage() {
       {/* ── About ────────────────────────────────────────────────────────── */}
       <section
         id="about"
-        className="scroll-mt-28 border-t border-slate-200/80 bg-[#fafbfc] py-14 sm:scroll-mt-32 sm:py-24"
+        className="scroll-mt-28 border-t border-slate-200/80 bg-canvas py-14 sm:scroll-mt-32 sm:py-24"
       >
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#0056D2]">
               About us
             </p>
-            <h2 className="mt-3 text-[1.75rem] font-bold tracking-tight text-[#0A1931] sm:text-4xl">
+            <h2 className="mt-3 text-[1.75rem] font-bold tracking-tight text-landing-ink sm:text-4xl">
               A trusted water partner
             </h2>
             <div className="mx-auto mt-5 h-px w-12 bg-[#0056D2]/40" aria-hidden />
@@ -495,14 +495,14 @@ export default function HomePage() {
       {/* ── Pricing ──────────────────────────────────────────────────────── */}
       <section
         id="pricing"
-        className="scroll-mt-28 border-t border-slate-200/80 bg-[#fafbfc] py-14 sm:scroll-mt-32 sm:py-24"
+        className="scroll-mt-28 border-t border-slate-200/80 bg-canvas py-14 sm:scroll-mt-32 sm:py-24"
       >
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#0056D2]">
               Pricing
             </p>
-            <h2 className="mt-3 text-[1.75rem] font-bold tracking-tight text-[#0A1931] sm:text-4xl">
+            <h2 className="mt-3 text-[1.75rem] font-bold tracking-tight text-landing-ink sm:text-4xl">
               Clear packages. No surprises.
             </h2>
             <div className="mx-auto mt-5 h-px w-12 bg-[#0056D2]/40" aria-hidden />
@@ -522,7 +522,7 @@ export default function HomePage() {
                   key={name}
                   href="/register"
                   aria-label={`${name} — ${price}. ${ctaLabel}`}
-                  className={`group relative flex flex-col bg-white px-7 pb-8 pt-0 transition-[border-color,box-shadow] duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056D2] sm:px-8 sm:pb-9 sm:transition-[border-color,box-shadow,transform] sm:hover:-translate-y-0.5 ${
+                  className={`group relative flex flex-col bg-surface px-7 pb-8 pt-0 transition-[border-color,box-shadow] duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0056D2] sm:px-8 sm:pb-9 sm:transition-[border-color,box-shadow,transform] sm:hover:-translate-y-0.5 ${
                     featured
                       ? "border-2 border-[#0056D2] shadow-[0_18px_40px_-28px_rgba(0,86,210,0.45)] sm:hover:shadow-[0_22px_48px_-24px_rgba(0,86,210,0.5)]"
                       : "border border-slate-300 shadow-[0_12px_28px_-24px_rgba(15,23,42,0.35)] hover:border-[#0056D2]/40 sm:hover:shadow-[0_16px_36px_-22px_rgba(15,23,42,0.4)]"
@@ -547,11 +547,11 @@ export default function HomePage() {
                       <div className="mb-3 h-[15px]" aria-hidden />
                     )}
 
-                    <h3 className="text-lg font-semibold tracking-tight text-[#0A1931]">
+                    <h3 className="text-lg font-semibold tracking-tight text-landing-ink">
                       {name}
                     </h3>
 
-                    <p className="mt-5 text-[2rem] font-bold tracking-tight text-[#0A1931] sm:text-[2.25rem]">
+                    <p className="mt-5 text-[2rem] font-bold tracking-tight text-landing-ink sm:text-[2.25rem]">
                       {price}
                     </p>
                     <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
@@ -592,7 +592,7 @@ export default function HomePage() {
                     className={`mt-8 inline-flex h-11 w-full items-center justify-center text-sm font-semibold tracking-wide transition-colors ${
                       featured
                         ? "bg-[#0056D2] text-white group-hover:bg-[#0047b0]"
-                        : "border border-[#0A1931] text-[#0A1931] group-hover:border-[#0056D2] group-hover:text-[#0056D2]"
+                        : "border border-landing-ink text-landing-ink group-hover:border-[#0056D2] group-hover:text-[#0056D2]"
                     }`}
                   >
                     {ctaLabel}
