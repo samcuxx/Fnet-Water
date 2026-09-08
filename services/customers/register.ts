@@ -28,8 +28,12 @@ import { AUDIT_ACTIONS, record as recordAudit } from "@/services/audit";
  */
 export async function registerCustomer(
   input: RegisterInput,
-  context: { ipAddress?: string | null; userAgent?: string | null } = {},
-): Promise<{ userId: string; role: UserRole }> {
+  context: {
+    ipAddress?: string | null;
+    userAgent?: string | null;
+    registeredByAgentId?: string | null;
+  } = {},
+): Promise<{ userId: string; role: UserRole; customerId: string }> {
   const [emailTaken, phoneTaken] = await Promise.all([
     prisma.user.findUnique({ where: { email: input.email }, select: { id: true } }),
     prisma.user.findUnique({ where: { phone: input.phone }, select: { id: true } }),
@@ -88,6 +92,7 @@ export async function registerCustomer(
         referralCode: generateReferralCode(),
         ghanaDigitalAddress: input.ghanaDigitalAddress,
         referredByCustomerId: referrer?.id ?? null,
+        registeredByAgentId: context.registeredByAgentId ?? null,
       },
       select: { id: true, customerCode: true, referralCode: true },
     });
@@ -152,8 +157,9 @@ export async function registerCustomer(
         newValues: {
           role: UserRole.CUSTOMER,
           customerCode: profile.customerCode,
-          selfRegistered: true,
+          selfRegistered: !context.registeredByAgentId,
           referredBy: referrer?.id ?? null,
+          registeredByAgentId: context.registeredByAgentId ?? null,
         },
         ipAddress: context.ipAddress,
         userAgent: context.userAgent,
@@ -161,6 +167,6 @@ export async function registerCustomer(
       tx,
     );
 
-    return { userId: user.id, role: user.role };
+    return { userId: user.id, role: user.role, customerId: profile.id };
   });
 }

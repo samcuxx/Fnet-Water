@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import Link from "next/link";
+
 import { Banknote, Gift, Package, UserPlus, Users } from "lucide-react";
 
 import { PageHeader, StatCard } from "@/components/dashboard";
@@ -102,7 +104,12 @@ export default async function AgentDashboardPage() {
                 {summary.recentCustomers.map((customer) => (
                   <TR key={customer.id}>
                     <TD className="font-medium text-slate-900">
-                      {customer.user.fullName}
+                      <Link
+                        href={`/agent/customers/${customer.id}`}
+                        className="hover:underline"
+                      >
+                        {customer.user.fullName}
+                      </Link>
                     </TD>
                     <TD className="font-mono text-xs text-slate-500">
                       {customer.customerCode}
