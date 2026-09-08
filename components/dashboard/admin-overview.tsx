@@ -97,10 +97,10 @@ export function AdminOverview({ summary }: { summary: AdminSummary }) {
     .map((order) => Number(order.total));
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+    <div className="min-w-0 space-y-5 sm:space-y-6">
+      <header className="flex min-w-0 flex-col gap-3 sm:gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
             Operations overview
           </h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -108,31 +108,35 @@ export function AdminOverview({ summary }: { summary: AdminSummary }) {
           </p>
         </div>
 
-        <div className="inline-flex w-fit items-center rounded-lg border border-slate-200 bg-surface p-1 text-xs font-medium">
-          <span className="px-2.5 py-1.5 text-slate-400">Period</span>
-          {PERIODS.map((period) => {
-            const active = period === "All time";
+        <div className="-mx-1 max-w-full overflow-x-auto px-1 scrollbar-slim">
+          <div className="inline-flex min-w-min items-center rounded-lg border border-slate-200 bg-surface p-1 text-xs font-medium">
+            <span className="hidden px-2.5 py-1.5 text-slate-400 sm:inline">
+              Period
+            </span>
+            {PERIODS.map((period) => {
+              const active = period === "All time";
 
-            return (
-              <span
-                key={period}
-                className={cn(
-                  "rounded-md px-2.5 py-1.5",
-                  active
-                    ? "bg-slate-100 text-slate-900"
-                    : "text-slate-400",
-                )}
-              >
-                {period}
-              </span>
-            );
-          })}
+              return (
+                <span
+                  key={period}
+                  className={cn(
+                    "whitespace-nowrap rounded-md px-2 py-1.5 sm:px-2.5",
+                    active
+                      ? "bg-slate-100 text-slate-900"
+                      : "text-slate-400",
+                  )}
+                >
+                  {period}
+                </span>
+              );
+            })}
+          </div>
         </div>
       </header>
 
       <section
         aria-label="Key figures"
-        className="grid grid-cols-2 gap-3 xl:grid-cols-6"
+        className="grid grid-cols-2 gap-2.5 sm:gap-3 xl:grid-cols-6"
       >
         <MetricCard
           label="Net revenue"
@@ -172,7 +176,7 @@ export function AdminOverview({ summary }: { summary: AdminSummary }) {
         />
       </section>
 
-      <section className="grid gap-3 lg:grid-cols-3">
+      <section className="grid min-w-0 gap-3 lg:grid-cols-3">
         <Panel
           title="Order trend"
           subtitle="Recent · All time"
@@ -208,31 +212,36 @@ export function AdminOverview({ summary }: { summary: AdminSummary }) {
               {summary.recentOrders.map((order, index) => (
                 <li
                   key={order.id}
-                  className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
+                  className="flex min-w-0 items-start gap-2.5 py-3 first:pt-0 last:pb-0 sm:items-center sm:gap-3"
                 >
-                  <span className="w-4 shrink-0 text-xs tabular-nums text-slate-400">
+                  <span className="hidden w-4 shrink-0 text-xs tabular-nums text-slate-400 sm:block">
                     {index + 1}
                   </span>
                   <span
                     className={cn(
-                      "flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold",
+                      "mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold sm:mt-0",
                       AVATAR_TONES[index % AVATAR_TONES.length],
                     )}
                   >
                     {initials(order.customer.user.fullName)}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-slate-900">
-                      {order.customer.user.fullName}
-                    </p>
-                    <p className="truncate text-xs text-slate-500">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <p className="truncate text-sm font-medium text-slate-900">
+                        {order.customer.user.fullName}
+                      </p>
+                      <p className="shrink-0 text-sm font-medium tabular-nums text-slate-700">
+                        {formatMoney(order.total)}
+                      </p>
+                    </div>
+                    <p className="mt-0.5 truncate text-xs text-slate-500">
                       {order.orderNumber} · {formatNumber(order._count.items)}{" "}
-                      items · {humanizeEnum(order.status)}
+                      items
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      {humanizeEnum(order.status)}
                     </p>
                   </div>
-                  <p className="shrink-0 text-sm font-medium tabular-nums text-slate-700">
-                    {formatMoney(order.total)}
-                  </p>
                 </li>
               ))}
             </ol>
@@ -250,9 +259,11 @@ export function AdminOverview({ summary }: { summary: AdminSummary }) {
             {attentionRows.map((row) => (
               <li
                 key={row.label}
-                className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+                className="flex min-w-0 items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
               >
-                <span className="text-sm text-slate-600">{row.label}</span>
+                <span className="min-w-0 text-sm text-slate-600">
+                  {row.label}
+                </span>
                 <StatusChip tone={row.tone}>{row.value}</StatusChip>
               </li>
             ))}
@@ -260,7 +271,7 @@ export function AdminOverview({ summary }: { summary: AdminSummary }) {
         </Panel>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-surface px-5 py-5">
+      <section className="min-w-0 rounded-xl border border-slate-200 bg-surface px-3.5 py-4 sm:px-5 sm:py-5">
         <div className="flex items-start gap-3">
           <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
             <Boxes className="size-4" aria-hidden />
@@ -305,18 +316,20 @@ function MetricCard({
   icon: LucideIcon;
 }) {
   return (
-    <article className="rounded-xl border border-slate-200 bg-surface px-4 py-4 transition-colors hover:border-slate-300">
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-slate-500">
+    <article className="min-w-0 rounded-xl border border-slate-200 bg-surface px-3 py-3.5 transition-colors hover:border-slate-300 sm:px-4 sm:py-4">
+      <div className="flex items-start justify-between gap-2">
+        <p className="min-w-0 text-[10px] font-medium uppercase leading-snug tracking-[0.1em] text-slate-500 sm:text-[11px] sm:tracking-[0.14em]">
           {label}
         </p>
-        <Icon className="size-4 text-[#0056D2]" aria-hidden />
+        <Icon className="size-3.5 shrink-0 text-[#0056D2] sm:size-4" aria-hidden />
       </div>
-      <p className="mt-3 text-xl font-semibold tracking-tight text-slate-900 tabular-nums">
+      <p className="mt-2.5 break-words text-lg font-semibold tracking-tight text-slate-900 tabular-nums sm:mt-3 sm:text-xl">
         {value}
       </p>
-      <p className="mt-1 text-xs text-slate-500">{hint}</p>
-      <p className="mt-3 text-xs font-medium text-emerald-600">↗ 0.0%</p>
+      <p className="mt-1 text-xs leading-snug text-slate-500">{hint}</p>
+      <p className="mt-2.5 text-xs font-medium text-emerald-600 sm:mt-3">
+        ↗ 0.0%
+      </p>
     </article>
   );
 }
@@ -333,9 +346,9 @@ function Panel({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-surface px-5 py-5">
-      <header className="mb-5 flex items-start justify-between gap-3">
-        <div>
+    <section className="min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-surface px-3.5 py-4 sm:px-5 sm:py-5">
+      <header className="mb-4 flex items-start justify-between gap-3 sm:mb-5">
+        <div className="min-w-0">
           <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
           <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>
         </div>
@@ -394,7 +407,7 @@ function TrendChart({ points }: { points: number[] }) {
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
-      className="h-40 w-full"
+      className="h-36 w-full max-w-full sm:h-40"
       role="img"
       aria-label="Recent order values"
     >
