@@ -210,7 +210,7 @@ export function RegisterForm({ referralCode }: { referralCode?: string }) {
           fullWidth
           isLoading={pending}
           loadingText="Creating your account…"
-          className="rounded-sm bg-[#0056D2] text-sm font-semibold uppercase tracking-[0.08em] shadow-none hover:bg-[#0047b0] active:bg-[#003d99] disabled:bg-[#0056D2]/40"
+          className="cursor-pointer rounded-sm bg-[#0056D2] text-sm font-semibold uppercase tracking-[0.08em] shadow-none transition-colors hover:bg-[#0047b0] active:bg-[#003d99] disabled:cursor-not-allowed disabled:bg-[#0056D2]/40"
         >
           Create account
         </Button>

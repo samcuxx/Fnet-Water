@@ -38,7 +38,7 @@ const SIZES: Record<ButtonSize, string> = {
 };
 
 const BASE =
-  "inline-flex items-center justify-center rounded-lg font-medium transition-colors " +
+  "inline-flex cursor-pointer items-center justify-center rounded-lg font-medium transition-colors " +
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 " +
   "disabled:cursor-not-allowed";
 
