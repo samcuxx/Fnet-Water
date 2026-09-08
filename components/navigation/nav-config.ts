@@ -64,7 +64,6 @@ const ADMIN: NavSection[] = [
         label: "Referrals & Rewards",
         href: "/admin/referrals",
         icon: "gift",
-        soon: true,
       },
       { label: "Reports", href: "/admin/reports", icon: "chart", soon: true },
     ],
