@@ -19,6 +19,7 @@ export async function listOrders() {
       createdAt: true,
       customer: {
         select: {
+          id: true,
           customerCode: true,
           user: { select: { fullName: true } },
         },
@@ -29,8 +30,8 @@ export async function listOrders() {
 }
 
 export async function getOrder(id: string) {
-  return prisma.order.findUnique({
-    where: { id },
+  return prisma.order.findFirst({
+    where: { OR: [{ id }, { orderNumber: id }] },
     include: {
       customer: {
         select: {

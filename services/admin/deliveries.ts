@@ -38,8 +38,8 @@ export async function listDeliveries() {
 }
 
 export async function getDelivery(id: string) {
-  return prisma.delivery.findUnique({
-    where: { id },
+  return prisma.delivery.findFirst({
+    where: { OR: [{ id }, { deliveryNumber: id }] },
     include: {
       driver: {
         select: {

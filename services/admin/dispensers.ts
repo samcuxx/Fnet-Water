@@ -28,8 +28,8 @@ export async function listDispensers() {
 }
 
 export async function getDispenser(id: string) {
-  return prisma.dispenser.findUnique({
-    where: { id },
+  return prisma.dispenser.findFirst({
+    where: { OR: [{ id }, { assetTag: id }] },
     include: {
       customer: {
         select: {

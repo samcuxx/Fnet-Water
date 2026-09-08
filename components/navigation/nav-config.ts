@@ -85,30 +85,28 @@ const MANAGER: NavSection[] = [
   {
     items: [
       { label: "Dashboard", href: "/manager", icon: "home", exact: true },
-      { label: "Orders", href: "/manager/orders", icon: "package", soon: true },
-      { label: "Deliveries", href: "/manager/deliveries", icon: "truck", soon: true },
-      { label: "Customers", href: "/manager/customers", icon: "users", soon: true },
+      { label: "Orders", href: "/manager/orders", icon: "package" },
+      { label: "Deliveries", href: "/manager/deliveries", icon: "truck" },
+      { label: "Customers", href: "/manager/customers", icon: "users" },
     ],
   },
   {
     title: "Operations",
     items: [
-      { label: "Inventory", href: "/manager/inventory", icon: "boxes", soon: true },
-      { label: "Bottles", href: "/manager/bottles", icon: "droplets", soon: true },
+      { label: "Inventory", href: "/manager/inventory", icon: "boxes" },
+      { label: "Bottles", href: "/manager/bottles", icon: "droplets" },
       {
         label: "Dispensers",
         href: "/manager/dispensers",
         icon: "clipboard",
-        soon: true,
       },
       {
         label: "Installments",
         href: "/manager/installments",
         icon: "receipt",
-        soon: true,
       },
-      { label: "Payments", href: "/manager/payments", icon: "banknote", soon: true },
-      { label: "Reports", href: "/manager/reports", icon: "chart", soon: true },
+      { label: "Payments", href: "/manager/payments", icon: "banknote" },
+      { label: "Reports", href: "/manager/reports", icon: "chart" },
     ],
   },
 ];
@@ -117,14 +115,13 @@ const AGENT: NavSection[] = [
   {
     items: [
       { label: "Dashboard", href: "/agent", icon: "home", exact: true },
-      { label: "My customers", href: "/agent/customers", icon: "users", soon: true },
-      { label: "Orders", href: "/agent/orders", icon: "package", soon: true },
-      { label: "Referrals", href: "/agent/referrals", icon: "gift", soon: true },
+      { label: "My customers", href: "/agent/customers", icon: "users" },
+      { label: "Orders", href: "/agent/orders", icon: "package" },
+      { label: "Referrals", href: "/agent/referrals", icon: "gift" },
       {
         label: "Performance",
         href: "/agent/performance",
         icon: "chart",
-        soon: true,
       },
     ],
   },
@@ -134,10 +131,10 @@ const DRIVER: NavSection[] = [
   {
     items: [
       { label: "Today", href: "/driver", icon: "home", exact: true },
-      { label: "Assigned", href: "/driver/assigned", icon: "clipboard", soon: true },
-      { label: "Completed", href: "/driver/completed", icon: "userCheck", soon: true },
-      { label: "My stock", href: "/driver/stock", icon: "boxes", soon: true },
-      { label: "History", href: "/driver/history", icon: "history", soon: true },
+      { label: "Assigned", href: "/driver/assigned", icon: "clipboard" },
+      { label: "Completed", href: "/driver/completed", icon: "userCheck" },
+      { label: "My stock", href: "/driver/stock", icon: "boxes" },
+      { label: "History", href: "/driver/history", icon: "history" },
     ],
   },
 ];
@@ -146,14 +143,13 @@ const CUSTOMER: NavSection[] = [
   {
     items: [
       { label: "Dashboard", href: "/customer", icon: "home", exact: true },
-      { label: "Order water", href: "/customer/order", icon: "droplets", soon: true },
-      { label: "My orders", href: "/customer/orders", icon: "package", soon: true },
-      { label: "Deliveries", href: "/customer/deliveries", icon: "truck", soon: true },
+      { label: "Order water", href: "/customer/order", icon: "droplets" },
+      { label: "My orders", href: "/customer/orders", icon: "package" },
+      { label: "Deliveries", href: "/customer/deliveries", icon: "truck" },
       {
         label: "Bottle balance",
         href: "/customer/bottles",
         icon: "activity",
-        soon: true,
       },
     ],
   },
@@ -164,13 +160,12 @@ const CUSTOMER: NavSection[] = [
         label: "Dispensers",
         href: "/customer/dispensers",
         icon: "clipboard",
-        soon: true,
       },
-      { label: "Payments", href: "/customer/payments", icon: "banknote", soon: true },
-      { label: "Rewards", href: "/customer/rewards", icon: "gift", soon: true },
-      { label: "Referrals", href: "/customer/referrals", icon: "userCheck", soon: true },
-      { label: "Addresses", href: "/customer/addresses", icon: "mapPin", soon: true },
-      { label: "Profile", href: "/customer/profile", icon: "user", soon: true },
+      { label: "Payments", href: "/customer/payments", icon: "banknote" },
+      { label: "Rewards", href: "/customer/rewards", icon: "gift" },
+      { label: "Referrals", href: "/customer/referrals", icon: "userCheck" },
+      { label: "Addresses", href: "/customer/addresses", icon: "mapPin" },
+      { label: "Profile", href: "/customer/profile", icon: "user" },
     ],
   },
 ];
@@ -196,15 +191,15 @@ export function navigationFor(role: UserRole): NavSection[] {
 export const MOBILE_BAR: Partial<Record<UserRole, NavItem[]>> = {
   [UserRole.DRIVER]: [
     { label: "Today", href: "/driver", icon: "home", exact: true },
-    { label: "Assigned", href: "/driver/assigned", icon: "clipboard", soon: true },
-    { label: "Stock", href: "/driver/stock", icon: "boxes", soon: true },
-    { label: "History", href: "/driver/history", icon: "history", soon: true },
+    { label: "Assigned", href: "/driver/assigned", icon: "clipboard" },
+    { label: "Stock", href: "/driver/stock", icon: "boxes" },
+    { label: "History", href: "/driver/history", icon: "history" },
   ],
   [UserRole.CUSTOMER]: [
     { label: "Home", href: "/customer", icon: "home", exact: true },
-    { label: "Order", href: "/customer/order", icon: "droplets", soon: true },
-    { label: "Orders", href: "/customer/orders", icon: "package", soon: true },
-    { label: "Rewards", href: "/customer/rewards", icon: "gift", soon: true },
+    { label: "Order", href: "/customer/order", icon: "droplets" },
+    { label: "Orders", href: "/customer/orders", icon: "package" },
+    { label: "Rewards", href: "/customer/rewards", icon: "gift" },
   ],
 };
 

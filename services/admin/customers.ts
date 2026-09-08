@@ -29,8 +29,8 @@ export async function listCustomers() {
 }
 
 export async function getCustomer(id: string) {
-  return prisma.customerProfile.findUnique({
-    where: { id },
+  return prisma.customerProfile.findFirst({
+    where: { OR: [{ id }, { customerCode: id }] },
     include: {
       user: {
         select: {

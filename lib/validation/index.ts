@@ -4,6 +4,7 @@ import { ValidationError, type FieldErrors } from "@/lib/errors";
 
 export * from "./common";
 export * from "./auth";
+export * from "./operations";
 
 /**
  * Parses input against a schema and throws a `ValidationError` carrying

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import Link from "next/link";
+
 import {
   CalendarClock,
   Droplets,
@@ -143,7 +145,12 @@ export default async function ManagerDashboardPage() {
                   {summary.upcomingDeliveries.map((delivery) => (
                     <TR key={delivery.id}>
                       <TD className="font-medium text-brand-700">
-                        {delivery.deliveryNumber}
+                        <Link
+                          href={`/manager/deliveries/${delivery.id}`}
+                          className="hover:underline"
+                        >
+                          {delivery.deliveryNumber}
+                        </Link>
                       </TD>
                       <TD>
                         <span className="block text-slate-900">
