@@ -71,7 +71,7 @@ const ADMIN: NavSection[] = [
   {
     title: "Management",
     items: [
-      { label: "Users", href: "/admin/users", icon: "userCog", soon: true },
+      { label: "Users", href: "/admin/users", icon: "userCog" },
       { label: "Drivers", href: "/admin/drivers", icon: "truck", soon: true },
       { label: "Agents", href: "/admin/agents", icon: "userCheck", soon: true },
       { label: "Trackers", href: "/admin/trackers", icon: "radio", soon: true },
