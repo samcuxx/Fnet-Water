@@ -55,7 +55,7 @@ const ADMIN: NavSection[] = [
       { label: "Dashboard", href: "/admin", icon: "home", exact: true },
       { label: "Customers", href: "/admin/customers", icon: "users" },
       { label: "Orders", href: "/admin/orders", icon: "package" },
-      { label: "Deliveries", href: "/admin/deliveries", icon: "truck", soon: true },
+      { label: "Deliveries", href: "/admin/deliveries", icon: "truck" },
       { label: "Bottles", href: "/admin/bottles", icon: "droplets", soon: true },
       { label: "Inventory", href: "/admin/inventory", icon: "boxes", soon: true },
       { label: "Dispensers", href: "/admin/dispensers", icon: "clipboard", soon: true },
