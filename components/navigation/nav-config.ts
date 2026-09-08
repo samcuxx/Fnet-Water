@@ -53,7 +53,7 @@ const ADMIN: NavSection[] = [
   {
     items: [
       { label: "Dashboard", href: "/admin", icon: "home", exact: true },
-      { label: "Customers", href: "/admin/customers", icon: "users", soon: true },
+      { label: "Customers", href: "/admin/customers", icon: "users" },
       { label: "Orders", href: "/admin/orders", icon: "package", soon: true },
       { label: "Deliveries", href: "/admin/deliveries", icon: "truck", soon: true },
       { label: "Bottles", href: "/admin/bottles", icon: "droplets", soon: true },
