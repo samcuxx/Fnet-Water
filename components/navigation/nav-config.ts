@@ -76,7 +76,7 @@ const ADMIN: NavSection[] = [
       { label: "Agents", href: "/admin/agents", icon: "userCheck" },
       { label: "Trackers", href: "/admin/trackers", icon: "radio" },
       { label: "Audit log", href: "/admin/audit", icon: "shieldCheck" },
-      { label: "System settings", href: "/admin/settings", icon: "cog", soon: true },
+      { label: "System settings", href: "/admin/settings", icon: "cog" },
     ],
   },
 ];
