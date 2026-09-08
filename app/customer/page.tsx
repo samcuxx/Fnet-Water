@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import Link from "next/link";
+
 import {
   CalendarClock,
   Droplets,
@@ -127,7 +129,12 @@ export default async function CustomerDashboardPage() {
                   {summary.recentOrders.map((order) => (
                     <TR key={order.id}>
                       <TD className="font-medium text-brand-700">
-                        {order.orderNumber}
+                        <Link
+                          href={`/customer/orders/${order.id}`}
+                          className="hover:underline"
+                        >
+                          {order.orderNumber}
+                        </Link>
                       </TD>
                       <TD numeric>{order._count.items}</TD>
                       <TD numeric>{formatMoney(order.total)}</TD>
