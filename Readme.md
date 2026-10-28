@@ -32,6 +32,7 @@ that is never rewritten.
 | [`docs/DATABASE.md`](docs/DATABASE.md) | Schema design and the reasoning behind it |
 | [`docs/BUSINESS_RULES.md`](docs/BUSINESS_RULES.md) | Business logic, the RBAC matrix, and documented assumptions |
 | [`docs/API.md`](docs/API.md) | Server Actions, route handlers, error contract, mobile reuse |
+| [`docs/COOLIFY_PRODUCTION_GUIDE.md`](docs/COOLIFY_PRODUCTION_GUIDE.md) | Full building & self-hosting guide for Coolify in production |
 
 ## Getting started
 

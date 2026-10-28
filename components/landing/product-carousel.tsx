@@ -60,7 +60,7 @@ const VISIBLE = {
 } as const;
 
 function useVisibleCount() {
-  const [count, setCount] = useState(VISIBLE.desktop);
+  const [count, setCount] = useState<(typeof VISIBLE)[keyof typeof VISIBLE]>(VISIBLE.desktop);
 
   useEffect(() => {
     const sync = () => {
@@ -86,16 +86,20 @@ export function ProductCarousel() {
   const [index, setIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
-  useEffect(() => {
-    setIndex((prev) => Math.min(prev, maxIndex));
-  }, [maxIndex]);
+  const currentIndex = Math.min(index, maxIndex);
 
   const goPrev = useCallback(() => {
-    setIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
+    setIndex((prev) => {
+      const cur = Math.min(prev, maxIndex);
+      return cur <= 0 ? maxIndex : cur - 1;
+    });
   }, [maxIndex]);
 
   const goNext = useCallback(() => {
-    setIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+    setIndex((prev) => {
+      const cur = Math.min(prev, maxIndex);
+      return cur >= maxIndex ? 0 : cur + 1;
+    });
   }, [maxIndex]);
 
   useEffect(() => {
@@ -144,7 +148,7 @@ export function ProductCarousel() {
             <ul
               className="flex transition-transform duration-500 ease-out"
               style={{
-                transform: `translateX(-${index * slidePct}%)`,
+                transform: `translateX(-${currentIndex * slidePct}%)`,
               }}
             >
               {PRODUCTS.map((product) => (
@@ -186,10 +190,10 @@ export function ProductCarousel() {
                 key={i}
                 type="button"
                 aria-label={`Go to slide ${i + 1}`}
-                aria-current={i === index}
+                aria-current={i === currentIndex}
                 onClick={() => setIndex(i)}
                 className={`size-2.5 rounded-full transition-colors ${
-                  i === index
+                  i === currentIndex
                     ? "bg-[#0A1931]"
                     : "bg-slate-300 hover:bg-slate-400"
                 }`}

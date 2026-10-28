@@ -41,6 +41,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     apply(isTheme(stored) ? stored : "system");
   }, [apply]);
 

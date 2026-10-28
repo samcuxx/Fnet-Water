@@ -1,0 +1,99 @@
+# ==============================================================================
+# F Net Water Hub — Coolify Production Docker Compose Stack
+# ==============================================================================
+# This template is designed for one-click deployment in Coolify.
+# In Coolify: New Resource -> Docker Compose -> paste this file or point to repository.
+#
+# Volumes persist database files and object storage across container redeployments.
+# The app container automatically applies Prisma migrations on startup.
+# ==============================================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-fnet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-fnet_water_hub}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fnet} -d ${POSTGRES_DB:-fnet_water_hub}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - coolify
+
+  minio:
+    image: pgsty/silo:latest
+    restart: always
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "silo", "healthcheck", "ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - coolify
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      APP_URL: ${APP_URL}
+      APP_NAME: ${APP_NAME:-"F Net Water Hub"}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fnet}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-fnet_water_hub}?schema=public
+      AUTH_SECRET: ${AUTH_SECRET}
+      SESSION_MAX_AGE_DAYS: ${SESSION_MAX_AGE_DAYS:-7}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: "false"
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET:-fnet-water-hub}
+      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-manual}
+      PAYMENT_SECRET_KEY: ${PAYMENT_SECRET_KEY:-}
+      PAYMENT_PUBLIC_KEY: ${PAYMENT_PUBLIC_KEY:-}
+      PAYMENT_WEBHOOK_SECRET: ${PAYMENT_WEBHOOK_SECRET:-}
+      NOTIFICATIONS_SMS_ENABLED: ${NOTIFICATIONS_SMS_ENABLED:-false}
+      NOTIFICATIONS_EMAIL_ENABLED: ${NOTIFICATIONS_EMAIL_ENABLED:-false}
+      NOTIFICATIONS_WHATSAPP_ENABLED: ${NOTIFICATIONS_WHATSAPP_ENABLED:-false}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - coolify
+
+volumes:
+  postgres-data:
+    name: fnet-water-hub_postgres-data
+  minio-data:
+    name: fnet-water-hub_minio-data
+
+networks:
+  coolify:
+    driver: bridge
