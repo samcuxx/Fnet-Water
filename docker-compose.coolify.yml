@@ -51,7 +51,9 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-fnet}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-fnet_water_hub}?schema=public
-    command: npx prisma migrate deploy
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-samcuxx@gmail.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-100%forSamCux}
+    command: sh -c "npx prisma migrate deploy && npx tsx prisma/create-admin.ts"
 
   app:
     build:
