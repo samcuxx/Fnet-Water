@@ -29,10 +29,10 @@ export function normalizeGhanaPhone(phone: string): string {
 }
 
 /**
- * Generates a random 6-digit numeric OTP
+ * Generates a random 5-digit numeric OTP
  */
 export function generateOtp(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return Math.floor(10000 + Math.random() * 90000).toString();
 }
 
 /**

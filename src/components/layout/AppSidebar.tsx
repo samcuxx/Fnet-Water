@@ -79,7 +79,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
         ],
       },
       {
-        name: "Finance & Paystack",
+        name: "Finance & Payments",
         icon: (
           <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M10.75 2.75a.75.75 0 00-1.5 0v1.087a4.5 4.5 0 00-2.42 1.343.75.75 0 101.06 1.06 3 3 0 012.86-.74v4.54a4.5 4.5 0 00-2.42 1.343.75.75 0 101.06 1.06 3 3 0 011.5-.477v1.134a.75.75 0 001.5 0v-1.087a4.5 4.5 0 002.42-1.343.75.75 0 10-1.06-1.06 3 3 0 01-2.86.74v-4.54a4.5 4.5 0 002.42-1.343.75.75 0 10-1.06-1.06 3 3 0 01-1.5.477V2.75z" />
@@ -98,8 +98,9 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
           </svg>
         ),
         subItems: [
+          { name: "Staff Directory", href: "/admin/users" },
+          { name: "Customer Directory", href: "/admin/customers" },
           { name: "Drivers & Routes", href: "/admin/drivers" },
-          { name: "Customers", href: "/admin/customers" },
           { name: "Field Agents", href: "/admin/agents" },
         ],
       },
@@ -117,11 +118,125 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
           </svg>
         ),
       },
+      {
+        name: "My Profile",
+        href: "/profile",
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fillRule="evenodd"
+              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+              clipRule="evenodd"
+            />
+          </svg>
+        ),
+      },
+    ],
+    MANAGER: [
+      {
+        name: "Logistics Hub",
+        href: "/manager",
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 4.25A2.25 2.25 0 014.25 2h2.5A2.25 2.25 0 019 4.25v4.5A2.25 2.25 0 016.75 11h-2.5A2.25 2.25 0 012 8.75v-4.5zM2 13.25A2.25 2.25 0 014.25 11h2.5A2.25 2.25 0 019 13.25v2.5A2.25 2.25 0 016.75 18h-2.5A2.25 2.25 0 012 15.75v-2.5zM11 4.25A2.25 2.25 0 0113.25 2h2.5A2.25 2.25 0 0118 4.25v2.5A2.25 2.25 0 0115.75 9h-2.5A2.25 2.25 0 0111 6.75v-2.5zM11 11.25A2.25 2.25 0 0113.25 9h2.5A2.25 2.25 0 0118 11.25v4.5A2.25 2.25 0 0115.75 18h-2.5A2.25 2.25 0 0111 15.75v-4.5z" />
+          </svg>
+        ),
+      },
+      {
+        name: "Deliveries Queue",
+        href: "/manager/deliveries",
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+          </svg>
+        ),
+      },
+      {
+        name: "My Profile",
+        href: "/profile",
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fillRule="evenodd"
+              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+              clipRule="evenodd"
+            />
+          </svg>
+        ),
+      },
+    ],
+    DRIVER: [
+      {
+        name: "Dispatch Dashboard",
+        href: "/driver",
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+          </svg>
+        ),
+      },
+      {
+        name: "My Profile",
+        href: "/profile",
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fillRule="evenodd"
+              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+              clipRule="evenodd"
+            />
+          </svg>
+        ),
+      },
+    ],
+    AGENT: [
+      {
+        name: "Agent Portal",
+        href: "/agent",
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+          </svg>
+        ),
+      },
+      {
+        name: "My Profile",
+        href: "/profile",
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fillRule="evenodd"
+              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+              clipRule="evenodd"
+            />
+          </svg>
+        ),
+      },
     ],
     CUSTOMER: [
       {
-        name: "Order Refills",
-        href: "/customer/refills",
+        name: "My Portal",
+        href: "/customer",
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 4.25A2.25 2.25 0 014.25 2h2.5A2.25 2.25 0 019 4.25v4.5A2.25 2.25 0 016.75 11h-2.5A2.25 2.25 0 012 8.75v-4.5zM2 13.25A2.25 2.25 0 014.25 11h2.5A2.25 2.25 0 019 13.25v2.5A2.25 2.25 0 016.75 18h-2.5A2.25 2.25 0 012 15.75v-2.5zM11 4.25A2.25 2.25 0 0113.25 2h2.5A2.25 2.25 0 0118 4.25v2.5A2.25 2.25 0 0115.75 9h-2.5A2.25 2.25 0 0111 6.75v-2.5zM11 11.25A2.25 2.25 0 0113.25 9h2.5A2.25 2.25 0 0118 11.25v4.5A2.25 2.25 0 0115.75 18h-2.5A2.25 2.25 0 0111 15.75v-4.5z" />
+          </svg>
+        ),
+      },
+      {
+        name: "Order Water",
+        href: "/customer/order",
+        icon: (
+          <svg className="size-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+          </svg>
+        ),
+      },
+      {
+        name: "My Orders",
+        href: "/customer/orders",
         icon: (
           <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
@@ -134,12 +249,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
         ),
       },
       {
-        name: "Track Delivery",
-        href: "/customer/track",
+        name: "Address Book",
+        href: "/customer/addresses",
         icon: (
           <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
           </svg>
         ),
       },
@@ -153,11 +267,15 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
         ),
       },
       {
-        name: "Order History",
-        href: "/customer/orders",
+        name: "My Profile",
+        href: "/profile",
         icon: (
           <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clipRule="evenodd" />
+            <path
+              fillRule="evenodd"
+              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+              clipRule="evenodd"
+            />
           </svg>
         ),
       },

@@ -64,10 +64,7 @@ export default function HomePage() {
         />
 
         {/* Soft gradient dissolve blending seamlessly into the background */}
-        {/* Light mode gradient */}
-        <div className="absolute inset-y-0 left-0 w-32 xl:w-48 bg-gradient-to-r from-white to-transparent dark:hidden pointer-events-none" />
-        {/* Dark mode gradient */}
-        <div className="hidden dark:block absolute inset-y-0 left-0 w-32 xl:w-48 bg-gradient-to-r from-gray-950 to-transparent pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-32 xl:w-48 bg-gradient-to-r from-white dark:from-gray-950 to-transparent pointer-events-none" />
       </div>
     </div>
   );

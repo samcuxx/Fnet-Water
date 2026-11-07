@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/common/ThemeProviders";
+import AuthProvider from "@/components/common/AuthProvider";
 
 export const metadata: Metadata = {
   title: "F Net Water Hub — Water Supply & Smart Dispenser Management",
@@ -25,7 +26,7 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
       </body>
     </html>
