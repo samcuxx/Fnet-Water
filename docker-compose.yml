@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: fnet_water_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: fnet_user
+      POSTGRES_PASSWORD: fnet_secure_pass_2026
+      POSTGRES_DB: fnet_water_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fnet_user -d fnet_water_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fnet_water_web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://fnet_user:fnet_secure_pass_2026@db:5432/fnet_water_db?schema=public
+      NEXTAUTH_SECRET: fnet-water-hub-super-secret-jwt-key-2026
+      NEXTAUTH_URL: http://localhost:3000
+      PAYSTACK_SECRET_KEY: ${PAYSTACK_SECRET_KEY:-sk_test_e3dc4308aa829bb13669f66be490fadc1d120778}
+      NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY: ${NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY:-pk_test_eb0b32c0bf50b5e00420d9d175e41a082e601be4}
+      MNOTIFY_API_KEY: ${MNOTIFY_API_KEY:-EpyJqPefIbrTOBWOfr5ifgQXn}
+      MNOTIFY_SENDER_ID: ${MNOTIFY_SENDER_ID:-Fnet}
+      MNOTIFY_PROJECT: ${MNOTIFY_PROJECT:-Fnet}
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NODE_ENV: production
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local

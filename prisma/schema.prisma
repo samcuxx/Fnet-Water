@@ -1,0 +1,393 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  DRIVER
+  AGENT
+  CUSTOMER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum OrderStatus {
+  PENDING
+  ASSIGNED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  FAILED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  PARTIALLY_PAID
+  REFUNDED
+}
+
+enum PaymentMethod {
+  PAYSTACK_MOMO
+  PAYSTACK_CARD
+  BANK_TRANSFER
+  CASH_ON_DELIVERY
+}
+
+enum DispenserStatus {
+  AVAILABLE
+  INSTALLED_ON_PLAN
+  INSTALLED_OWNED
+  FAULTY
+  MAINTENANCE
+}
+
+enum AddressType {
+  HOME
+  OFFICE
+  SHOP
+  SCHOOL
+  WAREHOUSE
+  OTHER
+}
+
+enum ProductType {
+  REFILLABLE_BOTTLE
+  TAKEAWAY_BOTTLE
+  BULK_SUPPLY
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+model User {
+  id           String      @id @default(uuid())
+  name         String
+  email        String      @unique
+  phone        String      @unique
+  password     String
+  role         UserRole    @default(CUSTOMER)
+  status       UserStatus  @default(ACTIVE)
+  avatar       String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  customerProfile    CustomerProfile?
+  assignedDeliveries Delivery[]       @relation("DriverDeliveries")
+  notifications      Notification[]
+  auditLogs          AuditLog[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+}
+
+model CustomerProfile {
+  id                 String            @id @default(uuid())
+  userId             String            @unique
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ghanaCardNumber    String?
+  customerCode       String            @unique
+  bottlesHeld        Int               @default(0)
+  freeBottleBalance  Int               @default(0)
+  referralCode       String            @unique
+  referredById       String?
+  referrer           CustomerProfile?  @relation("CustomerReferrals", fields: [referredById], references: [id])
+  referralsMade      CustomerProfile[] @relation("CustomerReferrals")
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  deliveryAddresses  DeliveryAddress[]
+  orders             Order[]
+  dispensers         Dispenser[]
+  dispenserPlans     DispenserPlan[]
+  referralRecords    Referral[]        @relation("ReferrerRecords")
+  refereeRecord      Referral?         @relation("RefereeRecord")
+  paymentTransactions PaymentTransaction[]
+
+  @@index([customerCode])
+  @@index([referralCode])
+}
+
+model DeliveryAddress {
+  id                   String          @id @default(uuid())
+  customerProfileId    String
+  customerProfile      CustomerProfile @relation(fields: [customerProfileId], references: [id], onDelete: Cascade)
+  category             AddressType     @default(HOME)
+  areaName             String
+  digitalAddress       String          // e.g. GA-183-9021
+  gpsLatitude          Float?
+  gpsLongitude         Float?
+  deliveryInstructions String?
+  isDefault            Boolean         @default(false)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  orders               Order[]
+
+  @@index([customerProfileId])
+  @@index([digitalAddress])
+}
+
+model Product {
+  id            String      @id @default(uuid())
+  name          String
+  type          ProductType
+  description   String?
+  price         Float       // in GH₵
+  depositFee    Float       @default(0) // in GH₵ for refillable bottles
+  stockQuantity Int         @default(0)
+  image         String?
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  orderItems    OrderItem[]
+
+  @@index([type])
+}
+
+model Order {
+  id                   String          @id @default(uuid())
+  orderNumber          String          @unique // e.g. FNW-2026-1042
+  customerProfileId    String
+  customerProfile      CustomerProfile @relation(fields: [customerProfileId], references: [id], onDelete: Restrict)
+  deliveryAddressId    String
+  deliveryAddress      DeliveryAddress @relation(fields: [deliveryAddressId], references: [id], onDelete: Restrict)
+  deliveryDate         DateTime?
+  deliverySlot         String?         // Morning (8am-12pm), Afternoon, Evening
+  deliveryInstructions String?
+  subtotal             Float           // in GH₵
+  depositFee           Float           @default(0)
+  deliveryFee          Float           @default(0)
+  discountAmount       Float           @default(0)
+  totalAmount          Float           // in GH₵
+  status               OrderStatus     @default(PENDING)
+  paymentStatus        PaymentStatus   @default(UNPAID)
+  paymentMethod        PaymentMethod   @default(PAYSTACK_MOMO)
+  paymentReference     String?
+  freeBottlesRedeemed  Int             @default(0)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  items                OrderItem[]
+  delivery             Delivery?
+  paymentTransactions  PaymentTransaction[]
+
+  @@index([orderNumber])
+  @@index([customerProfileId])
+  @@index([status])
+  @@index([paymentStatus])
+}
+
+model OrderItem {
+  id           String   @id @default(uuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  quantity     Int      @default(1)
+  unitPrice    Float    // in GH₵
+  depositPrice Float    @default(0)
+  totalPrice   Float    // in GH₵
+
+  @@index([orderId])
+}
+
+model Delivery {
+  id             String          @id @default(uuid())
+  orderId        String          @unique
+  order          Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  driverId       String?
+  driver         User?           @relation("DriverDeliveries", fields: [driverId], references: [id])
+  assignedAt     DateTime?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  status         OrderStatus     @default(PENDING)
+  notes          String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  bottleExchange BottleExchange?
+
+  @@index([driverId])
+  @@index([status])
+}
+
+model BottleExchange {
+  id              String   @id @default(uuid())
+  deliveryId      String   @unique
+  delivery        Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  driverId        String
+  customerId      String
+  filledDelivered Int      @default(0)
+  emptyCollected  Int      @default(0)
+  damagedCount    Int      @default(0)
+  lostCount       Int      @default(0)
+  cashCollected   Float    @default(0) // in GH₵
+  customerNotes   String?
+  createdAt       DateTime @default(now())
+
+  @@index([driverId])
+  @@index([customerId])
+}
+
+model BottleInventory {
+  id              String   @id @default(uuid())
+  filledWarehouse Int      @default(500)
+  emptyWarehouse  Int      @default(300)
+  withCustomers   Int      @default(1200)
+  damaged         Int      @default(15)
+  lost            Int      @default(5)
+  lastUpdated     DateTime @default(now()) @updatedAt
+}
+
+model Dispenser {
+  id                String          @id @default(uuid())
+  serialNumber      String          @unique
+  modelName         String
+  status            DispenserStatus @default(AVAILABLE)
+  totalCost         Float           @default(1800.0) // in GH₵
+  customerProfileId String?
+  customerProfile   CustomerProfile? @relation(fields: [customerProfileId], references: [id])
+  waterLevelPercent Int             @default(100)    // 0 - 100%
+  dailyUsageLiters  Float           @default(18.5)
+  batteryPercent    Int             @default(95)     // 0 - 100%
+  isOnline          Boolean         @default(true)
+  gpsLatitude       Float?
+  gpsLongitude      Float?
+  tamperAlert       Boolean         @default(false)
+  maintenanceNotes  String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  installmentPlan   DispenserPlan?
+
+  @@index([serialNumber])
+  @@index([status])
+}
+
+model DispenserPlan {
+  id                 String             @id @default(uuid())
+  dispenserId        String             @unique
+  dispenser          Dispenser          @relation(fields: [dispenserId], references: [id], onDelete: Cascade)
+  customerProfileId  String
+  customerProfile    CustomerProfile    @relation(fields: [customerProfileId], references: [id], onDelete: Restrict)
+  totalCost          Float              // e.g. 1800 GH₵
+  initialDeposit     Float              // e.g. 300 GH₵
+  amountPaid         Float              @default(300.0)
+  outstandingBalance Float              // e.g. 1500 GH₵
+  monthlyDue         Float              @default(150.0)
+  nextPaymentDate    DateTime
+  isFullyPaid        Boolean            @default(false)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  payments           DispenserPayment[]
+
+  @@index([customerProfileId])
+  @@index([isFullyPaid])
+}
+
+model DispenserPayment {
+  id            String        @id @default(uuid())
+  planId        String
+  plan          DispenserPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  amount        Float         // in GH₵
+  paymentMethod PaymentMethod @default(PAYSTACK_MOMO)
+  referenceCode String
+  paidAt        DateTime      @default(now())
+
+  @@index([planId])
+}
+
+model Referral {
+  id              String          @id @default(uuid())
+  referrerId      String
+  referrer        CustomerProfile @relation("ReferrerRecords", fields: [referrerId], references: [id], onDelete: Cascade)
+  refereeId       String          @unique
+  referee         CustomerProfile @relation("RefereeRecord", fields: [refereeId], references: [id], onDelete: Cascade)
+  referralCode    String
+  isQualified     Boolean         @default(false) // becomes true when referee completes first paid order
+  qualifiedAt     DateTime?
+  rewardCredited  Boolean         @default(false) // true when part of 5-referral free bottle credit
+  createdAt       DateTime        @default(now())
+
+  @@index([referrerId])
+  @@index([isQualified])
+}
+
+model PaymentTransaction {
+  id                String          @id @default(uuid())
+  reference         String          @unique // Paystack transaction reference
+  orderId           String?
+  order             Order?          @relation(fields: [orderId], references: [id])
+  customerProfileId String
+  customerProfile   CustomerProfile @relation(fields: [customerProfileId], references: [id])
+  amount            Float           // in GH₵
+  currency          String          @default("GHS")
+  channel           String          // momo, card, bank
+  status            PaymentStatus   @default(PAID)
+  paystackPayload   String?         // json response string
+  paidAt            DateTime        @default(now())
+  createdAt         DateTime        @default(now())
+
+  @@index([reference])
+  @@index([customerProfileId])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String?
+  user      User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      UserRole?
+  title     String
+  message   String
+  type      NotificationType @default(INFO)
+  linkUrl   String?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+  @@index([role])
+  @@index([isRead])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  entityType String
+  entityId   String?
+  details    String?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType])
+  @@index([action])
+}
+
+model OtpVerification {
+  id         String   @id @default(uuid())
+  phone      String
+  otpCode    String
+  expiresAt  DateTime
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([phone])
+}
