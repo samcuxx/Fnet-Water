@@ -31,7 +31,7 @@ export default function DatePicker({
 
     const fp = flatpickr(inputRef.current, {
       mode,
-      static: true,
+      static: false, // Prevents DOM reflow and layout shift
       monthSelectorType: "static",
       dateFormat: "Y-m-d",
       defaultDate,
@@ -51,7 +51,7 @@ export default function DatePicker({
     <div className={`w-full ${className}`}>
       {label && <Label htmlFor={id}>{label}</Label>}
 
-      <div className="relative">
+      <div className="relative w-full">
         <input
           ref={inputRef}
           id={id}

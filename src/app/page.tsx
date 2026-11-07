@@ -1,146 +1,74 @@
 import Link from "next/link";
+import Image from "next/image";
 import Logo from "@/components/brand/Logo";
 import ThemeToggleButton from "@/components/common/ThemeToggleButton";
 
 export default function HomePage() {
-  const portals = [
-    {
-      title: "Customer Portal",
-      description: "Order water refills, track delivery runs, and view dispenser payments.",
-      role: "Customer",
-      href: "/login?role=customer",
-      cta: "Customer Login",
-    },
-    {
-      title: "Driver Portal",
-      description: "View daily route stops, delivery manifests, and bottle exchange records.",
-      role: "Driver",
-      href: "/login?role=driver",
-      cta: "Driver Login",
-    },
-    {
-      title: "Operations & Admin",
-      description: "Dispatch orders, assign drivers, manage inventory, and view audit reports.",
-      role: "Management",
-      href: "/login?role=admin",
-      cta: "Staff Login",
-    },
-    {
-      title: "Field Agent Portal",
-      description: "Register customers, record dispenser sales, and track commissions.",
-      role: "Agent",
-      href: "/login?role=agent",
-      cta: "Agent Login",
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col justify-between transition-colors">
-      {/* Navigation */}
-      <header className="border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-950/90 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col lg:flex-row">
+      {/* Left Column (Desktop) / Primary Content Container (Mobile) */}
+      <div className="flex-1 lg:w-1/2 flex flex-col justify-between p-6 sm:p-10 lg:p-14 xl:p-16 min-h-screen lg:min-h-0 z-10">
+        {/* Navigation */}
+        <header className="flex items-center justify-between pb-4 sm:pb-6">
           <Logo size="md" />
+          <ThemeToggleButton showLabel={false} />
+        </header>
 
-          <div className="flex items-center gap-3">
-            <Link
-              href="/login?role=customer"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-brand-600 dark:hover:text-blue-light-400 px-3 py-1.5 transition"
-            >
-              Customer Sign In
-            </Link>
+        {/* Hero Content */}
+        <main className="py-6 sm:py-10 lg:py-14 max-w-lg">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900 dark:text-white leading-[1.15]">
+            Water delivery &amp; smart dispensers
+          </h1>
+
+          <p className="mt-3 sm:mt-5 text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+            Order 19L refills, track scheduled deliveries, and manage dispenser plans across Ghana.
+          </p>
+
+          <div className="mt-6 sm:mt-8">
             <Link
               href="/login"
-              className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg text-white bg-brand-500 hover:bg-brand-600 transition"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-lg text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs"
             >
               Sign In
             </Link>
           </div>
-        </div>
-      </header>
 
-      {/* Hero Section */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 flex-1 flex flex-col justify-center">
-        <div className="max-w-2xl mb-14">
-          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
-            Water delivery and smart dispenser management
-          </h1>
-          <p className="mt-4 text-base sm:text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-            Scheduled refill deliveries, empty bottle exchanges, and dispenser installment plans across Accra and greater Ghana.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/login?role=customer"
-              className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 transition"
-            >
-              Order Water Refill
-            </Link>
-            <Link
-              href="/login"
-              className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-800 transition"
-            >
-              Access Portals
-            </Link>
+          {/* Mobile-only Hero Image Showcase */}
+          <div className="lg:hidden relative w-full h-52 sm:h-64 rounded-2xl overflow-hidden mt-8 border border-gray-100 dark:border-gray-800/80 shadow-theme-xs">
+            <Image
+              src="/images/hero/water-hero.jpg"
+              alt="F Net Water Hub commercial dispenser and pure water refill bottle"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
+            />
           </div>
-        </div>
+        </main>
 
-        {/* Portal Cards */}
-        <div>
-          <div className="border-b border-gray-200 dark:border-gray-800 pb-3 mb-6">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              Select Your Portal
-            </h2>
-          </div>
+        {/* Footer */}
+        <footer className="pt-6 text-xs text-gray-500 dark:text-gray-400">
+          <div>&copy; {new Date().getFullYear()} F Net Water Hub. Accra, Ghana.</div>
+        </footer>
+      </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {portals.map((portal) => (
-              <div
-                key={portal.title}
-                className="p-5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col justify-between hover:border-gray-300 dark:hover:border-gray-700 transition"
-              >
-                <div>
-                  <div className="text-xs font-semibold text-brand-600 dark:text-blue-light-400 mb-1">
-                    {portal.role}
-                  </div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
-                    {portal.title}
-                  </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-normal mb-5">
-                    {portal.description}
-                  </p>
-                </div>
+      {/* Right Column (Desktop Only): Pure Full-Height Image with Seamless Dissolve */}
+      <div className="hidden lg:block relative lg:w-1/2 min-h-screen overflow-hidden">
+        <Image
+          src="/images/hero/water-hero.jpg"
+          alt="F Net Water Hub commercial dispenser and pure water refill bottle"
+          fill
+          priority
+          sizes="50vw"
+          className="object-cover object-center"
+        />
 
-                <Link
-                  href={portal.href}
-                  className="text-xs font-medium text-brand-600 dark:text-blue-light-400 hover:underline inline-flex items-center gap-1"
-                >
-                  <span>{portal.cta}</span>
-                  <span aria-hidden="true">&rarr;</span>
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </main>
-
-      {/* Clean Footer with Theme Toggle */}
-      <footer className="border-t border-gray-200 dark:border-gray-800 py-6 bg-white dark:bg-gray-950">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500 dark:text-gray-400">
-          <div className="flex items-center gap-2">
-            <span>&copy; {new Date().getFullYear()} F Net Water Hub.</span>
-            <span>Accra, Ghana.</span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <span>Ghana Cedis (GH₵)</span>
-            <span>Paystack MoMo & Cards</span>
-            <span>mNotify SMS</span>
-          </div>
-
-          <div>
-            <ThemeToggleButton showLabel={true} />
-          </div>
-        </div>
-      </footer>
+        {/* Soft gradient dissolve blending seamlessly into the background */}
+        {/* Light mode gradient */}
+        <div className="absolute inset-y-0 left-0 w-32 xl:w-48 bg-gradient-to-r from-white to-transparent dark:hidden pointer-events-none" />
+        {/* Dark mode gradient */}
+        <div className="hidden dark:block absolute inset-y-0 left-0 w-32 xl:w-48 bg-gradient-to-r from-gray-950 to-transparent pointer-events-none" />
+      </div>
     </div>
   );
 }

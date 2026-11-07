@@ -34,6 +34,7 @@ export default function UiShowcasePage() {
   const sampleOrders = [
     {
       id: "ORD-7819",
+      date: "Today, 10:30 AM",
       customer: "Kofi Owusu-Ansah",
       location: "East Legon, Accra",
       bottles: "4x 19L Refill (4 Returned)",
@@ -43,8 +44,9 @@ export default function UiShowcasePage() {
     },
     {
       id: "ORD-7820",
+      date: "Today, 09:15 AM",
       customer: "Ama Serwaa",
-      location: "Airport Residential Area",
+      location: "Airport Residential",
       bottles: "2x 19L Refill (2 Returned)",
       amount: "GH₵ 90.00",
       paymentMethod: "Vodafone Cash",
@@ -52,18 +54,20 @@ export default function UiShowcasePage() {
     },
     {
       id: "ORD-7821",
+      date: "Yesterday, 04:00 PM",
       customer: "Kwabena Boateng",
       location: "Osu / Oxford Street",
-      bottles: "1x Smart Dispenser (Installment 1/4)",
+      bottles: "Smart Dispenser (1/4 Plan)",
       amount: "GH₵ 450.00",
       paymentMethod: "Visa Card",
       status: "DISPATCHED",
     },
     {
       id: "ORD-7822",
+      date: "Yesterday, 02:20 PM",
       customer: "Esi Mensah",
       location: "Spintex Road, Batsonaa",
-      bottles: "6x 19L Refill (5 Returned, 1 Owed)",
+      bottles: "6x 19L Refill (1 Owed)",
       amount: "GH₵ 270.00",
       paymentMethod: "MTN MoMo",
       status: "PENDING",
@@ -391,50 +395,71 @@ export default function UiShowcasePage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableCell isHeader>Order ID</TableCell>
-                    <TableCell isHeader>Customer</TableCell>
-                    <TableCell isHeader>Delivery Address</TableCell>
-                    <TableCell isHeader>Bottle Refills</TableCell>
-                    <TableCell isHeader>Amount</TableCell>
-                    <TableCell isHeader>Payment</TableCell>
-                    <TableCell isHeader>Status</TableCell>
+                    <TableCell isHeader nowrap className="w-32">
+                      Order ID
+                    </TableCell>
+                    <TableCell isHeader>Customer & Location</TableCell>
+                    <TableCell isHeader>Bottles / Exchange</TableCell>
+                    <TableCell isHeader nowrap className="w-28">
+                      Amount
+                    </TableCell>
+                    <TableCell isHeader nowrap align="right" className="w-48">
+                      Status & Payment
+                    </TableCell>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {sampleOrders.map((order) => (
                     <TableRow key={order.id}>
-                      <TableCell className="font-semibold text-brand-600 dark:text-blue-light-400">
-                        {order.id}
+                      <TableCell nowrap>
+                        <div className="font-semibold text-brand-600 dark:text-blue-light-400">
+                          {order.id}
+                        </div>
+                        <div className="text-[11px] text-gray-400 dark:text-gray-500">
+                          {order.date}
+                        </div>
                       </TableCell>
-                      <TableCell className="font-medium text-gray-900 dark:text-white">
-                        {order.customer}
-                      </TableCell>
-                      <TableCell className="text-gray-500 dark:text-gray-400">
-                        {order.location}
-                      </TableCell>
-                      <TableCell>{order.bottles}</TableCell>
-                      <TableCell className="font-semibold">{order.amount}</TableCell>
+
                       <TableCell>
-                        <Badge size="sm" variant="light" color="info">
-                          {order.paymentMethod}
-                        </Badge>
+                        <div className="font-medium text-gray-900 dark:text-white">
+                          {order.customer}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {order.location}
+                        </div>
                       </TableCell>
+
                       <TableCell>
-                        <Badge
-                          size="sm"
-                          variant="light"
-                          color={
-                            order.status === "COMPLETED"
-                              ? "success"
-                              : order.status === "IN_TRANSIT"
-                              ? "warning"
-                              : order.status === "DISPATCHED"
-                              ? "primary"
-                              : "error"
-                          }
-                        >
-                          {order.status}
-                        </Badge>
+                        <div className="text-xs text-gray-800 dark:text-gray-200">
+                          {order.bottles}
+                        </div>
+                      </TableCell>
+
+                      <TableCell nowrap className="font-semibold text-gray-900 dark:text-white">
+                        {order.amount}
+                      </TableCell>
+
+                      <TableCell nowrap align="right">
+                        <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                          <Badge
+                            size="sm"
+                            variant="light"
+                            color={
+                              order.status === "COMPLETED"
+                                ? "success"
+                                : order.status === "IN_TRANSIT"
+                                ? "warning"
+                                : order.status === "DISPATCHED"
+                                ? "primary"
+                                : "error"
+                            }
+                          >
+                            {order.status}
+                          </Badge>
+                          <Badge size="sm" variant="light" color="info">
+                            {order.paymentMethod}
+                          </Badge>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
