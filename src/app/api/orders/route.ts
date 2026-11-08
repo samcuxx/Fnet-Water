@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { createCustomerOrder, getCustomerOrders } from "@/lib/order-store";
+import { createCustomerOrder, getCustomerOrders, getAllOrders } from "@/lib/order-store";
 import { getCustomerAddresses } from "@/lib/customer-store";
 import { getUserById } from "@/lib/auth-store";
 
@@ -15,8 +15,13 @@ export async function GET() {
       );
     }
 
+    const role = (session.user as { role?: string }).role;
     const userId = (session.user as { id?: string }).id || "usr_customer_001";
-    const orders = await getCustomerOrders(userId);
+
+    const orders =
+      role === "ADMIN" || role === "MANAGER"
+        ? await getAllOrders()
+        : await getCustomerOrders(userId);
 
     return NextResponse.json({
       success: true,

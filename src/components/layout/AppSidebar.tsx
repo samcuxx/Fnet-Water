@@ -40,7 +40,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
     ADMIN: [
       {
         name: "Dashboard",
-        href: "/dashboard",
+        href: "/admin",
         icon: (
           <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M2 4.25A2.25 2.25 0 014.25 2h2.5A2.25 2.25 0 019 4.25v4.5A2.25 2.25 0 016.75 11h-2.5A2.25 2.25 0 012 8.75v-4.5zM2 13.25A2.25 2.25 0 014.25 11h2.5A2.25 2.25 0 019 13.25v2.5A2.25 2.25 0 016.75 18h-2.5A2.25 2.25 0 012 15.75v-2.5zM11 4.25A2.25 2.25 0 0113.25 2h2.5A2.25 2.25 0 0118 4.25v2.5A2.25 2.25 0 0115.75 9h-2.5A2.25 2.25 0 0111 6.75v-2.5zM11 11.25A2.25 2.25 0 0113.25 9h2.5A2.25 2.25 0 0118 11.25v4.5A2.25 2.25 0 0115.75 18h-2.5A2.25 2.25 0 0111 15.75v-4.5z" />
@@ -73,7 +73,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
           </svg>
         ),
         subItems: [
-          { name: "Bottle Tracking", href: "/admin/inventory/bottles" },
+          { name: "Inventory & Stock", href: "/admin/inventory" },
           { name: "Smart Dispensers", href: "/admin/dispensers" },
           { name: "Products Catalog", href: "/admin/products" },
         ],
@@ -149,6 +149,24 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
           <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
             <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+          </svg>
+        ),
+      },
+      {
+        name: "Inventory & Stock",
+        href: "/manager/inventory",
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+          </svg>
+        ),
+      },
+      {
+        name: "Smart Dispensers",
+        href: "/manager/dispensers",
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.993.883L4 8v8a2 2 0 001.85 1.995L6 18h8a2 2 0 001.995-1.85L16 16V8a1 1 0 00-.883-.993L15 7h-1V6a4 4 0 00-4-4zm0 2a2 2 0 012 2v1H8V6a2 2 0 012-2z" />
           </svg>
         ),
       },

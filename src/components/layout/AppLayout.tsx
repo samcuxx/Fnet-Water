@@ -10,19 +10,24 @@ import type { RoleType } from "@/types/next-auth";
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  role?: RoleType;
+  role?: RoleType | RoleType[];
 }
 
 const LayoutContent: React.FC<{
   children: React.ReactNode;
-  role?: RoleType;
+  role?: RoleType | RoleType[];
 }> = ({ children, role = "ADMIN" }) => {
+  const { data: session } = useSession();
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
   const isSidebarVisible = isExpanded || isHovered;
 
+  // Render sidebar according to the user's logged-in session role
+  const sessionRole = (session?.user as { role?: RoleType })?.role;
+  const activeRole: RoleType = sessionRole || (Array.isArray(role) ? role[0] : role);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors">
-      <AppSidebar role={role} />
+      <AppSidebar role={activeRole} />
       <Backdrop />
 
       <div
@@ -50,9 +55,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, role = "ADMIN" }
   }, [status]);
 
   // 2. Back-Forward Cache (bfcache) Defeater:
-  // If user presses the Back button after logging out, browsers may attempt to restore
-  // the frozen memory snapshot. Detecting event.persisted forces a clean network reload,
-  // which hits middleware and redirects to /login.
   useEffect(() => {
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
@@ -64,23 +66,27 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, role = "ADMIN" }
     return () => window.removeEventListener("pageshow", handlePageShow);
   }, []);
 
-  // 3. Client Role Enforcement
+  // 3. Client Role Enforcement (ADMIN has oversight on ADMIN and MANAGER operations)
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
-      const userRole = (session.user as { role?: string }).role;
-      if (role && userRole && userRole !== role) {
-        // If an unauthorized role attempts to view this screen, boot to their proper portal
-        const dest =
-          userRole === "ADMIN"
-            ? "/admin"
-            : userRole === "MANAGER"
-            ? "/manager"
-            : userRole === "DRIVER"
-            ? "/driver"
-            : userRole === "AGENT"
-            ? "/agent"
-            : "/customer";
-        window.location.replace(dest);
+      const userRole = (session.user as { role?: RoleType }).role;
+      if (role && userRole) {
+        const allowedRoles: RoleType[] = Array.isArray(role) ? role : [role];
+        const isAllowed =
+          userRole === "ADMIN" ||
+          allowedRoles.includes(userRole);
+
+        if (!isAllowed) {
+          const dest =
+            userRole === "MANAGER"
+              ? "/manager"
+              : userRole === "DRIVER"
+              ? "/driver"
+              : userRole === "AGENT"
+              ? "/agent"
+              : "/customer";
+          window.location.replace(dest);
+        }
       }
     }
   }, [status, session, role]);

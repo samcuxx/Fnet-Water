@@ -27,20 +27,34 @@ This file is automatically loaded by Antigravity and binds all coding, design, a
      - Banned in UI: `mNotify`, `mNotify SMS OTP`, `Paystack`, `Prisma`, `Docker`, `Docker Desktop`, `NextAuth`, `NextAuth.js`, `PostgreSQL`, `JWT`, `bcrypt`.
      - Required: **"SMS Code"** / **"Verification Code"**, **"Mobile Money"**, **"Phone Number"**, **"Email or Phone Number"**, **"Password"**.
 
-4. **Progressive Multi-Step UX Standard**:
+4. **Plain, Natural Language (Non-Technical End-User Standard)**:
+   - Target audience is everyday Ghanaian consumers, small business operators, and van drivers. Never write UI copy like a developer or engineer.
+   - Strictly Banned Robotic Terms:
+     - `1:1 swap` / `1:1 bottle swap` -> Use **"Bottle exchange"**, **"Returning empties"**, or **"Empty bottle return"**.
+     - `Complete Delivery & 1:1 Swap` -> Use **"Complete Delivery"**.
+     - `Handover` / `Point-of-Delivery Handover` -> Use **"Delivery Details"** or **"Complete Delivery"**.
+     - `Filled 19L Handed Over` -> Use **"Bottles Delivered"**.
+     - `Empty 19L Returned` -> Use **"Empty Bottles Collected"**.
+     - `Damaged / Broken Bottles` -> Use **"Damaged Bottles"**.
+     - `Pending Allocation` / `Dispatch Allocation` -> Use **"Unassigned Orders"** or **"Awaiting Driver Assignment"**.
+     - `Remittance` -> Use **"Cash Collected"** or **"Cash to Collect"**.
+     - `Dual Stock` -> Use **"Returns"** or **"Stock Level"**.
+   - Zero raw HTML entities in buttons or labels (`&check;`, `&rarr;`, `&times;`). Always use clean, responsive SVGs.
+
+5. **Progressive Multi-Step UX Standard**:
    - Never combine distinct interaction phases into a single cluttered card.
    - Multi-phase flows (SMS login, checkout, registration, password reset) must progress through sequential, dedicated steps:
      - Step 1: Input (e.g. Phone Number) $\rightarrow$ Action ("Send Code").
      - Step 2: Verification $\rightarrow$ Dedicated step displaying *"Enter the 5-digit code sent to [phone]"* with clear back navigation (*"← Change number"*).
    - All security codes must use the **5-Box Digit Input Standard** with auto-advance, backspace focus shifting, and full clipboard paste handling.
 
-5. **Anti-Slop Craftsmanship**:
+6. **Anti-Slop Craftsmanship**:
    - Zero AI buzzwords (`unlock`, `elevate`, `empower`, `seamless`, `cutting-edge`, `revolutionary`, `robust`, `delve`, `game-changer`, `testament`).
    - Zero em dashes (`—`) in UI copy or descriptions. Use commas, periods, colons, or parentheses instead.
    - Zero cluttered card bombardments: maximum 1 sentence for card descriptions. Cards must hold real, actionable operational data.
    - Zero table horizontal scrolling: all tables must be neatly balanced and responsive.
    - Zero theme transition glitches: `disableTransitionOnChange` mandatory on `<ThemeProvider>`.
 
-6. **Self-Verification Before Handover**:
+7. **Self-Verification Before Handover**:
    - Always run `npx.cmd tsc --noEmit` and verify zero errors before reporting completion.
    - Test modified routes and ensure clean HTTP 200 responses with zero hydration errors.

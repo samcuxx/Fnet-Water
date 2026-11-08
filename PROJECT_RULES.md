@@ -162,3 +162,24 @@ Every completed module report must conclude with a structured **Reviewer Testing
 - **Credentials / Access**: How to access the view
 - **Step-by-Step Test Scenario**: Clear 1-2-3 actions
 - **Expected Outcome**: What the user should see in the UI.
+
+---
+
+## 8. NON-TECHNICAL END-USER LANGUAGE & ZERO JARGON STANDARD
+
+All applications and modules in F Net Water Hub are used by everyday Ghanaian consumers, logistics managers, and commercial van drivers. Technical jargon, developer shorthands, and robotic terminology are strictly forbidden in UI text.
+
+### Rule 8.1: Strict Ban on Robotic Phrases
+- Banned: `1:1 swap`, `1:1 bottle swap` -> Required: **"Bottle exchange"**, **"Returning empties"**, or **"Empty bottle return"**.
+- Banned: `Complete Delivery & 1:1 Swap` -> Required: **"Complete Delivery"**.
+- Banned: `Point-of-Delivery Handover` -> Required: **"Complete Delivery: [Order Number]"** or **"Delivery Details"**.
+- Banned: `Filled 19L Handed Over` -> Required: **"Bottles Delivered"**.
+- Banned: `Empty 19L Returned` -> Required: **"Empty Bottles Collected"**.
+- Banned: `Damaged / Broken Bottles Handover` -> Required: **"Damaged Bottles"**.
+- Banned: `Pending Allocation` / `Dispatch Allocation` -> Required: **"Unassigned Orders"** / **"Awaiting Driver Assignment"**.
+- Banned: `Dual Stock` -> Required: **"Returns"** or **"Stock Level"**.
+- Banned: `Remittance` -> Required: **"Cash Collected"** or **"Cash to Collect"**.
+
+### Rule 8.2: Icons Over Raw HTML Characters
+- Never place raw character entities like `&check;`, `&rarr;`, `&times;` in buttons or labels.
+- Always use standard inline SVG icons with explicit `w-4 h-4` or `w-5 h-5` that scale cleanly and align across mobile viewports.

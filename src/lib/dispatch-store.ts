@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { isDatabaseConnected } from "@/lib/auth-store";
 import { getOrderById, updateOrderStatus, StoredOrder, OrderStatus } from "@/lib/order-store";
 import { getCustomerProfile, updateCustomerProfileData } from "@/lib/customer-store";
+import { syncDeliveryExchangeToInventory } from "@/lib/inventory-store";
 
 export interface DriverProfile {
   id: string;
@@ -473,6 +474,18 @@ export async function completeStopBottleExchange(data: {
     // Non-fatal
   }
 
+  // 4b. Sync Inventory (Warehouse filled decreases, empties returned increase, damaged logged)
+  try {
+    await syncDeliveryExchangeToInventory({
+      filledDelivered: data.filledDelivered,
+      emptyCollected: data.emptyCollected,
+      damagedCount: data.damagedCount,
+      orderNumber: stop.orderNumber,
+    });
+  } catch {
+    // Non-fatal
+  }
+
   // 5. Prisma DB Sync
   const dbOnline = await isDatabaseConnected();
   if (dbOnline) {
@@ -508,4 +521,13 @@ export async function completeStopBottleExchange(data: {
   }
 
   return { stop, exchange };
+}
+
+/**
+ * Retrieve all point-of-delivery bottle exchange records
+ */
+export function getAllBottleExchanges(): BottleExchangeRecord[] {
+  return Array.from(memoryExchanges.values()).sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 }

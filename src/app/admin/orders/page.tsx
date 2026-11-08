@@ -1,0 +1,310 @@
+"use client";
+
+import React, { useState, useEffect, useCallback } from "react";
+import AppLayout from "@/components/layout/AppLayout";
+import Badge from "@/components/ui/badge/Badge";
+import Input from "@/components/form/input/InputField";
+import Select from "@/components/form/Select";
+import { Modal } from "@/components/ui/Modal";
+import type { StoredOrder, OrderStatus } from "@/lib/order-store";
+
+export default function AdminOrdersPage() {
+  const [orders, setOrders] = useState<StoredOrder[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [selectedOrder, setSelectedOrder] = useState<StoredOrder | null>(null);
+
+  const loadOrders = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/orders");
+      if (res.ok) {
+        const data = await res.json();
+        setOrders(data.orders || []);
+      }
+    } catch (err) {
+      console.error("Failed to load admin orders:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
+
+  const filteredOrders = orders.filter((o) => {
+    const matchesSearch =
+      o.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
+      o.customerName.toLowerCase().includes(search.toLowerCase()) ||
+      o.deliveryAddressText.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter === "ALL" || o.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const getStatusBadge = (status: OrderStatus) => {
+    switch (status) {
+      case "DELIVERED":
+        return <Badge color="success" size="sm">Delivered</Badge>;
+      case "OUT_FOR_DELIVERY":
+        return <Badge color="warning" size="sm">Out for Delivery</Badge>;
+      case "ASSIGNED":
+        return <Badge color="info" size="sm">Driver Assigned</Badge>;
+      case "PENDING":
+        return <Badge color="warning" size="sm">Pending</Badge>;
+      case "CANCELLED":
+        return <Badge color="error" size="sm">Cancelled</Badge>;
+      default:
+        return <Badge color="light" size="sm">{status}</Badge>;
+    }
+  };
+
+  const pendingCount = orders.filter((o) => o.status === "PENDING").length;
+  const inTransitCount = orders.filter((o) => o.status === "OUT_FOR_DELIVERY" || o.status === "ASSIGNED").length;
+  const deliveredCount = orders.filter((o) => o.status === "DELIVERED").length;
+
+  return (
+    <AppLayout role="ADMIN">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                Customer Water Orders
+              </h1>
+              <Badge color="primary" size="sm">
+                Executive
+              </Badge>
+            </div>
+            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              Overview of all customer refill and dispenser orders across Ghana.
+            </p>
+          </div>
+        </div>
+
+        {/* 4 KPI Metric Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+            <span className="text-xs text-gray-500 font-medium block">Total Orders</span>
+            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+              {orders.length}
+            </div>
+            <span className="text-[11px] text-gray-400">All customer submissions</span>
+          </div>
+
+          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+            <span className="text-xs text-amber-600 font-medium block">Awaiting Dispatch</span>
+            <div className="mt-1 text-2xl font-bold text-amber-600">
+              {pendingCount}
+            </div>
+            <span className="text-[11px] text-gray-400">Ready for driver assignment</span>
+          </div>
+
+          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+            <span className="text-xs text-brand-600 font-medium block">In Transit</span>
+            <div className="mt-1 text-2xl font-bold text-brand-600 dark:text-blue-light-400">
+              {inTransitCount}
+            </div>
+            <span className="text-[11px] text-gray-400">En route to customers</span>
+          </div>
+
+          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+            <span className="text-xs text-emerald-600 font-medium block">Completed</span>
+            <div className="mt-1 text-2xl font-bold text-emerald-600">
+              {deliveredCount}
+            </div>
+            <span className="text-[11px] text-gray-400">Delivered and fulfilled</span>
+          </div>
+        </div>
+
+        {/* Search & Filter Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Input
+              type="text"
+              placeholder="Search order number, customer, address..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-72 text-xs"
+            />
+            <Select
+              options={[
+                { value: "ALL", label: "All Statuses" },
+                { value: "PENDING", label: "Pending" },
+                { value: "ASSIGNED", label: "Driver Assigned" },
+                { value: "OUT_FOR_DELIVERY", label: "Out for Delivery" },
+                { value: "DELIVERED", label: "Delivered" },
+              ]}
+              value={statusFilter}
+              onChange={(val) => setStatusFilter(val)}
+              className="w-44 text-xs"
+            />
+          </div>
+          <span className="text-xs text-gray-500">
+            Showing {filteredOrders.length} of {orders.length} orders
+          </span>
+        </div>
+
+        {/* Orders Table */}
+        <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
+                <th className="py-3 px-4">Order ID</th>
+                <th className="py-3 px-4">Customer</th>
+                <th className="py-3 px-4">Delivery Location</th>
+                <th className="py-3 px-4">Items</th>
+                <th className="py-3 px-4">Total</th>
+                <th className="py-3 px-4">Status</th>
+                <th className="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              {filteredOrders.map((ord) => (
+                <tr key={ord.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                  <td className="py-3 px-4 font-mono font-bold text-gray-900 dark:text-white">
+                    {ord.orderNumber}
+                  </td>
+                  <td className="py-3 px-4">
+                    <span className="font-semibold text-gray-800 dark:text-gray-200 block">
+                      {ord.customerName}
+                    </span>
+                    <span className="text-[11px] text-gray-400">{ord.customerPhone}</span>
+                  </td>
+                  <td className="py-3 px-4">
+                    <span className="block text-gray-800 dark:text-gray-200 truncate max-w-xs">
+                      {ord.deliveryAddressText}
+                    </span>
+                    <span className="text-[10px] font-mono text-gray-400">
+                      {ord.deliveryDigitalAddress}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-gray-600 dark:text-gray-400">
+                    {ord.items.map((it) => `${it.productName} (${it.quantity})`).join(", ")}
+                  </td>
+                  <td className="py-3 px-4 font-bold text-gray-900 dark:text-white">
+                    GH₵ {ord.totalAmount.toFixed(2)}
+                  </td>
+                  <td className="py-3 px-4">{getStatusBadge(ord.status)}</td>
+                  <td className="py-3 px-4 text-right">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedOrder(ord)}
+                      className="px-2.5 py-1 text-xs font-semibold rounded-lg text-brand-600 dark:text-blue-light-400 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition cursor-pointer"
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Order Details Modal */}
+        <Modal
+          isOpen={selectedOrder !== null}
+          onClose={() => setSelectedOrder(null)}
+          title={`Order Details: ${selectedOrder?.orderNumber}`}
+        >
+          {selectedOrder && (
+            <div className="space-y-4 text-xs">
+              <div className="p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 space-y-1.5">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Customer:</span>
+                  <span className="font-bold text-gray-900 dark:text-white">
+                    {selectedOrder.customerName} ({selectedOrder.customerPhone})
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Delivery Address:</span>
+                  <span className="font-medium text-gray-800 dark:text-gray-200">
+                    {selectedOrder.deliveryAddressText} ({selectedOrder.deliveryDigitalAddress})
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Delivery Slot:</span>
+                  <span className="font-medium text-gray-800 dark:text-gray-200">
+                    {selectedOrder.deliverySlot}
+                  </span>
+                </div>
+                {selectedOrder.assignedDriverName && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Assigned Driver:</span>
+                    <span className="font-bold text-brand-600 dark:text-blue-light-400">
+                      {selectedOrder.assignedDriverName}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Items List */}
+              <div className="space-y-2">
+                <span className="font-bold text-gray-900 dark:text-white uppercase tracking-wider text-[11px]">
+                  Ordered Products
+                </span>
+                <div className="border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden divide-y divide-gray-100 dark:divide-gray-800">
+                  {selectedOrder.items.map((it, idx) => (
+                    <div key={idx} className="p-2.5 flex justify-between items-center">
+                      <div>
+                        <span className="font-semibold text-gray-900 dark:text-white block">
+                          {it.productName}
+                        </span>
+                        <span className="text-[11px] text-gray-400">
+                          Qty: {it.quantity} &times; GH₵ {it.unitPrice.toFixed(2)}
+                        </span>
+                      </div>
+                      <span className="font-bold text-gray-900 dark:text-white">
+                        GH₵ {it.totalPrice.toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Financial Breakdown */}
+              <div className="p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 space-y-1">
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                  <span>Subtotal:</span>
+                  <span>GH₵ {selectedOrder.subtotal.toFixed(2)}</span>
+                </div>
+                {selectedOrder.depositFee > 0 && (
+                  <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                    <span>Bottle Deposit:</span>
+                    <span>GH₵ {selectedOrder.depositFee.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                  <span>Delivery Fee:</span>
+                  <span>{selectedOrder.deliveryFee === 0 ? "FREE" : `GH₵ ${selectedOrder.deliveryFee.toFixed(2)}`}</span>
+                </div>
+                {selectedOrder.discountAmount > 0 && (
+                  <div className="flex justify-between text-emerald-600 font-medium">
+                    <span>Reward Discount:</span>
+                    <span>-GH₵ {selectedOrder.discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm font-bold text-gray-900 dark:text-white pt-1.5 border-t border-gray-200 dark:border-gray-700">
+                  <span>Total Amount:</span>
+                  <span>GH₵ {selectedOrder.totalAmount.toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedOrder(null)}
+                  className="px-4 py-2 text-xs font-semibold rounded-lg text-white bg-brand-500 hover:bg-brand-600 transition shadow-theme-xs cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+        </Modal>
+      </div>
+    </AppLayout>
+  );
+}

@@ -428,6 +428,71 @@ export async function getCustomerOrders(userId: string): Promise<StoredOrder[]> 
 }
 
 /**
+ * Get all orders across the entire platform (for Admin and Manager)
+ */
+export async function getAllOrders(): Promise<StoredOrder[]> {
+  const dbOnline = await isDatabaseConnected();
+  if (dbOnline) {
+    try {
+      const orders = await prisma.order.findMany({
+        include: {
+          items: { include: { product: true } },
+          customerProfile: { include: { user: true } },
+          deliveryAddress: true,
+          delivery: { include: { driver: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+      if (orders && orders.length > 0) {
+        return orders.map((o) => ({
+          id: o.id,
+          orderNumber: o.orderNumber,
+          userId: o.customerProfile.userId,
+          customerName: o.customerProfile.user.name,
+          customerPhone: o.customerProfile.user.phone,
+          deliveryAddressId: o.deliveryAddressId,
+          deliveryAddressText: o.deliveryAddress.areaName,
+          deliveryDigitalAddress: o.deliveryAddress.digitalAddress,
+          deliveryDate: o.deliveryDate?.toISOString() || new Date().toISOString(),
+          deliverySlot: (o.deliverySlot as StoredOrder["deliverySlot"]) || "Morning (8am - 12pm)",
+          deliveryInstructions: o.deliveryInstructions || undefined,
+          items: o.items.map((it) => ({
+            id: it.id,
+            productId: it.productId,
+            productName: it.product.name,
+            quantity: it.quantity,
+            unitPrice: it.unitPrice,
+            depositPrice: it.depositPrice,
+            totalPrice: it.totalPrice,
+          })),
+          hasEmptyBottleExchange: o.depositFee === 0,
+          subtotal: o.subtotal,
+          depositFee: o.depositFee,
+          deliveryFee: o.deliveryFee,
+          discountAmount: o.discountAmount,
+          totalAmount: o.totalAmount,
+          status: o.status as OrderStatus,
+          paymentStatus: o.paymentStatus as PaymentStatus,
+          paymentMethod: (o.paymentMethod === "PAYSTACK_MOMO" ? "MOBILE_MONEY" : o.paymentMethod === "PAYSTACK_CARD" ? "CARD" : "CASH_ON_DELIVERY") as PaymentMethod,
+          paymentReference: o.paymentReference || undefined,
+          freeBottlesRedeemed: o.freeBottlesRedeemed,
+          assignedDriverId: o.delivery?.driverId || undefined,
+          assignedDriverName: o.delivery?.driver?.name || undefined,
+          createdAt: o.createdAt.toISOString(),
+          updatedAt: o.updatedAt.toISOString(),
+        }));
+      }
+    } catch {
+      // Fallback
+    }
+  }
+
+  return Array.from(memoryOrders.values()).sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+}
+
+/**
  * Get order by ID or orderNumber
  */
 export async function getOrderById(idOrNumber: string): Promise<StoredOrder | null> {

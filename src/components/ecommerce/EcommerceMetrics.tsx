@@ -1,13 +1,17 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import Badge from "@/components/ui/badge/Badge";
 
 export default function EcommerceMetrics() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
       {/* Metric 1: Customers */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
+      <Link
+        href="/admin/customers"
+        className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs hover:border-brand-500/50 hover:shadow-theme-sm transition cursor-pointer block"
+      >
         <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
           <svg
             className="text-brand-600 dark:text-blue-light-400 size-6"
@@ -38,10 +42,13 @@ export default function EcommerceMetrics() {
             <span className="text-xs font-semibold">&uarr; 11.01%</span>
           </Badge>
         </div>
-      </div>
+      </Link>
 
       {/* Metric 2: 19L Refill Orders */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
+      <Link
+        href="/admin/orders"
+        className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs hover:border-brand-500/50 hover:shadow-theme-sm transition cursor-pointer block"
+      >
         <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
           <svg
             className="text-brand-600 dark:text-blue-light-400 size-6"
@@ -72,10 +79,13 @@ export default function EcommerceMetrics() {
             <span className="text-xs font-semibold">&uarr; 9.40%</span>
           </Badge>
         </div>
-      </div>
+      </Link>
 
       {/* Metric 3: Active Dispensers on Plan */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
+      <Link
+        href="/admin/dispensers"
+        className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs hover:border-brand-500/50 hover:shadow-theme-sm transition cursor-pointer block"
+      >
         <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
           <svg
             className="text-brand-600 dark:text-blue-light-400 size-6"
@@ -108,10 +118,13 @@ export default function EcommerceMetrics() {
             <span className="text-xs font-semibold">&uarr; 14.2%</span>
           </Badge>
         </div>
-      </div>
+      </Link>
 
       {/* Metric 4: MoMo & Card Revenue */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
+      <Link
+        href="/admin/finance/transactions"
+        className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs hover:border-brand-500/50 hover:shadow-theme-sm transition cursor-pointer block"
+      >
         <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
           <svg
             className="text-brand-600 dark:text-blue-light-400 size-6"
@@ -141,7 +154,7 @@ export default function EcommerceMetrics() {
             <span className="text-xs font-semibold">&uarr; 18.5%</span>
           </Badge>
         </div>
-      </div>
+      </Link>
     </div>
   );
 }
