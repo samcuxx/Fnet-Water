@@ -240,7 +240,7 @@ export default function CustomerDashboardPage() {
               {profile?.bottlesHeld ?? 4}
             </div>
             <span className="text-[10px] sm:text-[11px] text-brand-600 dark:text-blue-light-400 font-medium block truncate">
-              1:1 swap ready
+              Empty bottles ready
             </span>
           </div>
 
@@ -252,7 +252,7 @@ export default function CustomerDashboardPage() {
               {profile?.freeBottleBalance ?? 1}
             </div>
             <span className="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 font-medium block truncate">
-              5:1 rule reward
+              Referral reward
             </span>
           </div>
 
@@ -285,7 +285,7 @@ export default function CustomerDashboardPage() {
                 Order Refill
               </h3>
               <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
-                Fast doorstep swap
+                Doorstep delivery
               </p>
             </div>
           </Link>

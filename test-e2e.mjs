@@ -493,6 +493,73 @@ async function run() {
     assertTest("Ordering workflow security checks", false, err.message);
   }
 
+  // 19. Module 6: Delivery Dispatch & Driver Portal Security
+  try {
+    const unauthMgrDeliv = await fetch(`${BASE_URL}/manager/deliveries`, { redirect: "manual" });
+    const mgrLoc = unauthMgrDeliv.headers.get("location") || "";
+    assertTest(
+      "Unauthenticated /manager/deliveries redirects to /login",
+      (unauthMgrDeliv.status === 307 || unauthMgrDeliv.status === 302) && mgrLoc.includes("/login")
+    );
+
+    const unauthDriver = await fetch(`${BASE_URL}/driver`, { redirect: "manual" });
+    const drvLoc = unauthDriver.headers.get("location") || "";
+    assertTest(
+      "Unauthenticated /driver redirects to /login",
+      (unauthDriver.status === 307 || unauthDriver.status === 302) && drvLoc.includes("/login")
+    );
+
+    const unauthDispatchOrders = await fetch(`${BASE_URL}/api/dispatch/orders`);
+    assertTest(
+      "Unauthenticated /api/dispatch/orders returns 401 Unauthorized",
+      unauthDispatchOrders.status === 401
+    );
+
+    const unauthDispatchDrivers = await fetch(`${BASE_URL}/api/dispatch/drivers`);
+    assertTest(
+      "Unauthenticated /api/dispatch/drivers returns 401 Unauthorized",
+      unauthDispatchDrivers.status === 401
+    );
+
+    const unauthDispatchAssign = await fetch(`${BASE_URL}/api/dispatch/assign`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    assertTest(
+      "Unauthenticated /api/dispatch/assign returns 401 Unauthorized",
+      unauthDispatchAssign.status === 401
+    );
+
+    const unauthDriverStops = await fetch(`${BASE_URL}/api/driver/stops`);
+    assertTest(
+      "Unauthenticated /api/driver/stops returns 401 Unauthorized",
+      unauthDriverStops.status === 401
+    );
+
+    const unauthDriverStart = await fetch(`${BASE_URL}/api/driver/start`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    assertTest(
+      "Unauthenticated /api/driver/start returns 401 Unauthorized",
+      unauthDriverStart.status === 401
+    );
+
+    const unauthDriverExchange = await fetch(`${BASE_URL}/api/driver/exchange`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    assertTest(
+      "Unauthenticated /api/driver/exchange returns 401 Unauthorized",
+      unauthDriverExchange.status === 401
+    );
+  } catch (err) {
+    assertTest("Dispatch and Driver portal security checks", false, err.message);
+  }
+
   console.log("\x1b[36m============================================\x1b[0m");
   console.log(
     `\x1b[1mRESULTS: \x1b[32m${passed} Passed\x1b[0m, \x1b[31m${failed} Failed\x1b[0m`

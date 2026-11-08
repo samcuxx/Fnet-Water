@@ -19,7 +19,7 @@ export default function AdminDashboardPage() {
               Operations &amp; Executive Overview
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              Real-time analytics for water refills, bottle exchange, dispensers, and Paystack revenue.
+              Real-time analytics for water refills, bottle exchange, dispensers, and revenue across Ghana.
             </p>
           </div>
         </div>

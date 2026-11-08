@@ -212,7 +212,7 @@ export default function CustomerOrdersPage() {
                 {/* Tracking Action & Details */}
                 <div className="pt-2 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
                   <span className="text-[11px] text-gray-500 dark:text-gray-400">
-                    {ord.hasEmptyBottleExchange ? "1:1 Bottle Swap Included" : "New Bottles Deposit Added"}
+                    {ord.hasEmptyBottleExchange ? "Empty Bottles Exchanged" : "Bottle Deposit Paid"}
                   </span>
 
                   <button
@@ -335,10 +335,10 @@ export default function CustomerOrdersPage() {
                         : "font-medium text-gray-500 dark:text-gray-400"
                     }`}
                   >
-                    4. Delivered &amp; Exchanged
+                    4. Delivered
                   </span>
                   <span className="text-[11px] text-gray-400">
-                    1:1 pure water bottles handed over at destination
+                    Water bottles delivered to destination
                   </span>
                 </div>
               </div>

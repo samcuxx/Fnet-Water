@@ -143,7 +143,7 @@ export default function NotificationDropdown() {
             onClick={closeDropdown}
             className="text-xs font-medium text-brand-600 dark:text-blue-light-400 hover:underline"
           >
-            View all notifications &rarr;
+            View all notifications
           </Link>
         </div>
       </Dropdown>

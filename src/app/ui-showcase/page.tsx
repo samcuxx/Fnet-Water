@@ -196,7 +196,7 @@ export default function UiShowcasePage() {
               <div className="space-y-3">
                 <Alert
                   variant="success"
-                  title="Payment Received via Paystack"
+                  title="Payment Received via Mobile Money"
                   message="GH₵ 180.00 confirmed for Kofi Owusu-Ansah (Ref: PAY_GH_8921)."
                   showLink
                   linkText="View Receipt"
@@ -266,14 +266,14 @@ export default function UiShowcasePage() {
 
                 <div>
                   <Label htmlFor="cust-phone" required>
-                    Ghana Phone Number (mNotify SMS & MoMo)
+                    Ghana Phone Number (SMS &amp; Mobile Money)
                   </Label>
                   <Input
                     id="cust-phone"
                     placeholder="024XXXXXXX or +233..."
                     defaultValue="+233 24 123 4567"
                     success
-                    hint="Phone number verified with mNotify OTP."
+                    hint="Phone number verified with SMS code."
                   />
                 </div>
 
@@ -340,7 +340,7 @@ export default function UiShowcasePage() {
                 <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-3">
                   <div>
                     <Switch
-                      label="Enable Auto-SMS Order Updates via mNotify"
+                      label="Enable Auto-SMS Order Updates"
                       checked={switchActive}
                       onChange={setSwitchActive}
                     />
@@ -349,14 +349,14 @@ export default function UiShowcasePage() {
                   <div>
                     <Checkbox
                       id="terms-check"
-                      label="Customer agrees to 1:1 empty bottle exchange policy"
+                      label="Customer agrees to empty bottle exchange policy"
                       checked={checkboxState}
                       onChange={setCheckboxState}
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label>Preferred Paystack Payment Channel</Label>
+                    <Label>Preferred Payment Method</Label>
                     <div className="flex items-center gap-4">
                       <Radio
                         name="payMethod"

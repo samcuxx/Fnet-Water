@@ -201,7 +201,7 @@ export default function OrderWaterPage() {
                 </p>
               </div>
               <Badge color="primary" size="sm">
-                1:1 Swap Available
+                Bottle Exchange Available
               </Badge>
             </div>
 
@@ -272,10 +272,10 @@ export default function OrderWaterPage() {
                         <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs">
                           <div>
                             <span className="font-medium text-gray-700 dark:text-gray-300">
-                              Empty bottle return:
+                              Bottle return:
                             </span>
                             <span className="ml-1 text-gray-500 dark:text-gray-400">
-                              {hasEmptyBottleExchange ? "1:1 swap (Deposit waived)" : `No empty bottles (+GH₵ ${(qty * 80).toFixed(2)})`}
+                              {hasEmptyBottleExchange ? "Returning empties (No deposit fee)" : `Need bottles (+GH₵ ${(qty * 80).toFixed(2)})`}
                             </span>
                           </div>
                           <button
@@ -287,7 +287,7 @@ export default function OrderWaterPage() {
                                 : "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300"
                             }`}
                           >
-                            {hasEmptyBottleExchange ? "1:1 Swap Active" : "Add Deposit"}
+                            {hasEmptyBottleExchange ? "Returning Empty" : "Need Bottles"}
                           </button>
                         </div>
                       )}
@@ -655,8 +655,10 @@ export default function OrderWaterPage() {
         {currentStep === 4 && confirmedOrder && (
           <div className="space-y-4 text-center">
             <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs space-y-4">
-              <div className="size-14 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto text-2xl font-bold">
-                &check;
+              <div className="size-14 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
               </div>
 
               <div>

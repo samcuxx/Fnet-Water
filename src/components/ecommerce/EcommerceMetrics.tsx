@@ -130,7 +130,7 @@ export default function EcommerceMetrics() {
         <div className="flex items-end justify-between mt-5">
           <div>
             <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Paystack MoMo Revenue
+              Mobile Money Revenue
             </span>
             <h4 className="mt-2 text-2xl font-bold text-gray-800 dark:text-white">
               GH₵ 128,450

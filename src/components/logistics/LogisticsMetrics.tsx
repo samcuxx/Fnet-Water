@@ -50,10 +50,10 @@ export default function LogisticsMetrics() {
       <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-theme-xs">
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-            1:1 Bottles Exchanged
+            Bottles Exchanged
           </span>
           <Badge color="info" size="sm">
-            Dual Stock
+            Returns
           </Badge>
         </div>
         <div className="mt-3 flex items-baseline justify-between">

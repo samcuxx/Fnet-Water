@@ -118,10 +118,10 @@ export default function StatisticsChart() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
           <h3 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white">
-            Daily Revenue Statistics (Paystack &amp; MoMo)
+            Daily Revenue Statistics
           </h3>
           <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-            Real-time revenue trends across mobile money and card gateways
+            Real-time revenue trends across mobile money and card payments
           </p>
         </div>
 

@@ -17,7 +17,7 @@ const recentWaterOrders: OrderItem[] = [
   {
     id: "FNW-8821",
     name: "19L Pure Refill (4 Bottles)",
-    details: "1:1 Bottle Exchange Completed",
+    details: "Bottle Exchange Completed",
     customer: "Kwesi Appiah (East Legon)",
     amount: "GH₵ 120.00",
     status: "Delivered",
@@ -41,7 +41,7 @@ const recentWaterOrders: OrderItem[] = [
   {
     id: "FNW-8824",
     name: "19L Refill (10 Bottles Commercial)",
-    details: "Awaiting Dispatch Allocation",
+    details: "Awaiting Driver Assignment",
     customer: "Dr. Mensah Clinic (Osu)",
     amount: "GH₵ 300.00",
     status: "Pending",
@@ -49,7 +49,7 @@ const recentWaterOrders: OrderItem[] = [
   {
     id: "FNW-8825",
     name: "New Dispenser Onboarding",
-    details: "Paystack MoMo Verified",
+    details: "Mobile Money Verified",
     customer: "Samuel Danquah (Spintex)",
     amount: "GH₵ 450.00",
     status: "Delivered",
@@ -73,7 +73,7 @@ export default function RecentOrders() {
           type="button"
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 self-start sm:self-auto transition"
         >
-          View All Orders &rarr;
+          View All Orders
         </button>
       </div>
 
