@@ -1,1 +1,78 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2000" zoomAndPan="magnify" viewBox="0 0 1500 1499.999933" height="2000" preserveAspectRatio="xMidYMid meet" version="1.0"><defs><clipPath id="e44c6ca0c6"><path d="M 145.605469 150 L 1354.605469 150 L 1354.605469 1350 L 145.605469 1350 Z M 145.605469 150 " clip-rule="nonzero"/></clipPath></defs><rect x="-150" width="1800" fill="#ffffff" y="-149.999993" height="1799.99992" fill-opacity="1"/><rect x="-150" width="1800" fill="#ffffff" y="-149.999993" height="1799.99992" fill-opacity="1"/><g clip-path="url(#e44c6ca0c6)"><path fill="#00cc00" d="M 1354.292969 755.054688 C 1354.292969 836.609375 1338.292969 915.75 1306.761719 990.328125 C 1276.3125 1062.292969 1232.75 1126.9375 1177.277344 1182.40625 C 1121.808594 1237.878906 1057.1875 1281.441406 985.199219 1311.890625 C 944.816406 1328.976562 903.074219 1341.476562 860.351562 1349.363281 L 860.351562 1180.730469 C 1049.546875 1131.621094 1189.628906 959.3125 1189.628906 754.980469 C 1189.628906 512.53125 992.375 315.199219 749.925781 315.199219 L 310.246094 315.199219 L 310.246094 755.054688 C 310.246094 893.488281 374.566406 1017.175781 474.882812 1097.84375 L 474.882812 479.816406 L 749.925781 479.816406 C 787.027344 479.816406 823.050781 487.1875 857.023438 501.5625 C 889.789062 515.417969 919.199219 535.335938 944.421875 560.558594 C 969.667969 585.804688 989.464844 615.191406 1003.34375 647.957031 C 1017.71875 681.929688 1024.992188 717.949219 1024.992188 755.054688 C 1024.992188 792.160156 1017.71875 828.179688 1003.34375 862.152344 C 989.488281 894.917969 969.667969 924.328125 944.421875 949.550781 C 920.039062 973.933594 891.761719 993.238281 860.324219 1007.019531 L 860.324219 755.84375 C 860.324219 755.84375 860.324219 755.203125 860.324219 754.882812 C 860.324219 694.011719 810.796875 644.480469 749.925781 644.480469 L 639.523438 644.480469 L 639.523438 1349.363281 C 596.796875 1341.476562 555.058594 1328.976562 514.675781 1311.890625 C 501.140625 1306.171875 487.875 1299.984375 474.882812 1293.351562 C 418.722656 1264.652344 367.664062 1227.476562 322.597656 1182.40625 C 267.125 1126.9375 223.5625 1062.316406 193.113281 990.328125 C 161.605469 915.75 145.605469 836.609375 145.605469 755.054688 L 145.605469 150.535156 L 749.949219 150.535156 C 831.503906 150.535156 910.644531 166.609375 985.222656 198.144531 C 1057.1875 228.589844 1121.808594 272.230469 1177.304688 327.726562 C 1232.773438 383.195312 1276.339844 447.816406 1306.785156 519.804688 C 1338.292969 594.359375 1354.292969 673.5 1354.292969 755.054688 Z M 1354.292969 755.054688 " fill-opacity="1" fill-rule="nonzero"/></g></svg>
+<svg width="216" height="40" viewBox="0 0 216 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fnH_dark" x1="0" y1="4" x2="32" y2="36" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0284C7" />
+      <stop offset="45%" stop-color="#1D4ED8" />
+      <stop offset="100%" stop-color="#0B1528" />
+    </linearGradient>
+
+    <linearGradient id="fnHSpine_dark" x1="7" y1="7" x2="13" y2="25" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="70%" stop-color="#F0F9FF" />
+      <stop offset="100%" stop-color="#BAE6FD" />
+    </linearGradient>
+
+    <linearGradient id="fnHTop_dark" x1="10" y1="7" x2="25" y2="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="50%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+
+    <linearGradient id="fnHMid_dark" x1="10" y1="15" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#67E8F9" />
+      <stop offset="100%" stop-color="#00D2FF" />
+    </linearGradient>
+
+    <linearGradient id="fnHPearl_dark" x1="17" y1="21" x2="22" y2="26" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E0F2FE" />
+      <stop offset="50%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+
+    <filter id="fnHShadow_dark" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="1.2" stdDeviation="1.2" flood-color="#000000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Left Mark (32x32 at x=4, y=4) -->
+  <g transform="translate(4, 4)">
+    <rect width="32" height="32" rx="8" fill="url(#fnH_dark)"/>
+    <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" stroke="#38BDF8" stroke-opacity="0.3" stroke-width="1"/>
+
+    <g filter="url(#fnHShadow_dark)">
+      <!-- Spine -->
+      <rect x="7.5" y="6.5" width="4.2" height="18.5" rx="2.1" fill="url(#fnHSpine_dark)"/>
+
+      <!-- Top Wave -->
+      <path
+        d="M10 6.5
+           H 22.5
+           C 24.1569 6.5 25.5 7.84315 25.5 9.5
+           C 25.5 11.1569 24.1569 12.5 22.5 12.5
+           H 10
+           V 6.5 Z"
+        fill="url(#fnHTop_dark)"
+      />
+
+      <!-- Mid Jet -->
+      <path
+        d="M10 14.5
+           H 19
+           C 20.3807 14.5 21.5 15.6193 21.5 17
+           C 21.5 18.3807 20.3807 19.5 19 19.5
+           H 10
+           V 14.5 Z"
+        fill="url(#fnHMid_dark)"
+      />
+
+      <!-- Pearl -->
+      <circle cx="18.5" cy="23.2" r="2" fill="url(#fnHPearl_dark)"/>
+      <circle cx="17.9" cy="22.6" r="0.65" fill="#FFFFFF" opacity="0.85"/>
+    </g>
+  </g>
+
+  <!-- Typography -->
+  <text x="46" y="22" font-family="system-ui, -apple-system, 'Inter', 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="15.5" letter-spacing="-0.03em" fill="#FFFFFF">F NET</text>
+  <text x="96" y="22" font-family="system-ui, -apple-system, 'Inter', 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="15.5" letter-spacing="-0.01em" fill="#38BDF8">WATER HUB</text>
+  <text x="46.5" y="32" font-family="system-ui, -apple-system, 'Inter', 'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="7" letter-spacing="0.14em" fill="#94A3B8">SMART HYDRATION &#x2022; LOGISTICS</text>
+</svg>

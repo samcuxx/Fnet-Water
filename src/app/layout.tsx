@@ -15,8 +15,16 @@ export const metadata: Metadata = {
   description:
     "Technology-driven water supply, bottle exchange, smart dispenser tracking, and payments platform for Ghana.",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/logo/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/logo/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [
+      { url: "/logo/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
+  manifest: "/logo/site.webmanifest",
 };
 
 export default function RootLayout({

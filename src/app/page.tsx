@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { motion, AnimatePresence } from "framer-motion";
 import Logo from "@/components/brand/Logo";
 
 export default function HomePage() {
@@ -28,52 +29,47 @@ export default function HomePage() {
       {/* =========================================================================
           1. TOP NAVIGATION (STICKY)
       ========================================================================== */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/95 border-b border-gray-100 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between">
-          <div className="flex items-center gap-8">
+      <motion.header
+        initial={{ y: -16, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="sticky top-0 z-50 backdrop-blur-md bg-white/95 border-b border-gray-100 shadow-xs"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between">
+          <div className="flex items-center gap-10">
             <Logo size="md" href="/" />
             
-            <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-gray-600">
-              <a href="#products" className="hover:text-brand-600 transition">
-                Water Products
+            <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
+              <a href="#products" className="hover:text-brand-600 transition-colors">
+                Products
               </a>
-              <a href="#partners" className="hover:text-brand-600 transition">
-                Top Brands & Swap
+              <a href="#partners" className="hover:text-brand-600 transition-colors">
+                Bottle Exchange
               </a>
-              <a href="#dispensers" className="hover:text-brand-600 transition">
-                Smart Dispensers
+              <a href="#dispensers" className="hover:text-brand-600 transition-colors">
+                Dispensers
               </a>
-              <a href="#how-it-works" className="hover:text-brand-600 transition">
+              <a href="#how-it-works" className="hover:text-brand-600 transition-colors">
                 How It Works
-              </a>
-              <a href="#calculator" className="hover:text-brand-600 transition">
-                Refill Estimator
-              </a>
-              <a href="#fleet" className="hover:text-brand-600 transition">
-                Delivery Fleet
               </a>
             </nav>
           </div>
 
-          <div className="flex items-center gap-2.5 sm:gap-4">
-            <Link
-              href="/login"
-              className="text-xs sm:text-sm font-bold text-gray-700 hover:text-brand-600 px-3 py-2 transition"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/customer/order"
-              className="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 shadow-sm transition active:scale-[0.98]"
-            >
-              <span>Order Water</span>
-              <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </Link>
+          <div className="flex items-center">
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center gap-2 px-4.5 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 shadow-xs shadow-brand-500/20 transition-all cursor-pointer"
+              >
+                <span>Login</span>
+                <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </Link>
+            </motion.div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* =========================================================================
           2. HERO SECTION
@@ -83,7 +79,12 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
             {/* Left Content Column */}
-            <div className="lg:col-span-7 flex flex-col justify-center text-left">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="lg:col-span-7 flex flex-col justify-center text-left"
+            >
               
               {/* Trust Badge */}
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-200/80 text-brand-700 text-xs font-bold w-fit mb-4 sm:mb-5 shadow-xs">
@@ -106,25 +107,29 @@ export default function HomePage() {
 
               {/* Mobile Side-by-Side CTAs (Grid on mobile, flex on desktop) */}
               <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-3 sm:flex sm:items-center sm:gap-4 max-w-sm sm:max-w-none">
-                <Link
-                  href="/customer/order"
-                  className="h-12 sm:h-13 px-3 sm:px-6 rounded-xl sm:rounded-2xl text-xs sm:text-base font-bold text-white bg-brand-500 hover:bg-brand-600 active:scale-[0.99] shadow-md shadow-brand-500/20 transition cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 text-center"
-                >
-                  <svg className="size-4 sm:size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-                  </svg>
-                  <span>Order Refill</span>
-                </Link>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+                  <Link
+                    href="/customer/order"
+                    className="w-full h-12 sm:h-13 px-3 sm:px-6 rounded-xl sm:rounded-2xl text-xs sm:text-base font-bold text-white bg-brand-500 hover:bg-brand-600 active:scale-[0.99] shadow-md shadow-brand-500/20 transition cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 text-center"
+                  >
+                    <svg className="size-4 sm:size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+                    <span>Order Refill</span>
+                  </Link>
+                </motion.div>
 
-                <a
-                  href="#dispensers"
-                  className="h-12 sm:h-13 px-3 sm:px-6 rounded-xl sm:rounded-2xl text-xs sm:text-base font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-200/90 transition cursor-pointer flex items-center justify-center gap-1.5 text-center"
-                >
-                  <span>Dispensers</span>
-                  <svg className="size-3.5 sm:size-4 shrink-0 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </a>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+                  <a
+                    href="#dispensers"
+                    className="w-full h-12 sm:h-13 px-3 sm:px-6 rounded-xl sm:rounded-2xl text-xs sm:text-base font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-200/90 transition cursor-pointer flex items-center justify-center gap-1.5 text-center"
+                  >
+                    <span>Dispensers</span>
+                    <svg className="size-3.5 sm:size-4 shrink-0 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </a>
+                </motion.div>
               </div>
 
               {/* Value Guarantees Row */}
@@ -165,14 +170,19 @@ export default function HomePage() {
                   <span>Certified Pure</span>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Right Hero Image Card */}
             <div className="lg:col-span-5 relative mt-4 lg:mt-0">
               <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
                 
-                {/* Elevated Image Frame */}
-                <div className="relative rounded-3xl overflow-hidden shadow-xl shadow-blue-900/10 border-4 border-white aspect-[4/3] sm:aspect-[16/11]">
+                {/* Elevated Image Frame with Gentle Scale-In */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+                  className="relative rounded-3xl overflow-hidden shadow-xl shadow-blue-900/10 border-4 border-white aspect-[4/3] sm:aspect-[16/11]"
+                >
                   <Image
                     src="/images/landing/hero-commercial.jpg"
                     alt="F Net Water Pure Water Delivery Experience"
@@ -182,19 +192,45 @@ export default function HomePage() {
                     className="object-cover object-center"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-                </div>
+                </motion.div>
 
-                {/* Floating Badge 1: Live Dispatch */}
-                <div className="absolute -top-3 -left-2 sm:-top-4 sm:-left-3 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-md border border-gray-100 flex items-center gap-2.5">
+                {/* Floating Badge 1: Live Delivery Fleet with Organic Float */}
+                <motion.div
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{
+                    opacity: 1,
+                    x: 0,
+                    y: [0, -6, 0],
+                  }}
+                  transition={{
+                    opacity: { duration: 0.5, delay: 0.35 },
+                    x: { duration: 0.5, delay: 0.35 },
+                    y: { repeat: Infinity, duration: 4.5, ease: "easeInOut", delay: 0.35 },
+                  }}
+                  className="absolute -top-3 -left-2 sm:-top-4 sm:-left-3 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-md border border-gray-100 flex items-center gap-2.5 z-10"
+                >
                   <span className="flex size-2 rounded-full bg-emerald-500 animate-ping" />
                   <div>
                     <div className="text-[11px] font-bold text-gray-900">Live Delivery Fleet</div>
                     <div className="text-[10px] text-gray-500">Scheduled runs active today</div>
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Floating Badge 2: Bottle Exchange Verified */}
-                <div className="absolute -bottom-3 -right-2 sm:-bottom-4 sm:-right-3 bg-white/95 backdrop-blur-md px-3.5 py-2.5 rounded-2xl shadow-md border border-gray-100 flex items-center gap-2.5">
+                {/* Floating Badge 2: Bottle Exchange Verified with Counter-Float */}
+                <motion.div
+                  initial={{ opacity: 0, x: 12 }}
+                  animate={{
+                    opacity: 1,
+                    x: 0,
+                    y: [0, 6, 0],
+                  }}
+                  transition={{
+                    opacity: { duration: 0.5, delay: 0.45 },
+                    x: { duration: 0.5, delay: 0.45 },
+                    y: { repeat: Infinity, duration: 5, ease: "easeInOut", delay: 0.7 },
+                  }}
+                  className="absolute -bottom-3 -right-2 sm:-bottom-4 sm:-right-3 bg-white/95 backdrop-blur-md px-3.5 py-2.5 rounded-2xl shadow-md border border-gray-100 flex items-center gap-2.5 z-10"
+                >
                   <div className="flex size-7 items-center justify-center rounded-xl bg-blue-100 text-brand-600 font-bold text-xs">
                     19L
                   </div>
@@ -202,7 +238,7 @@ export default function HomePage() {
                     <div className="text-xs font-bold text-gray-900">Bottle Exchange</div>
                     <div className="text-[10px] text-emerald-600 font-semibold">Zero deposit on swap</div>
                   </div>
-                </div>
+                </motion.div>
 
               </div>
             </div>
@@ -214,33 +250,39 @@ export default function HomePage() {
       {/* =========================================================================
           3. OPERATIONAL STATS BAR
       ========================================================================== */}
-      <section className="py-8 sm:py-10 bg-white border-y border-gray-100">
+      <motion.section
+        initial={{ opacity: 0, y: 15 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-30px" }}
+        transition={{ duration: 0.5 }}
+        className="py-8 sm:py-10 bg-white border-y border-gray-100"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
             
-            <div className="p-4 rounded-2xl bg-gray-50/70 border border-gray-100">
+            <motion.div whileHover={{ y: -3, transition: { duration: 0.2 } }} className="p-4 rounded-2xl bg-gray-50/70 border border-gray-100 transition shadow-xs hover:shadow-sm">
               <div className="text-2xl sm:text-3xl font-extrabold text-brand-600">15,000+</div>
               <div className="text-xs sm:text-sm font-semibold text-gray-600 mt-1">Monthly Refills</div>
-            </div>
+            </motion.div>
 
-            <div className="p-4 rounded-2xl bg-gray-50/70 border border-gray-100">
+            <motion.div whileHover={{ y: -3, transition: { duration: 0.2 } }} className="p-4 rounded-2xl bg-gray-50/70 border border-gray-100 transition shadow-xs hover:shadow-sm">
               <div className="text-2xl sm:text-3xl font-extrabold text-brand-600">99.4%</div>
               <div className="text-xs sm:text-sm font-semibold text-gray-600 mt-1">On-Time Deliveries</div>
-            </div>
+            </motion.div>
 
-            <div className="p-4 rounded-2xl bg-gray-50/70 border border-gray-100">
+            <motion.div whileHover={{ y: -3, transition: { duration: 0.2 } }} className="p-4 rounded-2xl bg-gray-50/70 border border-gray-100 transition shadow-xs hover:shadow-sm">
               <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600">GH₵ 0</div>
               <div className="text-xs sm:text-sm font-semibold text-gray-600 mt-1">Empty Return Deposit</div>
-            </div>
+            </motion.div>
 
-            <div className="p-4 rounded-2xl bg-gray-50/70 border border-gray-100">
+            <motion.div whileHover={{ y: -3, transition: { duration: 0.2 } }} className="p-4 rounded-2xl bg-gray-50/70 border border-gray-100 transition shadow-xs hover:shadow-sm">
               <div className="text-2xl sm:text-3xl font-extrabold text-brand-600">12 Months</div>
               <div className="text-xs sm:text-sm font-semibold text-gray-600 mt-1">Rent-to-Own Payoff</div>
-            </div>
+            </motion.div>
 
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* =========================================================================
           4. PRODUCT CATALOG SHOWCASE
@@ -248,7 +290,13 @@ export default function HomePage() {
       <section id="products" className="py-14 sm:py-20 bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="text-center max-w-xl mx-auto mb-10 sm:mb-14">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center max-w-xl mx-auto mb-10 sm:mb-14"
+          >
             <span className="text-xs font-bold uppercase tracking-wider text-brand-600">
               Pure Drinking Solutions
             </span>
@@ -258,12 +306,19 @@ export default function HomePage() {
             <p className="mt-2 text-xs sm:text-sm text-gray-500">
               Clean mineral water and smart dispensing hardware for homes and offices.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             
             {/* PRODUCT 1: 18.9L / 19L Refill Bottle */}
-            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-200/90 shadow-sm hover:shadow-md transition flex flex-col justify-between group">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              whileHover={{ y: -6, transition: { duration: 0.25 } }}
+              className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-200/90 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between group"
+            >
               <div>
                 <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-b from-blue-50/40 to-slate-50 mb-5 border border-gray-100/80 shadow-inner">
                   <Image
@@ -314,16 +369,26 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              <Link
-                href="/customer/order?product=19L"
-                className="w-full text-center py-2.5 sm:py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 transition shadow-sm cursor-pointer"
-              >
-                Order Refill
-              </Link>
-            </div>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  href="/customer/order?product=19L"
+                  className="w-full inline-block text-center py-2.5 sm:py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 transition shadow-sm cursor-pointer"
+                >
+                  Order Refill
+                </Link>
+              </motion.div>
+            </motion.div>
 
             {/* PRODUCT 2: Smart Digital Dispenser */}
-            <div id="dispensers" className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-brand-500 shadow-md hover:shadow-lg transition flex flex-col justify-between relative group">
+            <motion.div
+              id="dispensers"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              whileHover={{ y: -6, transition: { duration: 0.25 } }}
+              className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-brand-500 shadow-md hover:shadow-lg transition-shadow flex flex-col justify-between relative group"
+            >
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-600 to-sky-500 text-white text-[11px] font-bold px-3.5 py-0.5 rounded-full shadow-sm z-10 whitespace-nowrap">
                 Rent-to-Own
               </div>
@@ -375,16 +440,25 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              <Link
-                href="/customer/dispenser"
-                className="w-full text-center py-2.5 sm:py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 transition shadow-sm cursor-pointer"
-              >
-                Choose Dispenser
-              </Link>
-            </div>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  href="/customer/dispenser"
+                  className="w-full inline-block text-center py-2.5 sm:py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 transition shadow-sm cursor-pointer"
+                >
+                  Choose Dispenser
+                </Link>
+              </motion.div>
+            </motion.div>
 
             {/* PRODUCT 3: 24-Pack 500ml Bottled Water */}
-            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-200/90 shadow-sm hover:shadow-md transition flex flex-col justify-between group">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              whileHover={{ y: -6, transition: { duration: 0.25 } }}
+              className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-200/90 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between group"
+            >
               <div>
                 <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-b from-blue-50/40 to-slate-50 mb-5 border border-gray-100/80 shadow-inner">
                   <Image
@@ -435,25 +509,33 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              <Link
-                href="/customer/order?product=PACK"
-                className="w-full text-center py-2.5 sm:py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-gray-800 bg-gray-100 hover:bg-gray-200 transition border border-gray-200 cursor-pointer"
-              >
-                Order Case Pack
-              </Link>
-            </div>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  href="/customer/order?product=PACK"
+                  className="w-full inline-block text-center py-2.5 sm:py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-gray-800 bg-gray-100 hover:bg-gray-200 transition border border-gray-200 cursor-pointer"
+                >
+                  Order Case Pack
+                </Link>
+              </motion.div>
+            </motion.div>
 
           </div>
         </div>
       </section>
 
-      {/* =========================================================================
+            {/* =========================================================================
           4.1 GHANA TOP WATER BRANDS AFFILIATION & SWAP NETWORK
       ========================================================================== */}
       <section id="partners" className="py-14 sm:py-20 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center max-w-2xl mx-auto mb-10 sm:mb-12"
+          >
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-brand-700 text-xs font-bold mb-3">
               <span className="size-2 rounded-full bg-brand-500" />
               <span>Universal Bottle Exchange</span>
@@ -464,10 +546,16 @@ export default function HomePage() {
             <p className="mt-2 text-xs sm:text-sm text-gray-600 leading-relaxed">
               We supply and accept empty 19L bottle exchanges for Ghana&apos;s most trusted certified brands with zero deposit penalties.
             </p>
-          </div>
+          </motion.div>
 
           {/* Lineup Commercial Photo */}
-          <div className="relative rounded-3xl overflow-hidden shadow-lg border-4 border-white mb-8 aspect-[16/9] sm:aspect-[21/9] mx-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="relative rounded-3xl overflow-hidden shadow-lg border-4 border-white mb-8 aspect-[21/7] sm:aspect-[21/7] mx-auto"
+          >
             <Image
               src="/images/landing/water-partners-lineup.jpg"
               alt="Ghana Top Water Brands Bottle Exchange Lineup"
@@ -475,12 +563,13 @@ export default function HomePage() {
               sizes="(max-width: 1024px) 100vw, 75vw"
               className="object-cover object-center"
             />
-         
-          </div>
+          
+          </motion.div>
 
          
 
-     
+        
+
         </div>
       </section>
 
@@ -490,7 +579,13 @@ export default function HomePage() {
       <section id="how-it-works" className="py-14 sm:py-20 bg-gray-50/40 border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="text-center max-w-xl mx-auto mb-10 sm:mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center max-w-xl mx-auto mb-10 sm:mb-12"
+          >
             <span className="text-xs font-bold uppercase tracking-wider text-brand-600">
               Effortless Delivery
             </span>
@@ -500,12 +595,19 @@ export default function HomePage() {
             <p className="mt-1.5 text-xs sm:text-sm text-gray-500">
               Get fresh drinking water in three simple steps.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             
             {/* Step 1 */}
-            <div className="p-6 sm:p-7 rounded-3xl bg-white border border-gray-200/80 shadow-xs">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: 0.1 }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="p-6 sm:p-7 rounded-3xl bg-white border border-gray-200/80 shadow-xs transition hover:shadow-md"
+            >
               <span className="flex size-9 items-center justify-center rounded-xl bg-brand-500 text-white font-extrabold text-xs mb-4 shadow-sm">
                 01
               </span>
@@ -515,10 +617,17 @@ export default function HomePage() {
               <p className="text-xs text-gray-500 leading-relaxed">
                 Pick your refills or cases online and select your preferred delivery time slot.
               </p>
-            </div>
+            </motion.div>
 
             {/* Step 2 */}
-            <div className="p-6 sm:p-7 rounded-3xl bg-white border border-gray-200/80 shadow-xs">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: 0.2 }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="p-6 sm:p-7 rounded-3xl bg-white border border-gray-200/80 shadow-xs transition hover:shadow-md"
+            >
               <span className="flex size-9 items-center justify-center rounded-xl bg-brand-500 text-white font-extrabold text-xs mb-4 shadow-sm">
                 02
               </span>
@@ -528,10 +637,17 @@ export default function HomePage() {
               <p className="text-xs text-gray-500 leading-relaxed">
                 Our driver delivers sealed bottles and collects your empties with zero deposit charge.
               </p>
-            </div>
+            </motion.div>
 
             {/* Step 3 */}
-            <div className="p-6 sm:p-7 rounded-3xl bg-white border border-gray-200/80 shadow-xs">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: 0.3 }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="p-6 sm:p-7 rounded-3xl bg-white border border-gray-200/80 shadow-xs transition hover:shadow-md"
+            >
               <span className="flex size-9 items-center justify-center rounded-xl bg-brand-500 text-white font-extrabold text-xs mb-4 shadow-sm">
                 03
               </span>
@@ -541,7 +657,7 @@ export default function HomePage() {
               <p className="text-xs text-gray-500 leading-relaxed">
                 Pay easily via Mobile Money, Card, or Cash on Delivery with instant SMS receipts.
               </p>
-            </div>
+            </motion.div>
 
           </div>
         </div>
@@ -555,7 +671,13 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
             {/* Left: Lifestyle Dispenser Photography */}
-            <div className="lg:col-span-6 relative">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-6 relative"
+            >
               <div className="relative rounded-3xl overflow-hidden shadow-xl border-4 border-white aspect-[4/3] sm:aspect-[16/11]">
                 <Image
                   src="/images/landing/dispenser-lifestyle.jpg"
@@ -565,10 +687,16 @@ export default function HomePage() {
                   className="object-cover object-center"
                 />
               </div>
-            </div>
+            </motion.div>
 
             {/* Right: Rent-to-Own Details */}
-            <div className="lg:col-span-6 space-y-5">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-6 space-y-5"
+            >
               <span className="text-xs font-bold uppercase tracking-wider text-brand-600">
                 Own Your Smart Hardware
               </span>
@@ -582,40 +710,42 @@ export default function HomePage() {
               </p>
 
               <div className="grid grid-cols-2 gap-3 pt-1">
-                <div className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
+                <motion.div whileHover={{ y: -2, transition: { duration: 0.15 } }} className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
                   <div className="text-xs font-bold text-gray-900">Dual Hot & Cold Taps</div>
                   <div className="text-[11px] text-gray-500 mt-0.5">Instant tea and chilled water</div>
-                </div>
+                </motion.div>
 
-                <div className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
+                <motion.div whileHover={{ y: -2, transition: { duration: 0.15 } }} className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
                   <div className="text-xs font-bold text-gray-900">Digital LED Screen</div>
                   <div className="text-[11px] text-gray-500 mt-0.5">Live temperature status</div>
-                </div>
+                </motion.div>
 
-                <div className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
+                <motion.div whileHover={{ y: -2, transition: { duration: 0.15 } }} className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
                   <div className="text-xs font-bold text-gray-900">Free Sanitization</div>
                   <div className="text-[11px] text-gray-500 mt-0.5">Routine cleaning & maintenance</div>
-                </div>
+                </motion.div>
 
-                <div className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
+                <motion.div whileHover={{ y: -2, transition: { duration: 0.15 } }} className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
                   <div className="text-xs font-bold text-gray-900">Child-Safety Lock</div>
                   <div className="text-[11px] text-gray-500 mt-0.5">Safe hot water dispensing</div>
-                </div>
+                </motion.div>
               </div>
 
               <div className="pt-2">
-                <Link
-                  href="/customer/dispenser"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 shadow-sm transition active:scale-[0.99] cursor-pointer"
-                >
-                  <span>Apply for Dispenser Plan</span>
-                  <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </Link>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Link
+                    href="/customer/dispenser"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 shadow-sm transition active:scale-[0.99] cursor-pointer"
+                  >
+                    <span>Apply for Dispenser Plan</span>
+                    <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </Link>
+                </motion.div>
               </div>
 
-            </div>
+            </motion.div>
 
           </div>
         </div>
@@ -627,7 +757,13 @@ export default function HomePage() {
       <section id="calculator" className="py-14 sm:py-20 bg-white border-t border-gray-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="text-center max-w-xl mx-auto mb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center max-w-xl mx-auto mb-10"
+          >
             <span className="text-xs font-bold uppercase tracking-wider text-brand-600">
               Interactive Estimator
             </span>
@@ -637,9 +773,15 @@ export default function HomePage() {
             <p className="mt-1 text-xs text-gray-500">
               Slide to calculate how much water you need and see your savings.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="bg-gradient-to-br from-blue-50/60 to-white rounded-3xl p-6 sm:p-8 border border-blue-100 shadow-sm">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55 }}
+            className="bg-gradient-to-br from-blue-50/60 to-white rounded-3xl p-6 sm:p-8 border border-blue-100 shadow-sm"
+          >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
               
               {/* Slider Control */}
@@ -694,23 +836,35 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                {monthlySavings > 0 && (
-                  <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 font-semibold flex items-center justify-between">
-                    <span>Monthly Savings:</span>
-                    <span className="font-bold">GH₵ {monthlySavings}</span>
-                  </div>
-                )}
+                <AnimatePresence>
+                  {monthlySavings > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, height: 0 }}
+                      animate={{ opacity: 1, scale: 1, height: "auto" }}
+                      exit={{ opacity: 0, scale: 0.95, height: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 font-semibold flex items-center justify-between">
+                        <span>Monthly Savings:</span>
+                        <span className="font-bold">GH₵ {monthlySavings}</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-                <Link
-                  href={`/customer/order?qty=${weeklyBottles}`}
-                  className="w-full inline-flex items-center justify-center py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 transition shadow-sm cursor-pointer mt-1"
-                >
-                  Order This Quantity
-                </Link>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Link
+                    href={`/customer/order?qty=${weeklyBottles}`}
+                    className="w-full inline-flex items-center justify-center py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 transition shadow-sm cursor-pointer mt-1"
+                  >
+                    Order This Quantity
+                  </Link>
+                </motion.div>
               </div>
 
             </div>
-          </div>
+          </motion.div>
 
         </div>
       </section>
@@ -723,7 +877,13 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
             {/* Left: Photorealistic Fleet Photograph */}
-            <div className="lg:col-span-6 relative">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-6 relative"
+            >
               <div className="relative rounded-3xl overflow-hidden shadow-xl border-4 border-white aspect-[4/3] sm:aspect-[16/11]">
                 <Image
                   src="/images/landing/logistics-fleet.jpg"
@@ -733,10 +893,16 @@ export default function HomePage() {
                   className="object-cover object-center"
                 />
               </div>
-            </div>
+            </motion.div>
 
             {/* Right: Fleet Operations Details */}
-            <div className="lg:col-span-6 space-y-5">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-6 space-y-5"
+            >
               <span className="text-xs font-bold uppercase tracking-wider text-brand-600">
                 Reliable Doorstep Logistics
               </span>
@@ -750,40 +916,42 @@ export default function HomePage() {
               </p>
 
               <div className="grid grid-cols-2 gap-3 pt-1">
-                <div className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
+                <motion.div whileHover={{ y: -2, transition: { duration: 0.15 } }} className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
                   <div className="text-xs font-bold text-gray-900">3 Delivery Slots</div>
                   <div className="text-[11px] text-gray-500 mt-0.5">Morning, afternoon, evening</div>
-                </div>
+                </motion.div>
 
-                <div className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
+                <motion.div whileHover={{ y: -2, transition: { duration: 0.15 } }} className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
                   <div className="text-xs font-bold text-gray-900">Gate Delivery</div>
                   <div className="text-[11px] text-gray-500 mt-0.5">Carried straight to your pantry</div>
-                </div>
+                </motion.div>
 
-                <div className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
+                <motion.div whileHover={{ y: -2, transition: { duration: 0.15 } }} className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
                   <div className="text-xs font-bold text-gray-900">SMS Tracking</div>
                   <div className="text-[11px] text-gray-500 mt-0.5">Alerts when driver is near</div>
-                </div>
+                </motion.div>
 
-                <div className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
+                <motion.div whileHover={{ y: -2, transition: { duration: 0.15 } }} className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-xs">
                   <div className="text-xs font-bold text-gray-900">Accra Coverage</div>
                   <div className="text-[11px] text-gray-500 mt-0.5">East Legon, Osu, Cantonments</div>
-                </div>
+                </motion.div>
               </div>
 
               <div className="pt-2">
-                <Link
-                  href="/customer/order"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 shadow-sm transition active:scale-[0.99] cursor-pointer"
-                >
-                  <span>Schedule Delivery</span>
-                  <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </Link>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Link
+                    href="/customer/order"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 shadow-sm transition active:scale-[0.99] cursor-pointer"
+                  >
+                    <span>Schedule Delivery</span>
+                    <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </Link>
+                </motion.div>
               </div>
 
-            </div>
+            </motion.div>
 
           </div>
         </div>
@@ -795,7 +963,13 @@ export default function HomePage() {
       <section className="py-14 sm:py-20 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="text-center max-w-xl mx-auto mb-10 sm:mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center max-w-xl mx-auto mb-10 sm:mb-12"
+          >
             <span className="text-xs font-bold uppercase tracking-wider text-brand-600">
               Trusted in Ghana
             </span>
@@ -805,11 +979,18 @@ export default function HomePage() {
             <p className="mt-1 text-xs sm:text-sm text-gray-500">
               Real feedback from homes and offices across Greater Accra.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             
-            <div className="p-6 rounded-3xl bg-gray-50/80 border border-gray-100 flex flex-col justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: 0.1 }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="p-6 rounded-3xl bg-gray-50/80 border border-gray-100 flex flex-col justify-between transition hover:shadow-md"
+            >
               <div>
                 <div className="flex text-amber-400 gap-1 mb-2.5 text-xs">
                   {[...Array(5)].map((_, i) => (
@@ -824,9 +1005,16 @@ export default function HomePage() {
                 <div className="text-xs font-bold text-gray-900">Ama Osei</div>
                 <div className="text-[11px] text-gray-500">Homeowner, East Legon</div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="p-6 rounded-3xl bg-gray-50/80 border border-gray-100 flex flex-col justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: 0.2 }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="p-6 rounded-3xl bg-gray-50/80 border border-gray-100 flex flex-col justify-between transition hover:shadow-md"
+            >
               <div>
                 <div className="flex text-amber-400 gap-1 mb-2.5 text-xs">
                   {[...Array(5)].map((_, i) => (
@@ -841,9 +1029,16 @@ export default function HomePage() {
                 <div className="text-xs font-bold text-gray-900">Kofi Antwi</div>
                 <div className="text-[11px] text-gray-500">Agency Lead, Ridge</div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="p-6 rounded-3xl bg-gray-50/80 border border-gray-100 flex flex-col justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: 0.3 }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="p-6 rounded-3xl bg-gray-50/80 border border-gray-100 flex flex-col justify-between transition hover:shadow-md"
+            >
               <div>
                 <div className="flex text-amber-400 gap-1 mb-2.5 text-xs">
                   {[...Array(5)].map((_, i) => (
@@ -858,7 +1053,7 @@ export default function HomePage() {
                 <div className="text-xs font-bold text-gray-900">Dr. Naa Korsah</div>
                 <div className="text-[11px] text-gray-500">Clinic Director, Osu</div>
               </div>
-            </div>
+            </motion.div>
 
           </div>
         </div>
@@ -871,7 +1066,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           
           <div className="space-y-3">
-            <Logo size="md" />
+            <Logo size="md" variant="dark" />
             <p className="text-xs text-gray-400 leading-relaxed">
               Ghana&apos;s leading water supply, bottle exchange, and smart dispenser platform.
             </p>

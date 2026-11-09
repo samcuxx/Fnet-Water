@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { motion, AnimatePresence } from "framer-motion";
 import AuthPageLayout from "@/components/layout/AuthPageLayout";
 
 export default function RegisterPage() {
@@ -102,17 +103,37 @@ export default function RegisterPage() {
         </p>
       </div>
 
-      {errorMsg && (
-        <div className="mb-5 p-3.5 rounded-2xl text-xs bg-red-50 border border-red-200 text-red-600 font-medium">
-          {errorMsg}
-        </div>
-      )}
+      <AnimatePresence>
+        {errorMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={{ opacity: 0, y: -8, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden mb-5"
+          >
+            <div className="p-3.5 rounded-2xl text-xs bg-red-50 border border-red-200 text-red-600 font-medium">
+              {errorMsg}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {successMsg && (
-        <div className="mb-5 p-3.5 rounded-2xl text-xs bg-green-50 border border-green-200 text-green-700 font-medium">
-          {successMsg}
-        </div>
-      )}
+      <AnimatePresence>
+        {successMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={{ opacity: 0, y: -8, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden mb-5"
+          >
+            <div className="p-3.5 rounded-2xl text-xs bg-green-50 border border-green-200 text-green-700 font-medium">
+              {successMsg}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -246,13 +267,15 @@ export default function RegisterPage() {
           />
         </div>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
           type="submit"
           disabled={isLoading}
           className="w-full h-12 sm:h-13 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold tracking-wider uppercase text-white bg-[#3B66FF] hover:bg-[#2753F0] active:scale-[0.99] shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50 mt-4 cursor-pointer"
         >
           {isLoading ? "Creating Account..." : "CREATE ACCOUNT"}
-        </button>
+        </motion.button>
       </form>
 
       <div className="mt-6 sm:mt-8 text-center">
