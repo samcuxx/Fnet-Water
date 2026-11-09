@@ -96,7 +96,7 @@ export default function CustomerDashboardPage() {
   const barOptions: ApexOptions = {
     colors: ["#0057B8"],
     chart: {
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       type: "bar",
       height: 200,
       toolbar: { show: false },
@@ -145,7 +145,7 @@ export default function CustomerDashboardPage() {
   const radialOptions: ApexOptions = {
     colors: ["#0057B8"],
     chart: {
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       type: "radialBar",
       height: 240,
       sparkline: { enabled: true },

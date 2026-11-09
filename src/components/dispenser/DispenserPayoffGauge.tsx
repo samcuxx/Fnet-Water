@@ -34,7 +34,7 @@ export default function DispenserPayoffGauge({
   const options: ApexOptions = {
     colors: [primaryColor],
     chart: {
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       type: "radialBar",
       height: 280,
       sparkline: {

@@ -22,7 +22,7 @@ export default function DeliveryStatisticsChart() {
       type: "bar",
       height: 260,
       toolbar: { show: false },
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
     },
     plotOptions: {
       bar: {
@@ -78,7 +78,7 @@ export default function DeliveryStatisticsChart() {
       show: true,
       position: "top",
       horizontalAlign: "left",
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       labels: {
         colors: isDark ? "#9CA3AF" : "#667085",
       },

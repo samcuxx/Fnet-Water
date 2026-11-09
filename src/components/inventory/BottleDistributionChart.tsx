@@ -43,7 +43,7 @@ export default function BottleDistributionChart({
       type: "bar",
       height: 280,
       toolbar: { show: false },
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
     },
     plotOptions: {
       bar: {

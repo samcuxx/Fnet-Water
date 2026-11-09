@@ -15,7 +15,7 @@
   - [x] Set up `src/app/layout.tsx` with metadata, "F Net Water Hub" title, and brand favicon.
 - [x] **1.2 Brand Color & Styling Configuration**
   - [x] Configure Tailwind v4 `@theme` in `src/app/globals.css` with brand primary (`#0057B8`), light cyan (`#00AEEF`), and white (`#FFFFFF`).
-  - [x] Import `Outfit` font and typography scales.
+  - [x] Import `Inter` font (professional typography) and typography scales.
 - [x] **1.3 Local Docker Compose & Environment Variables**
   - [x] Create `docker-compose.yml` with PostgreSQL 16 Alpine container (`db`) and persistent volume `postgres_data`.
   - [x] Create `.env.local` and `.env` configured with:
@@ -74,6 +74,10 @@
   - [x] Implement **mNotify SMS OTP** login & verification tab.
   - [x] Implement Sign Up page (`/register`) with customer registration fields and referral code input.
   - [x] Implement Password Reset page (`/reset-password`) with SMS OTP.
+  - [x] Redesign Auth Suite to High-Fidelity 3D Cyber Illustration Layout (Matching Mockup):
+    - [x] Master Auth Container (`AuthPageLayout.tsx`): Split-container with deep curved arch (`rounded-l-[240px]`), mobile bottom sheet overlay, and corner monstera leaf clusters.
+    - [x] Custom 3D Illustration (`/images/auth/auth-illustration.jpg`): 3D claymorphism water hero connecting floating glowing badges (pure 19L bottle, smart dispenser, delivery van, analytics, phone).
+    - [x] Form Styling Standard: Soft rounded-2xl inputs in `#F6F8FC`, `#3B66FF` bold uppercase primary buttons, show/hide password eye toggles, password/SMS login methods, and 5-box OTP digit input standard.
 - [x] **3.2 RBAC & Edge Route Protection**
   - [x] Implement `src/middleware.ts` to protect routes:
     - `/admin/*` -> `ADMIN` only

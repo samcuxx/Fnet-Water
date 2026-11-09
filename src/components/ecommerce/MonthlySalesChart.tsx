@@ -21,7 +21,7 @@ export default function MonthlySalesChart() {
   const options: ApexOptions = {
     colors: ["#0057B8"],
     chart: {
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       type: "bar",
       height: 200,
       toolbar: {

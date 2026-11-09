@@ -14,6 +14,8 @@ export default function ResetPasswordPage() {
   const [devOtp, setDevOtp] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -166,11 +168,11 @@ export default function ResetPasswordPage() {
 
   return (
     <AuthPageLayout>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
-          Reset Password
+      <div className="mb-6 sm:mb-8 text-left">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
+          {step === 1 ? "Reset Password" : "Create New Password"}
         </h1>
-        <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-2 text-xs sm:text-sm text-gray-500">
           {step === 1
             ? "Enter your phone number to receive a verification code."
             : `Enter the 5-digit code sent to ${phone} and choose a new password.`}
@@ -178,21 +180,21 @@ export default function ResetPasswordPage() {
       </div>
 
       {errorMsg && (
-        <div className="mb-5 p-3 rounded-lg text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400">
+        <div className="mb-5 p-3.5 rounded-2xl text-xs bg-red-50 border border-red-200 text-red-600 font-medium">
           {errorMsg}
         </div>
       )}
 
       {successMsg && (
-        <div className="mb-5 p-3 rounded-lg text-xs bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-900/60 text-green-700 dark:text-green-300">
+        <div className="mb-5 p-3.5 rounded-2xl text-xs bg-green-50 border border-green-200 text-green-700 font-medium">
           {successMsg}
         </div>
       )}
 
       {step === 1 ? (
-        <form onSubmit={handleSendOtp} className="space-y-4">
+        <form onSubmit={handleSendOtp} className="space-y-5">
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5">
               Phone Number
             </label>
             <input
@@ -201,29 +203,29 @@ export default function ResetPasswordPage() {
               placeholder="024 123 4567"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full h-11 px-3.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
+              className="w-full h-11 sm:h-12 px-4 rounded-xl sm:rounded-2xl bg-[#F6F8FC] border border-gray-200/90 text-sm font-mono text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-[#3B66FF] focus:ring-4 focus:ring-[#3B66FF]/10 transition-all outline-hidden"
             />
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-11 rounded-lg text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs disabled:opacity-50 mt-2"
+            className="w-full h-11 sm:h-12 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-[#3B66FF] hover:bg-[#2F54DB] active:scale-[0.99] transition shadow-md shadow-[#3B66FF]/25 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer mt-2"
           >
-            {isLoading ? "Sending code..." : "Send Code"}
+            {isLoading ? "Sending code..." : "Send Verification Code"}
           </button>
         </form>
       ) : (
-        <form onSubmit={handleResetPassword} className="space-y-5">
+        <form onSubmit={handleResetPassword} className="space-y-4">
           {devOtp && (
-            <div className="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 flex items-center justify-between text-xs">
-              <span className="text-blue-700 dark:text-blue-300">
+            <div className="p-3 rounded-2xl bg-blue-50/80 border border-blue-200/80 flex items-center justify-between text-xs">
+              <span className="text-blue-700">
                 Test Code: <strong className="font-mono font-bold">{devOtp}</strong>
               </span>
               <button
                 type="button"
                 onClick={() => setOtpDigits(devOtp.split(""))}
-                className="text-[11px] font-semibold text-brand-600 dark:text-blue-light-400 underline"
+                className="text-[11px] font-bold text-[#3B66FF] hover:underline cursor-pointer"
               >
                 Auto-Fill
               </button>
@@ -231,10 +233,10 @@ export default function ResetPasswordPage() {
           )}
 
           <div>
-            <label className="block text-center text-xs font-medium text-gray-700 dark:text-gray-300 mb-2.5">
-              Type your 5-digit security code
+            <label className="block text-center text-xs font-semibold text-gray-600 mb-2">
+              Type your 5-digit verification code
             </label>
-            <div className="flex justify-center gap-2 sm:gap-3" onPaste={handlePaste}>
+            <div className="flex justify-center gap-2 sm:gap-2.5" onPaste={handlePaste}>
               {[0, 1, 2, 3, 4].map((index) => (
                 <input
                   key={index}
@@ -247,67 +249,107 @@ export default function ResetPasswordPage() {
                   value={otpDigits[index]}
                   onChange={(e) => handleDigitChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="w-12 h-14 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-bold font-mono rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
+                  className="w-11 h-13 sm:w-13 sm:h-15 text-center text-xl sm:text-2xl font-bold font-mono rounded-xl sm:rounded-2xl border border-gray-200 bg-[#F6F8FC] text-gray-900 focus:outline-hidden focus:border-[#3B66FF] focus:bg-white focus:ring-4 focus:ring-[#3B66FF]/15 transition-all shadow-inner"
                 />
               ))}
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5">
               New Password
             </label>
-            <input
-              type="password"
-              required
-              placeholder="At least 6 characters"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full h-11 px-3.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
-            />
+            <div className="relative">
+              <input
+                type={showNewPassword ? "text" : "password"}
+                required
+                placeholder="At least 6 characters"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full h-11 sm:h-12 pl-4 pr-11 rounded-xl sm:rounded-2xl bg-[#F6F8FC] border border-gray-200/90 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-[#3B66FF] focus:ring-4 focus:ring-[#3B66FF]/10 transition-all outline-hidden"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition p-1"
+                aria-label={showNewPassword ? "Hide password" : "Show password"}
+              >
+                {showNewPassword ? (
+                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" strokeLinecap="round" strokeLinejoin="round" />
+                    <line x1="1" y1="1" x2="23" y2="23" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5">
               Confirm New Password
             </label>
-            <input
-              type="password"
-              required
-              placeholder="Repeat new password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full h-11 px-3.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                required
+                placeholder="Repeat new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full h-11 sm:h-12 pl-4 pr-11 rounded-xl sm:rounded-2xl bg-[#F6F8FC] border border-gray-200/90 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-[#3B66FF] focus:ring-4 focus:ring-[#3B66FF]/10 transition-all outline-hidden"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition p-1"
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              >
+                {showConfirmPassword ? (
+                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" strokeLinecap="round" strokeLinejoin="round" />
+                    <line x1="1" y1="1" x2="23" y2="23" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center justify-between pt-1">
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="inline-flex items-center gap-1 font-medium text-gray-700 dark:text-gray-300 hover:underline"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-[#3B66FF] transition cursor-pointer"
             >
               <svg className="size-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor">
                 <path d="M12.5 15L7.5 10L12.5 5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <span>Change number</span>
+              <span>Change phone number</span>
             </button>
           </div>
 
           <button
             type="submit"
             disabled={isLoading || otpDigits.join("").length < 5}
-            className="w-full h-11 rounded-lg text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs disabled:opacity-50"
+            className="w-full h-11 sm:h-12 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-[#3B66FF] hover:bg-[#2F54DB] active:scale-[0.99] transition shadow-md shadow-[#3B66FF]/25 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer mt-2"
           >
             {isLoading ? "Updating..." : "Update Password"}
           </button>
         </form>
       )}
 
-      <div className="mt-6 pt-5 border-t border-gray-100 dark:border-gray-800 text-center">
+      <div className="mt-8 pt-6 border-t border-gray-100 text-center">
         <Link
           href="/login"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 dark:text-blue-light-400 hover:underline"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#3B66FF] hover:underline"
         >
           <svg className="size-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor">
             <path d="M12.5 15L7.5 10L12.5 5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

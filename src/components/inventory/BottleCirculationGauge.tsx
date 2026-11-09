@@ -33,7 +33,7 @@ export default function BottleCirculationGauge({
   const options: ApexOptions = {
     colors: ["#0057B8"],
     chart: {
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       type: "radialBar",
       height: 280,
       sparkline: {

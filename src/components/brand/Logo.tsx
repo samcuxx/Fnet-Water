@@ -50,7 +50,7 @@ export default function Logo({
       <LogoIcon className={selectedSize.icon} />
       {!iconOnly && (
         <span
-          className={`font-outfit font-extrabold tracking-tight ${selectedSize.text} leading-none text-gray-900 dark:text-white`}
+          className={`font-sans font-extrabold tracking-tight ${selectedSize.text} leading-none text-gray-900 dark:text-white`}
         >
           F NET <span className="text-brand-600 dark:text-blue-light-400">WATER HUB</span>
         </span>

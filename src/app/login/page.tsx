@@ -34,6 +34,7 @@ export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   // SMS Sign In state: 1 = Phone input, 2 = 5-box OTP input
   const [smsStep, setSmsStep] = useState<1 | 2>(1);
@@ -263,32 +264,32 @@ export default function LoginPage() {
   return (
     <AuthPageLayout>
       {/* Title & Description */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
+      <div className="mb-6 sm:mb-8 text-left">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
           {smsStep === 2 && authMethod === "sms"
-            ? "Enter verification code"
-            : "Sign In"}
+            ? "Enter Verification Code"
+            : "Sign In to your Account"}
         </h1>
-        <p className="mt-1.5 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-2 text-xs sm:text-sm text-gray-500">
           {smsStep === 2 && authMethod === "sms"
             ? `Enter the 5-digit code sent to ${phone}`
-            : "Access your water refills, orders, and account portal."}
+            : "Welcome back! Enter your details to access your account."}
         </p>
       </div>
 
-      {/* Method Tabs (Only in Step 1) */}
+      {/* Segmented Method Switcher (Only in Step 1) */}
       {smsStep === 1 && (
-        <div className="grid grid-cols-2 gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl mb-6">
+        <div className="grid grid-cols-2 p-1 bg-[#F1F4FA] rounded-2xl mb-6 border border-gray-200/60">
           <button
             type="button"
             onClick={() => {
               setAuthMethod("password");
               setErrorMsg(null);
             }}
-            className={`py-2 text-xs font-semibold rounded-lg transition ${
+            className={`py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
               authMethod === "password"
-                ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-theme-xs"
-                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                ? "bg-white text-gray-900 shadow-xs"
+                : "text-gray-500 hover:text-gray-900"
             }`}
           >
             Password
@@ -299,10 +300,10 @@ export default function LoginPage() {
               setAuthMethod("sms");
               setErrorMsg(null);
             }}
-            className={`py-2 text-xs font-semibold rounded-lg transition ${
+            className={`py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
               authMethod === "sms"
-                ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-theme-xs"
-                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                ? "bg-white text-gray-900 shadow-xs"
+                : "text-gray-500 hover:text-gray-900"
             }`}
           >
             SMS Code
@@ -312,36 +313,36 @@ export default function LoginPage() {
 
       {/* Feedback Alert */}
       {errorMsg && (
-        <div className="mb-5 p-3 rounded-lg text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400">
+        <div className="mb-5 p-3.5 rounded-2xl text-xs bg-red-50 border border-red-200 text-red-600 font-medium">
           {errorMsg}
         </div>
       )}
 
       {/* VIEW A: Password Authentication */}
       {authMethod === "password" && (
-        <form onSubmit={handlePasswordSubmit} className="space-y-4">
+        <form onSubmit={handlePasswordSubmit} className="space-y-4 sm:space-y-5">
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-2">
               Email or Phone Number
             </label>
             <input
               type="text"
               required
-              placeholder="name@example.com or 024 123 4567"
+              placeholder="Enter Email or Phone Number"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              className="w-full h-11 px-3.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
+              className="w-full h-12 px-4 rounded-xl sm:rounded-2xl bg-[#F6F8FC] border border-gray-200/90 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-hidden"
             />
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs sm:text-sm font-bold text-gray-800">
                 Password
               </label>
               <Link
                 href="/reset-password"
-                className="text-xs text-brand-600 dark:text-blue-light-400 hover:underline"
+                className="text-xs font-semibold text-brand-600 hover:underline"
               >
                 Forgot password?
               </Link>
@@ -350,36 +351,59 @@ export default function LoginPage() {
               <input
                 type={showPassword ? "text" : "password"}
                 required
-                placeholder="Enter your password"
+                placeholder="Enter Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-11 px-3.5 pr-10 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
+                className="w-full h-12 px-4 pr-11 rounded-xl sm:rounded-2xl bg-[#F6F8FC] border border-gray-200/90 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-hidden"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xs font-medium"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 cursor-pointer transition"
               >
-                {showPassword ? "Hide" : "Show"}
+                {showPassword ? (
+                  <svg className="size-4.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
+                    <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.064 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                  </svg>
+                ) : (
+                  <svg className="size-4.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                    <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                  </svg>
+                )}
               </button>
             </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-1">
+            <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-gray-600 select-none">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="size-4.5 rounded-md border-gray-300 text-brand-600 focus:ring-brand-500 cursor-pointer"
+              />
+              <span>Remember me</span>
+            </label>
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-11 rounded-lg text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs disabled:opacity-50 mt-2"
+            className="w-full h-12 sm:h-13 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold tracking-wider uppercase text-white bg-[#3B66FF] hover:bg-[#2753F0] active:scale-[0.99] shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50 mt-2 cursor-pointer"
           >
-            {isLoading ? "Signing in..." : "Sign In"}
+            {isLoading ? "Signing In..." : "SIGN IN"}
           </button>
         </form>
       )}
 
       {/* VIEW B - STEP 1: Enter Phone Number */}
       {authMethod === "sms" && smsStep === 1 && (
-        <form onSubmit={handleSendCode} className="space-y-4">
+        <form onSubmit={handleSendCode} className="space-y-4 sm:space-y-5">
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-2">
               Phone Number
             </label>
             <input
@@ -388,9 +412,9 @@ export default function LoginPage() {
               placeholder="024 123 4567"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full h-11 px-3.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
+              className="w-full h-12 px-4 rounded-xl sm:rounded-2xl bg-[#F6F8FC] border border-gray-200/90 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-hidden font-mono"
             />
-            <span className="block mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+            <span className="block mt-2 text-xs text-gray-500">
               We will send a 5-digit verification code to this number.
             </span>
           </div>
@@ -398,25 +422,25 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-11 rounded-lg text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs disabled:opacity-50 mt-2"
+            className="w-full h-12 sm:h-13 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold tracking-wider uppercase text-white bg-[#3B66FF] hover:bg-[#2753F0] active:scale-[0.99] shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50 mt-2 cursor-pointer"
           >
-            {isLoading ? "Sending code..." : "Send Code"}
+            {isLoading ? "Sending Code..." : "SEND CODE"}
           </button>
         </form>
       )}
 
       {/* VIEW B - STEP 2: Enter 5-Box Verification Code */}
       {authMethod === "sms" && smsStep === 2 && (
-        <form onSubmit={handleVerifyOtp} className="space-y-6">
+        <form onSubmit={handleVerifyOtp} className="space-y-5 sm:space-y-6">
           {devOtp && (
-            <div className="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 flex items-center justify-between text-xs">
-              <span className="text-blue-700 dark:text-blue-300">
+            <div className="p-3 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
+              <span className="text-blue-700">
                 Test Code: <strong className="font-mono font-bold">{devOtp}</strong>
               </span>
               <button
                 type="button"
                 onClick={() => setOtpDigits(devOtp.split(""))}
-                className="text-[11px] font-semibold text-brand-600 dark:text-blue-light-400 underline"
+                className="text-[11px] font-bold text-brand-600 underline cursor-pointer"
               >
                 Auto-Fill
               </button>
@@ -424,7 +448,7 @@ export default function LoginPage() {
           )}
 
           <div>
-            <label className="block text-center text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-center text-xs sm:text-sm font-bold text-gray-800 mb-3">
               Type your 5-digit security code
             </label>
             <div className="flex justify-center gap-2 sm:gap-3" onPaste={handlePaste}>
@@ -440,20 +464,20 @@ export default function LoginPage() {
                   value={otpDigits[index]}
                   onChange={(e) => handleDigitChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="w-12 h-14 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-bold font-mono rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
+                  className="w-12 h-14 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-bold font-mono rounded-2xl border border-gray-200/90 bg-[#F6F8FC] text-gray-900 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-hidden"
                 />
               ))}
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center justify-between text-xs text-gray-500">
             <button
               type="button"
               onClick={() => {
                 setSmsStep(1);
                 setErrorMsg(null);
               }}
-              className="inline-flex items-center gap-1 font-medium text-gray-700 dark:text-gray-300 hover:underline"
+              className="inline-flex items-center gap-1 font-semibold text-gray-700 hover:underline cursor-pointer"
             >
               <svg className="size-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor">
                 <path d="M12.5 15L7.5 10L12.5 5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -467,7 +491,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={handleSendCode}
-                className="font-semibold text-brand-600 dark:text-blue-light-400 hover:underline"
+                className="font-bold text-brand-600 hover:underline cursor-pointer"
               >
                 Resend code
               </button>
@@ -477,15 +501,28 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading || otpDigits.join("").length < 5}
-            className="w-full h-11 rounded-lg text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs disabled:opacity-50"
+            className="w-full h-12 sm:h-13 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold tracking-wider uppercase text-white bg-[#3B66FF] hover:bg-[#2753F0] active:scale-[0.99] shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50 cursor-pointer"
           >
-            {isLoading ? "Verifying..." : "Verify & Sign In"}
+            {isLoading ? "Verifying..." : "VERIFY & SIGN IN"}
           </button>
         </form>
       )}
 
-      {/* Quick Demo Switcher (Discreet for testing) */}
-      <div className="mt-8 pt-5 border-t border-gray-100 dark:border-gray-800">
+      {/* Footer Registration Link */}
+      <div className="mt-6 sm:mt-8 text-center">
+        <span className="text-xs sm:text-sm text-gray-500">
+          Not registered yet?{" "}
+          <Link
+            href="/register"
+            className="font-bold text-brand-600 hover:underline ml-1"
+          >
+            Create an account
+          </Link>
+        </span>
+      </div>
+
+      {/* Quick Demo Switcher */}
+      <div className="mt-6 pt-4 border-t border-gray-100">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[11px] font-medium text-gray-400">
             Quick Test Accounts:
@@ -497,25 +534,12 @@ export default function LoginPage() {
               key={acc.role}
               type="button"
               onClick={() => handleSelectDemo(acc)}
-              className="text-[11px] px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium transition"
+              className="text-[11px] px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold transition cursor-pointer"
             >
               {acc.label}
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Footer Navigation */}
-      <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-800 text-center">
-        <span className="text-xs text-gray-500 dark:text-gray-400">
-          Don&apos;t have an account?{" "}
-          <Link
-            href="/register"
-            className="font-semibold text-brand-600 dark:text-blue-light-400 hover:underline"
-          >
-            Sign Up
-          </Link>
-        </span>
       </div>
     </AuthPageLayout>
   );

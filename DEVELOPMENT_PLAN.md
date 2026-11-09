@@ -86,7 +86,7 @@ flowchart TD
 
 ### 2. UI Template Assets & Configuration
 - Port Tailwind v4 configuration from `ui_template/src/index.css` to `src/app/globals.css`.
-- Configure `Outfit` font and standard typography rules.
+- Configure `Inter` font (professional typography) and standard typography rules.
 - Set up root `src/app/layout.tsx` with metadata, favicon, and theme providers.
 
 ### 3. Technical Implementation
@@ -167,7 +167,9 @@ flowchart TD
   - Actions: Deactivate / Reactivate account, Reset password.
 
 ### 2. UI Template Assets Used
-- `SignIn.tsx`, `SignUp.tsx`, `ResetPassword.tsx`
+- `AuthPageLayout.tsx`: Premium split-container with curved arch (`rounded-l-[240px]`), mobile bottom sheet overlay (`rounded-t-[40px]`), and rich monstera foliage clusters.
+- `public/images/auth/auth-illustration.jpg`: Custom 3D claymorphism water logistics hero connecting glowing holographic badges (pure 19L water bottle, smart dispenser, rapid delivery van, growth analytics, phone).
+- `login/page.tsx`, `register/page.tsx`, `reset-password/page.tsx`: Redesigned with soft `#F6F8FC` inputs, `#3B66FF` bold uppercase action buttons, password eye toggles, password/SMS login methods, and 5-box OTP verification standard.
 - `BasicTables.tsx`, `Modal.tsx`, `Input.tsx`, `Select.tsx`, `Badge.tsx`, `Button.tsx`
 
 ### 3. Technical Implementation

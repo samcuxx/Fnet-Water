@@ -23,14 +23,14 @@ export default function StatisticsChart() {
       show: true,
       position: "top",
       horizontalAlign: "left",
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       labels: {
         colors: isDark ? "#9CA3AF" : "#667085",
       },
     },
     colors: ["#0057B8", "#00AEEF"],
     chart: {
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       height: 310,
       type: "area",
       toolbar: {

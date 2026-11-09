@@ -19,6 +19,8 @@ export default function RegisterPage() {
     referralCode: "",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -91,30 +93,30 @@ export default function RegisterPage() {
 
   return (
     <AuthPageLayout>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
-          Create Account
+      <div className="mb-6 sm:mb-8 text-left">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
+          Create an Account
         </h1>
-        <p className="mt-1.5 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-          Sign up to order 19L refills, track dispensers, and manage deliveries.
+        <p className="mt-2 text-xs sm:text-sm text-gray-500">
+          Sign up to order pure 19L refills, track dispensers, and manage deliveries.
         </p>
       </div>
 
       {errorMsg && (
-        <div className="mb-5 p-3 rounded-lg text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400">
+        <div className="mb-5 p-3.5 rounded-2xl text-xs bg-red-50 border border-red-200 text-red-600 font-medium">
           {errorMsg}
         </div>
       )}
 
       {successMsg && (
-        <div className="mb-5 p-3 rounded-lg text-xs bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-900/60 text-green-700 dark:text-green-300">
+        <div className="mb-5 p-3.5 rounded-2xl text-xs bg-green-50 border border-green-200 text-green-700 font-medium">
           {successMsg}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5">
             Full Name
           </label>
           <input
@@ -123,72 +125,114 @@ export default function RegisterPage() {
             placeholder="e.g. Kwabena Mensah"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full h-11 px-3.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
+            className="w-full h-11 sm:h-12 px-4 rounded-xl sm:rounded-2xl bg-[#F6F8FC] border border-gray-200/90 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-hidden"
           />
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-            Phone Number
-          </label>
-          <input
-            type="tel"
-            required
-            placeholder="024 123 4567"
-            value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            className="w-full h-11 px-3.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-            Email
-          </label>
-          <input
-            type="email"
-            required
-            placeholder="name@example.com"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="w-full h-11 px-3.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              required
+              placeholder="024 123 4567"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              className="w-full h-11 sm:h-12 px-4 rounded-xl sm:rounded-2xl bg-[#F6F8FC] border border-gray-200/90 text-sm font-mono text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-hidden"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5">
+              Email
+            </label>
+            <input
+              type="email"
+              required
+              placeholder="name@example.com"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full h-11 sm:h-12 px-4 rounded-xl sm:rounded-2xl bg-[#F6F8FC] border border-gray-200/90 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-hidden"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div>
+            <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5">
               Password
             </label>
-            <input
-              type="password"
-              required
-              placeholder="At least 6 chars"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full h-11 px-3.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                placeholder="At least 6 chars"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="w-full h-11 sm:h-12 px-4 pr-10 rounded-xl sm:rounded-2xl bg-[#F6F8FC] border border-gray-200/90 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-hidden"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 cursor-pointer transition"
+              >
+                {showPassword ? (
+                  <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
+                    <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.064 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                  </svg>
+                ) : (
+                  <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                    <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5">
               Confirm Password
             </label>
-            <input
-              type="password"
-              required
-              placeholder="Repeat password"
-              value={formData.confirmPassword}
-              onChange={(e) =>
-                setFormData({ ...formData, confirmPassword: e.target.value })
-              }
-              className="w-full h-11 px-3.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                required
+                placeholder="Repeat password"
+                value={formData.confirmPassword}
+                onChange={(e) =>
+                  setFormData({ ...formData, confirmPassword: e.target.value })
+                }
+                className="w-full h-11 sm:h-12 px-4 pr-10 rounded-xl sm:rounded-2xl bg-[#F6F8FC] border border-gray-200/90 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-hidden"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 cursor-pointer transition"
+              >
+                {showConfirmPassword ? (
+                  <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
+                    <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.064 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                  </svg>
+                ) : (
+                  <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                    <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5">
             Referral Code (Optional)
           </label>
           <input
@@ -198,25 +242,25 @@ export default function RegisterPage() {
             onChange={(e) =>
               setFormData({ ...formData, referralCode: e.target.value.toUpperCase() })
             }
-            className="w-full h-11 px-3.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
+            className="w-full h-11 sm:h-12 px-4 rounded-xl sm:rounded-2xl bg-[#F6F8FC] border border-gray-200/90 text-sm font-mono text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-hidden"
           />
         </div>
 
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full h-11 rounded-lg text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs disabled:opacity-50 mt-4"
+          className="w-full h-12 sm:h-13 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold tracking-wider uppercase text-white bg-[#3B66FF] hover:bg-[#2753F0] active:scale-[0.99] shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50 mt-4 cursor-pointer"
         >
-          {isLoading ? "Creating Account..." : "Register Account"}
+          {isLoading ? "Creating Account..." : "CREATE ACCOUNT"}
         </button>
       </form>
 
-      <div className="mt-6 pt-5 border-t border-gray-100 dark:border-gray-800 text-center">
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+      <div className="mt-6 sm:mt-8 text-center">
+        <span className="text-xs sm:text-sm text-gray-500">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-semibold text-brand-600 dark:text-blue-light-400 hover:underline"
+            className="font-bold text-brand-600 hover:underline ml-1"
           >
             Sign In
           </Link>
