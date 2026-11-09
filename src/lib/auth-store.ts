@@ -576,6 +576,10 @@ export async function updateUserStatus(
   userId: string,
   status: StatusType
 ): Promise<StoredUser | null> {
+  // Primary administrator account can never be deactivated
+  if (userId === "usr_admin_001") {
+    return null;
+  }
   const dbOnline = await isDatabaseConnected();
   if (dbOnline) {
     try {
@@ -736,6 +740,10 @@ export async function updateUserPassword(
  * Deletes a user
  */
 export async function deleteUserRecord(userId: string): Promise<boolean> {
+  // Primary administrator account can never be deleted
+  if (userId === "usr_admin_001") {
+    return false;
+  }
   const dbOnline = await isDatabaseConnected();
   if (dbOnline) {
     try {

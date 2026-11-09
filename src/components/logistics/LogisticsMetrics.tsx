@@ -41,7 +41,7 @@ export default function LogisticsMetrics() {
             97.8%
           </h4>
           <span className="text-xs text-green-600 dark:text-green-400 font-semibold">
-            &uarr; 2.4% vs last week
+            +2.4% vs last week
           </span>
         </div>
       </div>

@@ -283,7 +283,7 @@ export default function DispensersManagementView({
                           <span className={disp.waterLevelPercent < 15 ? "text-amber-600 font-bold" : "text-gray-700 dark:text-gray-300"}>
                             Water: {disp.waterLevelPercent}%
                           </span>
-                          <span className="text-gray-400">&bull;</span>
+                          <span className="text-gray-400">•</span>
                           <span className="text-gray-500">Bat: {disp.batteryPercent}%</span>
                         </div>
                       </td>
@@ -329,7 +329,7 @@ export default function DispensersManagementView({
                   <Select
                     options={dispensers.map((d) => ({
                       value: d.userId,
-                      label: `${d.serialNumber} — ${d.customerName} (${d.modelName})`,
+                      label: `${d.serialNumber}: ${d.customerName} (${d.modelName})`,
                     }))}
                     value={simulatorUser}
                     onChange={(val) => setSimulatorUser(val)}
@@ -349,7 +349,7 @@ export default function DispensersManagementView({
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-amber-800 dark:text-amber-300">
-                        Simulate Low Water (&lt; 15%)
+                        Simulate Low Water (Under 15%)
                       </span>
                       <span className="text-[10px] text-amber-600 font-semibold">12% Remaining</span>
                     </div>

@@ -4,7 +4,7 @@ import { ThemeProvider } from "@/components/common/ThemeProviders";
 import AuthProvider from "@/components/common/AuthProvider";
 
 export const metadata: Metadata = {
-  title: "F Net Water Hub — Water Supply & Smart Dispenser Management",
+  title: "F Net Water Hub | Water Supply & Smart Dispenser Management",
   description:
     "Technology-driven water supply, bottle exchange, smart dispenser tracking, and payments platform for Ghana.",
   icons: {

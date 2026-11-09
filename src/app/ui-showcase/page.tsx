@@ -222,7 +222,7 @@ export default function UiShowcasePage() {
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                    <span>Accra Route Deliveries Completed</span>
+                    <span>Assigned Route Deliveries Completed</span>
                     <span>75%</span>
                   </div>
                   <ProgressBar progress={75} size="md" color="brand" />

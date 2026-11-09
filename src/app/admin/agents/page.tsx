@@ -64,7 +64,7 @@ export default function AdminAgentsPage() {
               </Badge>
             </div>
             <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              Community agents onboarding new residential, shop, and corporate pure water accounts across Accra.
+              Community agents onboarding new residential, shop, and corporate pure water accounts.
             </p>
           </div>
         </div>
@@ -76,7 +76,7 @@ export default function AdminAgentsPage() {
             <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
               {mockAgents.length} Agents
             </div>
-            <span className="text-[11px] text-gray-400">Operational across Greater Accra</span>
+            <span className="text-[11px] text-gray-400">Operational across assigned territories</span>
           </div>
 
           <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">

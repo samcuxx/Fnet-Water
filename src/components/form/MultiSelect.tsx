@@ -98,7 +98,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                     }}
                     className="cursor-pointer hover:text-brand-900 dark:hover:text-white"
                   >
-                    &times;
+                    ×
                   </span>
                 </span>
               );

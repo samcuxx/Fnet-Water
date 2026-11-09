@@ -110,7 +110,7 @@ export const DISPENSER_CATALOG: DispenserCatalogModel[] = [
   {
     id: "mod_hydropure_floor",
     name: "HydroPure Floor Standing",
-    tagline: "Bottom-loading ergonomic dispenser — no heavy lifting required",
+    tagline: "Bottom-loading ergonomic dispenser with no heavy lifting required",
     totalCost: 1600.0,
     initialDeposit: 250.0,
     monthlyDue: 135.0,
@@ -372,7 +372,7 @@ export async function applyForDispenserPlan(
   userPayments.push(depositPayment);
   memoryPayments.set(planId, userPayments);
 
-  return newPlan;
+  return { ...newPlan };
 }
 
 /**
@@ -385,6 +385,7 @@ export async function recordInstallmentPayment(
     paymentMethod: "MOBILE_MONEY" | "CARD";
     momoNetwork?: "MTN" | "TELECEL" | "AT";
     momoPhone?: string;
+    referenceCode?: string;
   }
 ): Promise<{
   plan: StoredDispenserPlan;
@@ -395,6 +396,20 @@ export async function recordInstallmentPayment(
   if (!plan) {
     throw new Error("No active dispenser plan found for this account.");
   }
+
+  // Idempotency check: if this reference was already recorded, avoid double-charging
+  const planPayments = memoryPayments.get(plan.id) || [];
+  if (data.referenceCode) {
+    const existingPayment = planPayments.find((p) => p.referenceCode === data.referenceCode);
+    if (existingPayment) {
+      return {
+        plan,
+        payment: existingPayment,
+        ownershipCelebration: plan.isFullyPaid,
+      };
+    }
+  }
+
   if (plan.isFullyPaid) {
     throw new Error("This dispenser has already been fully paid off. It is now 100% customer owned!");
   }
@@ -430,11 +445,10 @@ export async function recordInstallmentPayment(
     paymentMethod: data.paymentMethod,
     momoNetwork: data.momoNetwork || "MTN",
     momoPhone: data.momoPhone,
-    referenceCode: `DSP-INST-${Date.now().toString().slice(-4)}`,
+    referenceCode: data.referenceCode || `DSP-INST-${Date.now().toString().slice(-4)}`,
     paidAt: new Date().toISOString(),
   };
 
-  const planPayments = memoryPayments.get(plan.id) || [];
   planPayments.unshift(payment);
   memoryPayments.set(plan.id, planPayments);
 

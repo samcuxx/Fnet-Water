@@ -52,7 +52,7 @@ export default function ProfilePage() {
           phone: data.profile.phone || "",
         });
         setAddressForm({
-          deliveryArea: data.profile.deliveryArea || "East Legon, Greater Accra",
+          deliveryArea: data.profile.deliveryArea || "East Legon",
         });
       }
     } catch (err) {
@@ -220,14 +220,17 @@ export default function ProfilePage() {
             <span>{feedback.text}</span>
             <button
               onClick={() => setFeedback(null)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-0.5 rounded-lg"
+              aria-label="Dismiss feedback"
             >
-              &times;
+              <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
             </button>
           </div>
         )}
 
-        {/* Page Container matching ui_template UserProfiles.tsx */}
+        {/* Page Container */}
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6 shadow-theme-xs">
           <div className="mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
@@ -245,7 +248,7 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div className="space-y-6">
-              {/* CARD 1: UserMetaCard (Derived from ui_template UserMetaCard.tsx) */}
+              {/* CARD 1: UserMetaCard */}
               <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
                 <div className="flex flex-col gap-5 mb-6 xl:flex-row xl:items-center xl:justify-between">
                   <div className="flex flex-col items-center w-full gap-5 sm:flex-row">
@@ -265,10 +268,10 @@ export default function ProfilePage() {
 
                       <div className="mt-1 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                         <span>{profile?.email}</span>
-                        <span className="hidden sm:inline">&bull;</span>
+                        <span className="hidden sm:inline">•</span>
                         <span className="font-mono">{profile?.phone}</span>
-                        <span className="hidden sm:inline">&bull;</span>
-                        <span>Greater Accra, Ghana</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span>Ghana</span>
                       </div>
                     </div>
                   </div>
@@ -338,7 +341,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* CARD 2: UserAddressCard (Derived from ui_template UserAddressCard.tsx) */}
+              {/* CARD 2: UserAddressCard */}
               <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
                   <div>
@@ -377,14 +380,14 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Region / Province</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">Greater Accra Region</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Region</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">Ghana</p>
                   </div>
 
                   <div>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Primary Operating Zone</p>
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {profile?.deliveryArea || "East Legon, Accra"}
+                      {profile?.deliveryArea || "East Legon"}
                     </p>
                   </div>
                 </div>

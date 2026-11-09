@@ -181,6 +181,7 @@ export async function calculateOrderPricing(
   const orderItems: StoredOrderItem[] = [];
 
   for (const item of items) {
+    if (item.quantity <= 0) continue;
     const prod = await getProductById(item.productId);
     if (!prod) continue;
 
@@ -207,8 +208,8 @@ export async function calculateOrderPricing(
     });
   }
 
-  // Free delivery if subtotal >= GH₵ 100 or >= 3 refill bottles, else GH₵ 10.00
-  const deliveryFee = subtotal >= 100 || totalRefillBottles >= 3 ? 0.0 : 10.0;
+  // Free delivery if subtotal >= GH₵ 100 or >= 3 refill bottles, else GH₵ 10.00 (0 for empty cart)
+  const deliveryFee = subtotal === 0 || subtotal >= 100 || totalRefillBottles >= 3 ? 0.0 : 10.0;
 
   // Free refill discount
   let discountAmount = 0;
@@ -246,6 +247,7 @@ export async function createCustomerOrder(data: {
   hasEmptyBottleExchange: boolean;
   redeemFreeRefill: boolean;
   paymentMethod: PaymentMethod;
+  paymentStatus?: PaymentStatus;
   items: Array<{ productId: string; quantity: number }>;
 }): Promise<StoredOrder> {
   const profile = await getCustomerProfile(data.userId);
@@ -282,7 +284,7 @@ export async function createCustomerOrder(data: {
     discountAmount: pricing.discountAmount,
     totalAmount: pricing.totalAmount,
     status: "PENDING",
-    paymentStatus: data.paymentMethod === "CASH_ON_DELIVERY" ? "UNPAID" : "PAID",
+    paymentStatus: data.paymentStatus || (data.paymentMethod === "CASH_ON_DELIVERY" ? "UNPAID" : "PAID"),
     paymentMethod: data.paymentMethod,
     paymentReference: `PAY-${data.paymentMethod.slice(0, 4)}-${randNum}`,
     freeBottlesRedeemed,
@@ -332,7 +334,7 @@ export async function createCustomerOrder(data: {
             discountAmount: pricing.discountAmount,
             totalAmount: pricing.totalAmount,
             status: "PENDING",
-            paymentStatus: data.paymentMethod === "CASH_ON_DELIVERY" ? "UNPAID" : "PAID",
+            paymentStatus: data.paymentStatus || (data.paymentMethod === "CASH_ON_DELIVERY" ? "UNPAID" : "PAID"),
             paymentMethod: data.paymentMethod === "MOBILE_MONEY" ? "PAYSTACK_MOMO" : data.paymentMethod === "CARD" ? "PAYSTACK_CARD" : "CASH_ON_DELIVERY",
             freeBottlesRedeemed,
             items: {
@@ -587,4 +589,102 @@ export async function updateOrderStatus(
 
   memoryOrders.set(ord.id, { ...ord });
   return ord;
+}
+
+/**
+ * Updates an order's payment status (e.g. from Paystack webhook)
+ */
+export async function updateOrderPaymentStatus(
+  orderId: string,
+  paymentStatus: PaymentStatus,
+  paymentReference?: string
+): Promise<StoredOrder | null> {
+  const ord = await getOrderById(orderId);
+  if (!ord) return null;
+
+  ord.paymentStatus = paymentStatus;
+  if (paymentReference) ord.paymentReference = paymentReference;
+  ord.updatedAt = new Date().toISOString();
+
+  const dbOnline = await isDatabaseConnected();
+  if (dbOnline) {
+    try {
+      await prisma.order.update({
+        where: { id: ord.id },
+        data: {
+          paymentStatus,
+          paymentReference: paymentReference || undefined,
+        },
+      });
+    } catch {
+      // Fallback
+    }
+  }
+
+  memoryOrders.set(ord.id, { ...ord });
+  return ord;
+}
+
+/**
+ * Get an order by its payment reference
+ */
+export async function getOrderByReference(reference: string): Promise<StoredOrder | null> {
+  for (const ord of memoryOrders.values()) {
+    if (ord.paymentReference === reference) return ord;
+  }
+
+  const dbOnline = await isDatabaseConnected();
+  if (dbOnline) {
+    try {
+      const o = await prisma.order.findFirst({
+        where: { paymentReference: reference },
+        include: {
+          items: { include: { product: true } },
+          deliveryAddress: true,
+          customerProfile: { include: { user: true } },
+        },
+      });
+      if (o) {
+        return {
+          id: o.id,
+          orderNumber: o.orderNumber,
+          userId: o.customerProfile.userId,
+          customerName: o.customerProfile.user.name,
+          customerPhone: o.customerProfile.user.phone,
+          deliveryAddressId: o.deliveryAddressId,
+          deliveryAddressText: o.deliveryAddress?.areaName || "Delivery Location",
+          deliveryDigitalAddress: o.deliveryAddress?.digitalAddress || "GA-000-0000",
+          deliverySlot: o.deliverySlot as any,
+          deliveryDate: o.deliveryDate ? o.deliveryDate.toISOString() : new Date().toISOString(),
+          deliveryInstructions: o.deliveryInstructions || undefined,
+          hasEmptyBottleExchange: true,
+          subtotal: o.subtotal,
+          depositFee: o.depositFee,
+          deliveryFee: o.deliveryFee,
+          discountAmount: o.discountAmount,
+          totalAmount: o.totalAmount,
+          status: o.status as any,
+          paymentStatus: o.paymentStatus as any,
+          paymentMethod: (o.paymentMethod === "PAYSTACK_MOMO" ? "MOBILE_MONEY" : o.paymentMethod === "PAYSTACK_CARD" ? "CARD" : "CASH_ON_DELIVERY") as PaymentMethod,
+          paymentReference: o.paymentReference || undefined,
+          freeBottlesRedeemed: o.freeBottlesRedeemed,
+          items: o.items.map((i) => ({
+            id: i.id,
+            productId: i.productId,
+            productName: i.product.name,
+            quantity: i.quantity,
+            unitPrice: i.unitPrice,
+            depositPrice: i.depositPrice,
+            totalPrice: i.totalPrice,
+          })),
+          createdAt: o.createdAt.toISOString(),
+          updatedAt: o.updatedAt.toISOString(),
+        };
+      }
+    } catch {
+      // Fallback
+    }
+  }
+
+  return null;
 }

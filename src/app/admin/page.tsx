@@ -24,7 +24,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Grid Structure Matching ui_template Dashboard */}
+        {/* Grid Structure: Executive Dashboard Layout */}
         <div className="grid grid-cols-12 gap-4 md:gap-6">
           {/* Left Column: 4 KPI Metrics + Monthly 19L Sales Bar Chart (7 cols) */}
           <div className="col-span-12 space-y-6 xl:col-span-7">

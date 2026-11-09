@@ -265,9 +265,12 @@ export default function CustomerAddressesPage() {
             <span>{feedback.text}</span>
             <button
               onClick={() => setFeedback(null)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-0.5 rounded-lg"
+              aria-label="Dismiss message"
             >
-              &times;
+              <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
             </button>
           </div>
         )}
@@ -404,8 +407,8 @@ export default function CustomerAddressesPage() {
                   </div>
 
                   {addr.deliveryInstructions && (
-                    <p className="mt-3 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-lg border border-gray-100 dark:border-gray-800/60 leading-relaxed">
-                      &ldquo;{addr.deliveryInstructions}&rdquo;
+                    <p className="mt-3 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-lg border border-gray-100 dark:border-gray-800/60 leading-relaxed italic">
+                      "{addr.deliveryInstructions}"
                     </p>
                   )}
                 </div>
@@ -510,7 +513,7 @@ export default function CustomerAddressesPage() {
               <input
                 type="text"
                 required
-                placeholder="e.g. House 14, Boundary Road, East Legon"
+                placeholder="e.g. House 14, Boundary Road"
                 value={formData.areaName}
                 onChange={(e) => setFormData({ ...formData, areaName: e.target.value })}
                 className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
@@ -539,7 +542,7 @@ export default function CustomerAddressesPage() {
                 className="rounded border-gray-300 text-brand-600 focus:ring-brand-500"
               />
               <label htmlFor="isDefaultAdd" className="text-xs text-gray-700 dark:text-gray-300">
-                Set as my primary delivery location for 19L refills
+                Set as my default delivery location for water orders
               </label>
             </div>
 

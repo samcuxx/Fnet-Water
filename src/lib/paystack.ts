@@ -2,7 +2,7 @@ import crypto from "crypto";
 
 /**
  * Paystack Ghana Gateway Service
- * Handles payment initialization in GHS pesewas and webhook HMAC signature verification.
+ * Handles live payment initialization in GHS pesewas and HMAC SHA512 webhook verification.
  */
 
 const PAYSTACK_SECRET_KEY =
@@ -16,7 +16,7 @@ export interface InitializePaymentParams {
   reference?: string;
   callbackUrl?: string;
   metadata?: Record<string, unknown>;
-  channels?: string[]; // ["mobile_money", "card", "bank"]
+  channels?: string[]; // ["mobile_money", "card", "bank_transfer", "qr", "ussd"]
 }
 
 export interface PaystackInitResponse {
@@ -29,8 +29,43 @@ export interface PaystackInitResponse {
   };
 }
 
+export interface PaystackVerifyResponse {
+  status: boolean;
+  message: string;
+  data?: {
+    id: number;
+    status: string; // "success" | "failed" | "abandoned"
+    reference: string;
+    amount: number; // in pesewas
+    gateway_response: string;
+    paid_at: string | null;
+    created_at: string;
+    channel: string; // "mobile_money" | "card" | "bank" | "ussd" | "qr"
+    currency: string;
+    ip_address?: string;
+    metadata?: Record<string, unknown>;
+    customer?: {
+      id: number;
+      email: string;
+      customer_code?: string;
+      phone?: string | null;
+    };
+    authorization?: {
+      authorization_code?: string;
+      bin?: string;
+      last4?: string;
+      exp_month?: string;
+      exp_year?: string;
+      channel?: string;
+      card_type?: string;
+      bank?: string;
+      brand?: string;
+    };
+  };
+}
+
 /**
- * Initializes a transaction on Paystack
+ * Initializes a live transaction with Paystack API in Ghanaian Cedis (GHS)
  */
 export async function initializePaystackPayment(
   params: InitializePaymentParams
@@ -46,7 +81,7 @@ export async function initializePaystackPayment(
     reference,
     callback_url: params.callbackUrl,
     metadata: params.metadata,
-    channels: params.channels || ["mobile_money", "card", "bank_transfer"],
+    channels: params.channels || ["mobile_money", "card", "bank_transfer", "qr", "ussd"],
   };
 
   try {
@@ -60,20 +95,38 @@ export async function initializePaystackPayment(
     });
 
     const data = await response.json();
-    return data as PaystackInitResponse;
+    if (!response.ok || !data.status) {
+      console.error("[Paystack Init Error]:", data.message || "Failed response from Paystack");
+      return {
+        status: false,
+        message: data.message || "Paystack initialization failed.",
+      };
+    }
+
+    return {
+      status: true,
+      message: data.message || "Authorization URL created",
+      data: {
+        authorization_url: data.data.authorization_url,
+        access_code: data.data.access_code,
+        reference: data.data.reference || reference,
+      },
+    };
   } catch (error) {
-    console.error("[Paystack] Initialization error:", error);
+    console.error("[Paystack Connection Error]:", error);
     return {
       status: false,
-      message: error instanceof Error ? error.message : "Failed to connect to Paystack",
+      message: error instanceof Error ? error.message : "Unable to connect to Paystack payment gateway.",
     };
   }
 }
 
 /**
- * Verifies a transaction on Paystack via reference
+ * Verifies a transaction on Paystack via reference directly from Paystack API
  */
-export async function verifyPaystackTransaction(reference: string) {
+export async function verifyPaystackTransaction(
+  reference: string
+): Promise<PaystackVerifyResponse | null> {
   try {
     const response = await fetch(
       `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
@@ -84,9 +137,11 @@ export async function verifyPaystackTransaction(reference: string) {
         },
       }
     );
-    return await response.json();
+
+    const data = await response.json();
+    return data as PaystackVerifyResponse;
   } catch (error) {
-    console.error("[Paystack] Verification error:", error);
+    console.error("[Paystack Verify Error]:", error);
     return null;
   }
 }
@@ -106,9 +161,19 @@ export function verifyPaystackWebhookSignature(
       .digest("hex");
     return hash === signatureHeader;
   } catch (error) {
-    console.error("[Paystack] Signature verification error:", error);
+    console.error("[Paystack Webhook Signature Error]:", error);
     return false;
   }
+}
+
+/**
+ * Helper to compute valid webhook signature for testing
+ */
+export function computePaystackWebhookSignature(rawBody: string): string {
+  return crypto
+    .createHmac("sha512", PAYSTACK_SECRET_KEY)
+    .update(rawBody)
+    .digest("hex");
 }
 
 export { NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY, PAYSTACK_SECRET_KEY };

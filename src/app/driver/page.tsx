@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
@@ -148,28 +149,37 @@ export default function DriverDashboardPage() {
             <span>{feedback.text}</span>
             <button
               onClick={() => setFeedback(null)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-0.5"
+              aria-label="Dismiss feedback"
             >
-              &times;
+              <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
             </button>
           </div>
         )}
 
-        {/* Mobile Header: Driver Profile & Vehicle info */}
+        {/* Mobile Header: Driver Profile & Vehicle info with Van Visual */}
         <div className="bg-white dark:bg-gray-900 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="size-11 rounded-full bg-brand-500 text-white font-bold flex items-center justify-center text-lg shrink-0">
-              K
+            <div className="relative size-12 rounded-xl overflow-hidden bg-sky-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 shrink-0">
+              <Image
+                src="/images/logistics/delivery-van.jpg"
+                alt="Assigned Delivery Van"
+                fill
+                sizes="48px"
+                className="object-cover"
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base font-bold text-gray-900 dark:text-white">
                   Kwame Asante
                 </h1>
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Van 01 (GT-4421-23) &bull; Accra Route
+                Van 01 (GT-4421-23) • Assigned Route
               </p>
             </div>
           </div>
@@ -250,7 +260,7 @@ export default function DriverDashboardPage() {
                       <span className="font-mono text-xs font-bold text-gray-900 dark:text-white">
                         {stop.orderNumber}
                       </span>
-                      <span className="text-gray-300 dark:text-gray-700">&bull;</span>
+                      <span className="text-gray-300 dark:text-gray-700">•</span>
                       <span className="text-[11px] text-gray-500 dark:text-gray-400">
                         {stop.deliverySlot}
                       </span>

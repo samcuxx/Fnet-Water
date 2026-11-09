@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { recordInstallmentPayment } from "@/lib/dispenser-store";
+import { recordTransaction, PaymentChannel } from "@/lib/transaction-store";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,35 @@ export async function POST(req: NextRequest) {
       paymentMethod: paymentMethod || "MOBILE_MONEY",
       momoNetwork,
       momoPhone,
+    });
+
+    // Record in global transactions ledger
+    const userObj = session.user as { name?: string; phone?: string };
+    const channel: PaymentChannel =
+      paymentMethod === "CARD"
+        ? "CARD"
+        : momoNetwork === "Telecel"
+        ? "TELECEL_CASH"
+        : momoNetwork === "AT"
+        ? "AT_MONEY"
+        : "MTN_MOMO";
+
+    await recordTransaction({
+      reference: result.payment.referenceCode,
+      planId: result.plan.id,
+      customerProfileId: userId,
+      customerName: userObj.name || "Customer",
+      customerPhone: momoPhone || userObj.phone || "",
+      amount: parsedAmount,
+      currency: "GHS",
+      channel,
+      type: "DISPENSER_INSTALLMENT",
+      status: "PAID",
+      metadata: {
+        isFullyPaid: result.plan.isFullyPaid,
+        installmentsPaid: result.plan.installmentsPaidCount,
+        totalInstallments: result.plan.totalInstallmentsCount,
+      },
     });
 
     return NextResponse.json(

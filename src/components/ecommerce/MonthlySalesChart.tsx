@@ -109,7 +109,7 @@ export default function MonthlySalesChart() {
             Monthly Water Refills (19L)
           </h3>
           <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-            Total refill bottles delivered across Accra &amp; Tema
+            Total refill bottles delivered nationwide
           </p>
         </div>
 

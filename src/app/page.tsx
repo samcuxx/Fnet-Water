@@ -1,71 +1,486 @@
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Logo from "@/components/brand/Logo";
 import ThemeToggleButton from "@/components/common/ThemeToggleButton";
 
 export default function HomePage() {
+  const [weeklyBottles, setWeeklyBottles] = useState<number>(3);
+
+  const monthlyBottles = weeklyBottles * 4;
+  const monthlyLiters = Math.round(monthlyBottles * 18.9);
+  const refillPrice = 25; // GHS
+  const monthlyCost = monthlyBottles * refillPrice;
+
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col lg:flex-row">
-      {/* Left Column (Desktop) / Primary Content Container (Mobile) */}
-      <div className="flex-1 lg:w-1/2 flex flex-col justify-between p-6 sm:p-10 lg:p-14 xl:p-16 min-h-screen lg:min-h-0 z-10">
-        {/* Navigation */}
-        <header className="flex items-center justify-between pb-4 sm:pb-6">
-          <Logo size="md" />
-          <ThemeToggleButton showLabel={false} />
-        </header>
+    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 selection:bg-sky-500 selection:text-white">
+      {/* 1. TOP NAVIGATION */}
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/90 dark:bg-gray-950/90 border-b border-gray-100 dark:border-gray-800 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <Logo size="md" />
+            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600 dark:text-gray-300">
+              <a href="#products" className="hover:text-brand-500 dark:hover:text-blue-light-400 transition">
+                Water Products
+              </a>
+              <a href="#dispensers" className="hover:text-brand-500 dark:hover:text-blue-light-400 transition">
+                Smart Dispensers
+              </a>
+              <a href="#how-it-works" className="hover:text-brand-500 dark:hover:text-blue-light-400 transition">
+                How It Works
+              </a>
+              <a href="#calculator" className="hover:text-brand-500 dark:hover:text-blue-light-400 transition">
+                Refill Calculator
+              </a>
+            </nav>
+          </div>
 
-        {/* Hero Content */}
-        <main className="py-6 sm:py-10 lg:py-14 max-w-lg">
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900 dark:text-white leading-[1.15]">
-            Water delivery &amp; smart dispensers
-          </h1>
-
-          <p className="mt-3 sm:mt-5 text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-            Order 19L refills, track scheduled deliveries, and manage dispenser plans across Ghana.
-          </p>
-
-          <div className="mt-6 sm:mt-8">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <ThemeToggleButton showLabel={false} />
             <Link
               href="/login"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-lg text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs"
+              className="text-xs sm:text-sm font-semibold text-gray-700 hover:text-brand-600 dark:text-gray-200 dark:hover:text-blue-light-400 px-3 py-2 transition"
             >
               Sign In
             </Link>
+            <Link
+              href="/customer/order"
+              className="inline-flex items-center justify-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 shadow-sm transition active:scale-[0.98]"
+            >
+              Order Water
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* 2. HERO SECTION */}
+      <section className="relative overflow-hidden pt-10 pb-16 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            {/* Left Column: Clear, Punchy Copy */}
+            <div className="lg:col-span-7 flex flex-col justify-center text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-brand-600 dark:text-sky-300 text-xs font-semibold w-fit mb-4">
+                <span className="size-2 rounded-full bg-sky-500 animate-pulse" />
+                Pure Mineral Water • Fast Doorstep Delivery
+              </div>
+
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-gray-900 dark:text-white leading-[1.12]">
+                Pure Water Delivered to Your Door
+              </h1>
+
+              <p className="mt-4 text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-xl leading-relaxed">
+                Order 19L refills, return empty bottles with zero deposit fee, and manage smart dispensers with ease.
+              </p>
+
+              {/* Action Buttons */}
+              <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
+                <Link
+                  href="/customer/order"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm sm:text-base font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 shadow-theme-xs transition"
+                >
+                  <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.2-1H3z" />
+                    <path d="M16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                  </svg>
+                  Order Refill Now
+                </Link>
+
+                <a
+                  href="#dispensers"
+                  className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 transition"
+                >
+                  View Dispensers
+                </a>
+              </div>
+
+              {/* 3 Simple Value Points */}
+              <div className="mt-10 pt-6 border-t border-gray-200 dark:border-gray-800 grid grid-cols-3 gap-4 text-left">
+                <div>
+                  <div className="text-xl sm:text-2xl font-bold text-brand-600 dark:text-blue-light-400">GH₵ 25</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Per 19L refill</div>
+                </div>
+                <div>
+                  <div className="text-xl sm:text-2xl font-bold text-brand-600 dark:text-blue-light-400">Zero Fee</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">When returning empties</div>
+                </div>
+                <div>
+                  <div className="text-xl sm:text-2xl font-bold text-brand-600 dark:text-blue-light-400">100% Pure</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Reverse osmosis certified</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Clean, Perfectly Sized Hero Visual */}
+            <div className="lg:col-span-5 relative">
+              <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+                <div className="relative rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800 bg-sky-50/50 dark:bg-gray-900 aspect-4/3 flex items-center justify-center p-6">
+                  <Image
+                    src="/images/product/fnet-18l-bottle.jpg"
+                    alt="F Net 18.9L Water Refill Jug"
+                    fill
+                    priority
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-contain p-4"
+                  />
+                  <div className="absolute top-4 left-4 bg-brand-500 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-sm">
+                    18.9L Pure Refill
+                  </div>
+                </div>
+
+                {/* Satellite Card: Live Delivery Tracker */}
+                <div className="mt-4 p-3.5 rounded-2xl bg-white dark:bg-gray-900 shadow-md border border-gray-200 dark:border-gray-800 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center size-9 rounded-xl bg-sky-100 dark:bg-sky-950 text-brand-600 dark:text-sky-400 shrink-0">
+                      <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                        <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-gray-900 dark:text-white">
+                        Delivery Van Dispatched
+                      </div>
+                      <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+                        On route to your destination
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-semibold text-gray-400 font-mono">Today</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. PRODUCT CATALOG */}
+      <section id="products" className="py-16 sm:py-20 bg-gray-50/60 dark:bg-gray-900/40 border-y border-gray-100 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-xl mx-auto mb-12">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">
+              Water Products
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              Clean mineral drinking water for homes, offices, and events.
+            </p>
           </div>
 
-          {/* Mobile-only Hero Image Showcase */}
-          <div className="lg:hidden relative w-full h-52 sm:h-64 rounded-2xl overflow-hidden mt-8 border border-gray-100 dark:border-gray-800/80 shadow-theme-xs">
-            <Image
-              src="/images/hero/water-hero.jpg"
-              alt="F Net Water Hub commercial dispenser and pure water refill bottle"
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover object-center"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            {/* PRODUCT 1: 18.9L Refill */}
+            <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between">
+              <div>
+                <div className="relative w-full h-52 rounded-2xl overflow-hidden bg-sky-50/50 dark:bg-gray-800/40 mb-4 flex items-center justify-center border border-gray-100 dark:border-gray-800">
+                  <Image
+                    src="/images/product/fnet-18l-bottle.jpg"
+                    alt="18.9L Refill Bottle"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-contain p-3"
+                  />
+                </div>
+
+                <div className="flex items-baseline justify-between mb-2">
+                  <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                    18.9L Refill Bottle
+                  </h3>
+                  <div className="text-right">
+                    <span className="text-lg font-bold text-brand-600 dark:text-blue-light-400">GH₵ 25</span>
+                    <span className="text-xs text-gray-400 block">per refill</span>
+                  </div>
+                </div>
+
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
+                  Polycarbonate bottle with handle. Return your empty bottle to pay zero deposit fee.
+                </p>
+              </div>
+
+              <Link
+                href="/customer/order?product=19L"
+                className="w-full text-center py-2.5 px-4 rounded-xl text-xs font-semibold text-white bg-brand-500 hover:bg-brand-600 transition shadow-sm"
+              >
+                Order Refill
+              </Link>
+            </div>
+
+            {/* PRODUCT 2: Smart Dispenser */}
+            <div id="dispensers" className="bg-white dark:bg-gray-900 rounded-3xl p-6 border-2 border-brand-500/30 dark:border-brand-500/40 shadow-sm flex flex-col justify-between">
+              <div>
+                <div className="relative w-full h-52 rounded-2xl overflow-hidden bg-sky-50/50 dark:bg-gray-800/40 mb-4 flex items-center justify-center border border-gray-100 dark:border-gray-800">
+                  <Image
+                    src="/images/product/fnet-smart-dispenser.jpg"
+                    alt="Smart Digital Dispenser"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-contain p-3"
+                  />
+                </div>
+
+                <div className="flex items-baseline justify-between mb-2">
+                  <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                    Smart Digital Dispenser
+                  </h3>
+                  <div className="text-right">
+                    <span className="text-lg font-bold text-brand-600 dark:text-blue-light-400">GH₵ 120</span>
+                    <span className="text-xs text-gray-400 block">/ month</span>
+                  </div>
+                </div>
+
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
+                  Freestanding dispenser with digital LED temperature indicators and dual hot/cold faucets.
+                </p>
+              </div>
+
+              <Link
+                href="/customer/dispenser"
+                className="w-full text-center py-2.5 px-4 rounded-xl text-xs font-semibold text-white bg-brand-500 hover:bg-brand-600 transition shadow-sm"
+              >
+                View Dispenser Plans
+              </Link>
+            </div>
+
+            {/* PRODUCT 3: 24-Pack 500ml */}
+            <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between">
+              <div>
+                <div className="relative w-full h-52 rounded-2xl overflow-hidden bg-sky-50/50 dark:bg-gray-800/40 mb-4 flex items-center justify-center border border-gray-100 dark:border-gray-800">
+                  <Image
+                    src="/images/product/fnet-water-bottles-pack.jpg"
+                    alt="24-Pack 500ml Bottled Water"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-contain p-3"
+                  />
+                </div>
+
+                <div className="flex items-baseline justify-between mb-2">
+                  <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                    24-Pack (500ml) Bottled Water
+                  </h3>
+                  <div className="text-right">
+                    <span className="text-lg font-bold text-brand-600 dark:text-blue-light-400">GH₵ 42</span>
+                    <span className="text-xs text-gray-400 block">per pack</span>
+                  </div>
+                </div>
+
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
+                  Case of 24 sealed bottles for meetings, conferences, family outings, and travel.
+                </p>
+              </div>
+
+              <Link
+                href="/customer/order?product=PACK"
+                className="w-full text-center py-2.5 px-4 rounded-xl text-xs font-semibold text-white bg-brand-500 hover:bg-brand-600 transition shadow-sm"
+              >
+                Order Pack
+              </Link>
+            </div>
           </div>
-        </main>
+        </div>
+      </section>
 
-        {/* Footer */}
-        <footer className="pt-6 text-xs text-gray-500 dark:text-gray-400">
-          <div>&copy; {new Date().getFullYear()} F Net Water Hub. Accra, Ghana.</div>
-        </footer>
-      </div>
+      {/* 4. HOW IT WORKS (3 NON-TECHNICAL STEPS) */}
+      <section id="how-it-works" className="py-16 sm:py-20 bg-white dark:bg-gray-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-xl mx-auto mb-12">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">
+              How It Works
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              Three simple steps to doorstep hydration.
+            </p>
+          </div>
 
-      {/* Right Column (Desktop Only): Pure Full-Height Image with Seamless Dissolve */}
-      <div className="hidden lg:block relative lg:w-1/2 min-h-screen overflow-hidden">
-        <Image
-          src="/images/hero/water-hero.jpg"
-          alt="F Net Water Hub commercial dispenser and pure water refill bottle"
-          fill
-          priority
-          sizes="50vw"
-          className="object-cover object-center"
-        />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-3xl p-6 border border-gray-200 dark:border-gray-800">
+              <div className="size-10 rounded-xl bg-sky-100 dark:bg-sky-950 text-brand-600 dark:text-sky-400 font-bold text-base flex items-center justify-center mb-4">
+                1
+              </div>
+              <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1.5">
+                Order Online
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                Choose your refill bottles or bottled water packs and select your delivery schedule.
+              </p>
+            </div>
 
-        {/* Soft gradient dissolve blending seamlessly into the background */}
-        <div className="absolute inset-y-0 left-0 w-32 xl:w-48 bg-gradient-to-r from-white dark:from-gray-950 to-transparent pointer-events-none" />
-      </div>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-3xl p-6 border border-gray-200 dark:border-gray-800">
+              <div className="size-10 rounded-xl bg-sky-100 dark:bg-sky-950 text-brand-600 dark:text-sky-400 font-bold text-base flex items-center justify-center mb-4">
+                2
+              </div>
+              <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1.5">
+                Doorstep Bottle Exchange
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                The driver brings full sealed bottles to your door and collects your empties with no deposit charge.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-3xl p-6 border border-gray-200 dark:border-gray-800">
+              <div className="size-10 rounded-xl bg-sky-100 dark:bg-sky-950 text-brand-600 dark:text-sky-400 font-bold text-base flex items-center justify-center mb-4">
+                3
+              </div>
+              <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1.5">
+                Pay with Ease
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                Pay online using Mobile Money or Card, or pay cash on delivery.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. REFILL CALCULATOR */}
+      <section id="calculator" className="py-16 sm:py-20 bg-gray-50/60 dark:bg-gray-900/40 border-t border-gray-100 dark:border-gray-800">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 sm:p-10 border border-gray-200 dark:border-gray-800 shadow-sm">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-7">
+                <span className="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-blue-light-400">
+                  Refill Estimator
+                </span>
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                  Estimate Your Monthly Usage
+                </h3>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Slide to select your weekly bottle consumption.
+                </p>
+
+                <div className="mt-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs text-gray-600 dark:text-gray-300">Weekly usage:</span>
+                    <span className="text-lg font-bold text-brand-600 dark:text-blue-light-400">
+                      {weeklyBottles} bottles / week
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="15"
+                    value={weeklyBottles}
+                    onChange={(e) => setWeeklyBottles(parseInt(e.target.value, 10))}
+                    aria-label="Bottles per week"
+                    className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-brand-500"
+                  />
+                  <div className="flex justify-between text-[11px] text-gray-400 mt-2">
+                    <span>1 bottle</span>
+                    <span>5 bottles</span>
+                    <span>15+ bottles</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:col-span-5 p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 space-y-3">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">Monthly Refills:</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{monthlyBottles} bottles</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">Total Volume:</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{monthlyLiters} Liters</span>
+                </div>
+                <div className="flex justify-between text-xs pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <span className="font-semibold text-gray-900 dark:text-white">Estimated Cost:</span>
+                  <span className="text-base font-bold text-brand-600 dark:text-blue-light-400">
+                    GH₵ {monthlyCost}
+                  </span>
+                </div>
+                <Link
+                  href={`/customer/order?qty=${weeklyBottles}`}
+                  className="mt-3 w-full inline-flex items-center justify-center py-2.5 px-4 rounded-xl text-xs font-semibold text-white bg-brand-500 hover:bg-brand-600 transition"
+                >
+                  Order This Quantity
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. LOGISTICS FLEET */}
+      <section className="py-16 sm:py-20 bg-white dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-6">
+              <div className="relative w-full h-64 sm:h-80 rounded-3xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-800">
+                <Image
+                  src="/images/logistics/delivery-van.jpg"
+                  alt="F Net Water Delivery Fleet"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover object-center"
+                />
+              </div>
+            </div>
+
+            <div className="lg:col-span-6 space-y-4">
+              <span className="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-blue-light-400">
+                Reliable Logistics
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">
+                Dedicated Fleet for Fast Delivery
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                Our delivery vans are dispatched daily on scheduled morning, afternoon, and evening runs to bring sealed 19L bottles right to your home or office.
+              </p>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+                  <div className="text-xs font-bold text-gray-900 dark:text-white">Scheduled Routes</div>
+                  <div className="text-[11px] text-gray-400 mt-0.5">Morning, afternoon, evening</div>
+                </div>
+                <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+                  <div className="text-xs font-bold text-gray-900 dark:text-white">Doorstep Exchange</div>
+                  <div className="text-[11px] text-gray-400 mt-0.5">We collect your empty bottles</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. FOOTER */}
+      <footer className="bg-gray-950 text-gray-400 py-12 border-t border-gray-900 text-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="space-y-3">
+            <Logo size="md" />
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Pure drinking water delivery and smart dispenser services.
+            </p>
+          </div>
+
+          <div>
+            <h4 className="font-bold text-white uppercase tracking-wider mb-2.5">Products</h4>
+            <ul className="space-y-1.5">
+              <li><Link href="/customer/order?product=19L" className="hover:text-white transition">18.9L Refill Bottle</Link></li>
+              <li><Link href="/customer/dispenser" className="hover:text-white transition">Smart Digital Dispenser</Link></li>
+              <li><Link href="/customer/order?product=PACK" className="hover:text-white transition">500ml Bottled Water (24-Pack)</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-bold text-white uppercase tracking-wider mb-2.5">Portals</h4>
+            <ul className="space-y-1.5">
+              <li><Link href="/customer" className="hover:text-white transition">Customer Portal</Link></li>
+              <li><Link href="/driver" className="hover:text-white transition">Driver Delivery App</Link></li>
+              <li><Link href="/manager" className="hover:text-white transition">Dispatch &amp; Operations</Link></li>
+              <li><Link href="/admin" className="hover:text-white transition">Admin Overview</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-bold text-white uppercase tracking-wider mb-2.5">Contact</h4>
+            <div className="space-y-1.5">
+              <div>Phone: +233 24 000 0000</div>
+              <div>Mon - Sat: 6:00 AM - 7:00 PM</div>
+              <div className="pt-2 text-[11px] text-gray-500">
+                © {new Date().getFullYear()} F Net Water Hub. All rights reserved.
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

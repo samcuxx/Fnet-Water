@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import type { ApexOptions } from "apexcharts";
 import AppLayout from "@/components/layout/AppLayout";
@@ -210,7 +211,7 @@ export default function CustomerDashboardPage() {
                 href="/customer/addresses"
                 className="mt-1 inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-brand-600 dark:text-gray-400 dark:hover:text-blue-light-400 transition"
               >
-                <svg className="w-3.5 h-3.5 text-brand-500 shrink-0 fill-current" viewBox="0 0 20 20">
+                <svg className="size-3.5 text-brand-500 shrink-0 fill-current" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                 </svg>
                 <span className="truncate max-w-[200px] sm:max-w-xs">{defaultAddress.areaName}</span>
@@ -223,10 +224,10 @@ export default function CustomerDashboardPage() {
             href="/customer/order"
             className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs self-start sm:self-auto cursor-pointer"
           >
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <svg className="size-4 fill-current" viewBox="0 0 24 24">
               <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
             </svg>
-            Order 19L Refill (GH₵ 30)
+            Order Water Refill
           </Link>
         </div>
 
@@ -272,20 +273,20 @@ export default function CustomerDashboardPage() {
         {/* 4 Clean Quick Actions (2x2 on mobile, 4x1 on desktop) */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
           <Link
-            href="/customer/order"
+            href="/customer/orders"
             className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-brand-500 transition shadow-theme-xs flex items-center gap-3 cursor-pointer"
           >
             <div className="w-9 h-9 rounded-lg bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-blue-light-400 flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 01-1.581.814L10 14.197l-4.419 2.617A1 1 0 014 16V4zm2 2v8.528l3.419-2.025a1 1 0 011.162 0L14 14.528V6H6z" clipRule="evenodd" />
               </svg>
             </div>
             <div className="min-w-0">
               <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white truncate">
-                Order Refill
+                My Orders
               </h3>
               <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
-                Doorstep delivery
+                Track deliveries &amp; history
               </p>
             </div>
           </Link>
@@ -387,11 +388,22 @@ export default function CustomerDashboardPage() {
             {chartTab === "consumption" ? (
               <Chart options={barOptions} series={barSeries} type="bar" height={200} />
             ) : (
-              <div className="flex flex-col items-center">
-                <Chart options={radialOptions} series={radialSeries} type="radialBar" height={220} />
-                <div className="w-full pt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800">
-                  <span>Paid: GH₵ {(paidMonths * 200).toFixed(2)}</span>
-                  <span>Remaining: GH₵ {((totalMonths - paidMonths) * 200).toFixed(2)}</span>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <div className="relative size-32 rounded-2xl overflow-hidden bg-sky-50 dark:bg-gray-800/60 p-2 shrink-0 border border-gray-100 dark:border-gray-800">
+                  <Image
+                    src="/images/product/fnet-smart-dispenser.jpg"
+                    alt="Smart Digital Dispenser"
+                    fill
+                    sizes="128px"
+                    className="object-contain p-1"
+                  />
+                </div>
+                <div className="flex flex-col items-center flex-1 w-full max-w-sm">
+                  <Chart options={radialOptions} series={radialSeries} type="radialBar" height={220} />
+                  <div className="w-full pt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800">
+                    <span>Paid: GH₵ {(paidMonths * 200).toFixed(2)}</span>
+                    <span>Remaining: GH₵ {((totalMonths - paidMonths) * 200).toFixed(2)}</span>
+                  </div>
                 </div>
               </div>
             )}

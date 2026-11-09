@@ -6,6 +6,7 @@ import { SidebarProvider, useSidebar } from "@/context/SidebarContext";
 import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
 import Backdrop from "./Backdrop";
+import MobileDock from "./MobileDock";
 import type { RoleType } from "@/types/next-auth";
 
 interface AppLayoutProps {
@@ -36,10 +37,13 @@ const LayoutContent: React.FC<{
         } ${isMobileOpen ? "ml-0" : ""}`}
       >
         <AppHeader />
-        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto pb-24 lg:pb-8">
           {children}
         </main>
       </div>
+
+      {/* Floating Mobile Dock for Task Navigation */}
+      <MobileDock role={activeRole} />
     </div>
   );
 };

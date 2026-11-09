@@ -168,9 +168,12 @@ export default function DeliveriesManagementView({
             <span>{feedback.text}</span>
             <button
               onClick={() => setFeedback(null)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-0.5 rounded-lg"
+              aria-label="Dismiss feedback"
             >
-              &times;
+              <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
             </button>
           </div>
         )}
@@ -201,7 +204,7 @@ export default function DeliveriesManagementView({
             <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
               {pendingCount} Orders
             </div>
-            <span className="text-[11px] text-gray-400">Needs driver assign</span>
+            <span className="text-[11px] text-gray-400">Awaiting driver assignment</span>
           </div>
 
           <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
@@ -419,7 +422,7 @@ export default function DeliveriesManagementView({
                             {drv.name}
                           </div>
                           <div className="text-[11px] text-gray-500 dark:text-gray-400">
-                            {drv.vanNumber} &bull; {drv.licensePlate} &bull; {drv.phone}
+                            {drv.vanNumber} • {drv.licensePlate} • {drv.phone}
                           </div>
                         </div>
                       </div>

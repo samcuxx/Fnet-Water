@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/badge/Badge";
 import Alert from "@/components/ui/alert/Alert";
@@ -30,8 +31,6 @@ export default function CustomerDispenserPage() {
 
   // Payment Form State
   const [payAmount, setPayAmount] = useState("150");
-  const [payNetwork, setPayNetwork] = useState<"MTN" | "TELECEL" | "AT">("MTN");
-  const [payPhone, setPayPhone] = useState("0241000005");
   const [isPaying, setIsPaying] = useState(false);
   const [payError, setPayError] = useState("");
   const [paySuccessMessage, setPaySuccessMessage] = useState("");
@@ -46,7 +45,7 @@ export default function CustomerDispenserPage() {
 
   // Apply State
   const [selectedModel, setSelectedModel] = useState("Aquamaster Pro Hot/Cold");
-  const [applyAddress, setApplyAddress] = useState("East Legon, Accra");
+  const [applyAddress, setApplyAddress] = useState("East Legon");
   const [isApplying, setIsApplying] = useState(false);
   const [applyError, setApplyError] = useState("");
 
@@ -71,7 +70,7 @@ export default function CustomerDispenserPage() {
     loadData();
   }, [loadData]);
 
-  // Handle Monthly Installment Payment
+  // Handle Monthly Installment Payment via Paystack
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     setPayError("");
@@ -80,31 +79,34 @@ export default function CustomerDispenserPage() {
       setPayError("Please enter a valid amount greater than GH₵ 0.00");
       return;
     }
+    if (plan && amt > plan.outstandingBalance) {
+      setPayError(`Amount cannot exceed outstanding balance of GH₵ ${plan.outstandingBalance.toFixed(2)}`);
+      return;
+    }
 
     setIsPaying(true);
     try {
-      const res = await fetch("/api/customer/dispenser/pay", {
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      const res = await fetch("/api/payments/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: amt,
-          paymentMethod: "MOBILE_MONEY",
-          momoNetwork: payNetwork,
-          momoPhone: payPhone,
+          type: "DISPENSER_INSTALLMENT",
+          planId: plan?.id,
+          callbackUrl: `${origin}/customer/payment-callback`,
         }),
       });
 
       const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Payment failed.");
+      if (!res.ok || !data.success || !data.authorizationUrl) {
+        throw new Error(data.error || "Failed to initialize payment gateway.");
       }
 
-      setPaySuccessMessage(data.message);
-      setIsPayModalOpen(false);
-      await loadData();
+      // Redirect directly to official Paystack checkout
+      window.location.href = data.authorizationUrl;
     } catch (err) {
-      setPayError(err instanceof Error ? err.message : "Error processing payment.");
-    } finally {
+      setPayError(err instanceof Error ? err.message : "Error connecting to payment provider.");
       setIsPaying(false);
     }
   };
@@ -528,7 +530,7 @@ export default function CustomerDispenserPage() {
               {catalog.map((mod) => (
                 <div
                   key={mod.id}
-                  className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-theme-xs flex flex-col justify-between"
+                  className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-theme-xs flex flex-col justify-between group hover:shadow-lg transition-all"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -540,11 +542,22 @@ export default function CustomerDispenserPage() {
                       </span>
                     </div>
 
+                    {/* Dispenser Product Photo */}
+                    <div className="relative w-full h-44 rounded-xl overflow-hidden bg-sky-50 dark:bg-gray-800/60 my-2 flex items-center justify-center border border-gray-100 dark:border-gray-800">
+                      <Image
+                        src="/images/product/fnet-smart-dispenser.jpg"
+                        alt={mod.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                      <h3 className="text-base font-bold text-gray-900 dark:text-white">
                         {mod.name}
                       </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
                         {mod.tagline}
                       </p>
                     </div>
@@ -557,7 +570,7 @@ export default function CustomerDispenserPage() {
                       <div className="flex justify-between">
                         <span className="text-gray-500">Monthly Payment:</span>
                         <span className="font-bold text-brand-600 dark:text-blue-light-400">
-                          GH₵ {mod.monthlyDue.toFixed(2)} &times; {mod.installmentsCount} mos
+                          GH₵ {mod.monthlyDue.toFixed(2)} × {mod.installmentsCount} mos
                         </span>
                       </div>
                     </div>
@@ -631,30 +644,30 @@ export default function CustomerDispenserPage() {
               </span>
             </div>
 
-            <div>
-              <Label htmlFor="pay-network">Mobile Money Network</Label>
-              <Select
-                id="pay-network"
-                options={[
-                  { value: "MTN", label: "MTN Mobile Money" },
-                  { value: "TELECEL", label: "Telecel Cash" },
-                  { value: "AT", label: "AT Money" },
-                ]}
-                value={payNetwork}
-                onChange={(val) => setPayNetwork(val as "MTN" | "TELECEL" | "AT")}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="pay-phone">Phone Number</Label>
-              <Input
-                id="pay-phone"
-                type="tel"
-                value={payPhone}
-                onChange={(e) => setPayPhone(e.target.value)}
-                placeholder="024XXXXXXX"
-                required
-              />
+            <div className="p-3.5 rounded-xl bg-blue-50/60 dark:bg-brand-950/30 border border-blue-200/60 dark:border-brand-800 text-xs space-y-2">
+              <div className="flex items-center gap-1.5 font-bold text-gray-900 dark:text-white">
+                <svg className="size-4 text-brand-600 dark:text-blue-light-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <span>Secure Online Payment</span>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                You will be redirected to the secure payment portal to complete this installment using Mobile Money, Card, or Bank Transfer.
+              </p>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300">
+                  MTN MoMo
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-rose-100 dark:bg-rose-950/50 text-rose-800 dark:text-rose-300">
+                  Telecel Cash
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-100 dark:bg-blue-950/50 text-blue-800 dark:text-blue-300">
+                  AT Money
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-purple-100 dark:bg-purple-950/50 text-purple-800 dark:text-purple-300">
+                  Card (Visa / Mastercard)
+                </span>
+              </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
@@ -670,7 +683,7 @@ export default function CustomerDispenserPage() {
                 disabled={isPaying}
                 className="px-4 py-2 text-xs font-semibold rounded-lg text-white bg-brand-500 hover:bg-brand-600 transition shadow-theme-xs disabled:opacity-50 cursor-pointer"
               >
-                {isPaying ? "Processing..." : `Pay GH₵ ${parseFloat(payAmount || "0").toFixed(2)}`}
+                {isPaying ? "Connecting..." : `Proceed to Pay GH₵ ${parseFloat(payAmount || "0").toFixed(2)}`}
               </button>
             </div>
           </form>
@@ -784,7 +797,7 @@ export default function CustomerDispenserPage() {
                 type="text"
                 value={applyAddress}
                 onChange={(e) => setApplyAddress(e.target.value)}
-                placeholder="e.g. Near East Legon Police Station, Accra"
+                placeholder="Enter street name, house number or landmark"
                 required
               />
             </div>

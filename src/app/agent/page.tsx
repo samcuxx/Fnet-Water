@@ -147,7 +147,7 @@ export default function AgentDashboardPage() {
                     {referee.customer}
                   </div>
                   <div className="text-gray-500 dark:text-gray-400 mt-0.5">
-                    {referee.refills} refills purchased &bull; Last order: {referee.lastOrder}
+                    {referee.refills} refills purchased • Last order: {referee.lastOrder}
                   </div>
                 </div>
                 <div className="text-right">

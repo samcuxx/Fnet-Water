@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { createCustomerOrder, getCustomerOrders, getAllOrders } from "@/lib/order-store";
 import { getCustomerAddresses } from "@/lib/customer-store";
 import { getUserById } from "@/lib/auth-store";
+import { recordTransaction, PaymentChannel } from "@/lib/transaction-store";
 
 export async function GET() {
   try {
@@ -106,8 +107,32 @@ export async function POST(request: Request) {
       hasEmptyBottleExchange: Boolean(hasEmptyBottleExchange),
       redeemFreeRefill: Boolean(redeemFreeRefill),
       paymentMethod,
+      paymentStatus: "UNPAID",
       items: validItems,
     });
+
+    // 4. Record transaction in financial ledger (Only for Cash on Delivery or Free Orders)
+    // Online Paystack payments record their own pending transaction in /api/payments/initialize
+    if (paymentMethod === "CASH_ON_DELIVERY" || order.totalAmount === 0) {
+      await recordTransaction({
+        reference: order.paymentReference || `FNW-TX-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        customerProfileId: userId,
+        customerName: order.customerName,
+        customerPhone: order.customerPhone,
+        amount: order.totalAmount,
+        currency: "GHS",
+        channel: "CASH_ON_DELIVERY",
+        type: "WATER_ORDER",
+        status: order.totalAmount === 0 ? "PAID" : "UNPAID",
+        metadata: {
+          address: order.deliveryAddressText,
+          digitalAddress: order.deliveryDigitalAddress,
+          itemsCount: order.items.length,
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,

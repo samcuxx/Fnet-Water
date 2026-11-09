@@ -294,7 +294,7 @@ export async function createCustomerAddress(
   }
 ): Promise<StoredAddress> {
   const formattedDigital = formatGhanaDigitalAddress(data.digitalAddress);
-  const id = `addr_${Date.now()}`;
+  const id = `addr_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
 
   // If this address is set as default, mark existing addresses as non-default
   if (data.isDefault) {

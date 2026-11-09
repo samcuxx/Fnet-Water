@@ -39,7 +39,12 @@ export default function EcommerceMetrics() {
             </h4>
           </div>
           <Badge color="success" size="sm">
-            <span className="text-xs font-semibold">&uarr; 11.01%</span>
+            <span className="inline-flex items-center gap-1 text-xs font-semibold">
+              <svg className="size-3" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 17a.75.75 0 01-.75-.75V5.612L5.29 9.77a.75.75 0 01-1.08-1.04l5.25-5.5a.75.75 0 011.08 0l5.25 5.5a.75.75 0 11-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0110 17z" clipRule="evenodd" />
+              </svg>
+              11.01%
+            </span>
           </Badge>
         </div>
       </Link>
@@ -76,7 +81,12 @@ export default function EcommerceMetrics() {
           </div>
 
           <Badge color="success" size="sm">
-            <span className="text-xs font-semibold">&uarr; 9.40%</span>
+            <span className="inline-flex items-center gap-1 text-xs font-semibold">
+              <svg className="size-3" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 17a.75.75 0 01-.75-.75V5.612L5.29 9.77a.75.75 0 01-1.08-1.04l5.25-5.5a.75.75 0 011.08 0l5.25 5.5a.75.75 0 11-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0110 17z" clipRule="evenodd" />
+              </svg>
+              9.40%
+            </span>
           </Badge>
         </div>
       </Link>
@@ -115,7 +125,12 @@ export default function EcommerceMetrics() {
           </div>
 
           <Badge color="primary" size="sm">
-            <span className="text-xs font-semibold">&uarr; 14.2%</span>
+            <span className="inline-flex items-center gap-1 text-xs font-semibold">
+              <svg className="size-3" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 17a.75.75 0 01-.75-.75V5.612L5.29 9.77a.75.75 0 01-1.08-1.04l5.25-5.5a.75.75 0 011.08 0l5.25 5.5a.75.75 0 11-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0110 17z" clipRule="evenodd" />
+              </svg>
+              14.2%
+            </span>
           </Badge>
         </div>
       </Link>
@@ -151,7 +166,12 @@ export default function EcommerceMetrics() {
           </div>
 
           <Badge color="success" size="sm">
-            <span className="text-xs font-semibold">&uarr; 18.5%</span>
+            <span className="inline-flex items-center gap-1 text-xs font-semibold">
+              <svg className="size-3" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 17a.75.75 0 01-.75-.75V5.612L5.29 9.77a.75.75 0 01-1.08-1.04l5.25-5.5a.75.75 0 011.08 0l5.25 5.5a.75.75 0 11-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0110 17z" clipRule="evenodd" />
+              </svg>
+              18.5%
+            </span>
           </Badge>
         </div>
       </Link>

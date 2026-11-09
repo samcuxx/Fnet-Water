@@ -106,7 +106,7 @@ export async function POST(request: Request) {
       phone: normalizedPhone,
       password,
       role: "CUSTOMER",
-      deliveryArea: deliveryArea?.trim() || "Greater Accra",
+      deliveryArea: deliveryArea?.trim() || "Assigned Area",
       dispenserPlan: dispenserPlan?.trim() || "None (Refill Only)",
       bottlesHeld: 0,
     });

@@ -233,7 +233,7 @@ const memoryAuditLogs: InventoryAuditLog[] = [
   },
 ];
 
-function calculateCirculation(data: {
+export function calculateCirculation(data: {
   filledWarehouse: number;
   emptyWarehouse: number;
   withCustomers: number;

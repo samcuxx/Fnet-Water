@@ -6,6 +6,7 @@ import Badge from "@/components/ui/badge/Badge";
 import Input from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
 import { Modal } from "@/components/ui/Modal";
+import OrderReceipt from "@/components/invoice/OrderReceipt";
 import type { StoredOrder, OrderStatus } from "@/lib/order-store";
 
 export default function AdminOrdersPage() {
@@ -14,6 +15,8 @@ export default function AdminOrdersPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [selectedOrder, setSelectedOrder] = useState<StoredOrder | null>(null);
+  const [invoiceOrder, setInvoiceOrder] = useState<StoredOrder | null>(null);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   const loadOrders = useCallback(async () => {
     setIsLoading(true);
@@ -253,7 +256,7 @@ export default function AdminOrdersPage() {
                           {it.productName}
                         </span>
                         <span className="text-[11px] text-gray-400">
-                          Qty: {it.quantity} &times; GH₵ {it.unitPrice.toFixed(2)}
+                          Qty: {it.quantity} × GH₵ {it.unitPrice.toFixed(2)}
                         </span>
                       </div>
                       <span className="font-bold text-gray-900 dark:text-white">
@@ -292,16 +295,43 @@ export default function AdminOrdersPage() {
                 </div>
               </div>
 
-              <div className="flex justify-end pt-2">
+              <div className="flex justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInvoiceOrder(selectedOrder);
+                    setIsInvoiceModalOpen(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer"
+                >
+                  <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                  </svg>
+                  <span>Tax Invoice</span>
+                </button>
                 <button
                   type="button"
                   onClick={() => setSelectedOrder(null)}
-                  className="px-4 py-2 text-xs font-semibold rounded-lg text-white bg-brand-500 hover:bg-brand-600 transition shadow-theme-xs cursor-pointer"
+                  className="px-4 py-1.5 text-xs font-semibold rounded-lg text-white bg-brand-500 hover:bg-brand-600 transition shadow-theme-xs cursor-pointer"
                 >
                   Close
                 </button>
               </div>
             </div>
+          )}
+        </Modal>
+
+        {/* Modal: Official Tax Invoice */}
+        <Modal
+          isOpen={isInvoiceModalOpen}
+          onClose={() => setIsInvoiceModalOpen(false)}
+          className="max-w-3xl"
+        >
+          {invoiceOrder && (
+            <OrderReceipt
+              order={invoiceOrder}
+              onClose={() => setIsInvoiceModalOpen(false)}
+            />
           )}
         </Modal>
       </div>

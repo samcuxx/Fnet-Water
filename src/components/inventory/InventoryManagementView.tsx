@@ -306,7 +306,7 @@ export default function InventoryManagementView({
             <div className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
               {bottles?.withCustomers ?? 1200}
             </div>
-            <span className="text-[11px] text-gray-400">Circulating across Accra</span>
+            <span className="text-[11px] text-gray-400">Circulating with customers</span>
           </div>
 
           {/* Card 4: Available Dispensers */}

@@ -107,7 +107,7 @@ export default function RecentOrders() {
                     {ord.name}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">
-                    {ord.id} &bull; {ord.details}
+                    {ord.id} • {ord.details}
                   </div>
                 </TableCell>
                 <TableCell className="py-3.5 px-3">

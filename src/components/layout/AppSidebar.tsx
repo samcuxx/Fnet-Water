@@ -118,19 +118,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
           </svg>
         ),
       },
-      {
-        name: "My Profile",
-        href: "/profile",
-        icon: (
-          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fillRule="evenodd"
-              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-              clipRule="evenodd"
-            />
-          </svg>
-        ),
-      },
     ],
     MANAGER: [
       {
@@ -170,19 +157,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
           </svg>
         ),
       },
-      {
-        name: "My Profile",
-        href: "/profile",
-        icon: (
-          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fillRule="evenodd"
-              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-              clipRule="evenodd"
-            />
-          </svg>
-        ),
-      },
     ],
     DRIVER: [
       {
@@ -195,19 +169,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
           </svg>
         ),
       },
-      {
-        name: "My Profile",
-        href: "/profile",
-        icon: (
-          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fillRule="evenodd"
-              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-              clipRule="evenodd"
-            />
-          </svg>
-        ),
-      },
     ],
     AGENT: [
       {
@@ -216,19 +177,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
         icon: (
           <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-          </svg>
-        ),
-      },
-      {
-        name: "My Profile",
-        href: "/profile",
-        icon: (
-          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fillRule="evenodd"
-              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-              clipRule="evenodd"
-            />
           </svg>
         ),
       },
@@ -281,19 +229,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
         icon: (
           <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.993.883L4 8v8a2 2 0 001.85 1.995L6 18h8a2 2 0 001.995-1.85L16 16V8a1 1 0 00-.883-.993L15 7h-1V6a4 4 0 00-4-4zm0 2a2 2 0 012 2v1H8V6a2 2 0 012-2z" />
-          </svg>
-        ),
-      },
-      {
-        name: "My Profile",
-        href: "/profile",
-        icon: (
-          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fillRule="evenodd"
-              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-              clipRule="evenodd"
-            />
           </svg>
         ),
       },

@@ -68,7 +68,7 @@ export default function DeliveryVehicle() {
           >
             <div className="flex items-center justify-between">
               <div className="font-semibold text-gray-900 dark:text-white">
-                {v.name} &bull;{" "}
+                {v.name} •{" "}
                 <span className="font-mono text-gray-500">{v.plate}</span>
               </div>
               <Badge
@@ -81,7 +81,7 @@ export default function DeliveryVehicle() {
 
             <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-gray-600 dark:text-gray-400">
               <div>
-                Driver: <strong className="text-gray-800 dark:text-gray-200">{v.driver}</strong> &bull; {v.route}
+                Driver: <strong className="text-gray-800 dark:text-gray-200">{v.driver}</strong> • {v.route}
               </div>
               <div className="font-medium text-brand-600 dark:text-blue-light-400">
                 {v.capacity}

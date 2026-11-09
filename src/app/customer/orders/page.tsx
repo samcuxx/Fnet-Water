@@ -5,6 +5,7 @@ import Link from "next/link";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import OrderReceipt from "@/components/invoice/OrderReceipt";
 import type { StoredOrder, OrderStatus } from "@/lib/order-store";
 
 export default function CustomerOrdersPage() {
@@ -14,6 +15,8 @@ export default function CustomerOrdersPage() {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [selectedOrder, setSelectedOrder] = useState<StoredOrder | null>(null);
   const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
+  const [receiptOrder, setReceiptOrder] = useState<StoredOrder | null>(null);
+  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
 
   const loadOrders = useCallback(async () => {
     try {
@@ -163,7 +166,7 @@ export default function CustomerOrdersPage() {
                     <span className="font-mono text-sm font-bold text-gray-900 dark:text-white">
                       {ord.orderNumber}
                     </span>
-                    <span className="text-xs text-gray-400">&bull;</span>
+                    <span className="text-xs text-gray-400">•</span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                       {new Date(ord.createdAt).toLocaleDateString("en-GB", {
                         day: "numeric",
@@ -190,7 +193,7 @@ export default function CustomerOrdersPage() {
                     <div className="space-y-1">
                       {ord.items.map((it) => (
                         <div key={it.id} className="text-gray-800 dark:text-gray-200 font-medium">
-                          {it.productName} &times; {it.quantity}
+                          {it.productName} × {it.quantity}
                         </div>
                       ))}
                     </div>
@@ -204,7 +207,7 @@ export default function CustomerOrdersPage() {
                       {ord.deliveryAddressText}
                     </div>
                     <div className="font-mono text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
-                      GPS: {ord.deliveryDigitalAddress} &bull; {ord.deliverySlot}
+                      GPS: {ord.deliveryDigitalAddress} • {ord.deliverySlot}
                     </div>
                   </div>
                 </div>
@@ -215,14 +218,32 @@ export default function CustomerOrdersPage() {
                     {ord.hasEmptyBottleExchange ? "Empty Bottles Exchanged" : "Bottle Deposit Paid"}
                   </span>
 
-                  <button
-                    type="button"
-                    onClick={() => openTracking(ord)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-600 dark:text-blue-light-400 bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 dark:hover:bg-brand-900/60 transition cursor-pointer"
-                  >
-                    <span>Track Delivery</span>
-                    <span>&rarr;</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReceiptOrder(ord);
+                        setIsReceiptModalOpen(true);
+                      }}
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition cursor-pointer"
+                    >
+                      <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                      </svg>
+                      <span>Receipt</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => openTracking(ord)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-600 dark:text-blue-light-400 bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 dark:hover:bg-brand-900/60 transition cursor-pointer"
+                    >
+                      <span>Track Delivery</span>
+                      <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -233,7 +254,7 @@ export default function CustomerOrdersPage() {
         <Modal
           isOpen={isTrackingModalOpen}
           onClose={() => setIsTrackingModalOpen(false)}
-          title={`Delivery Tracking — ${selectedOrder?.orderNumber}`}
+          title={`Delivery Tracking: ${selectedOrder?.orderNumber}`}
         >
           {selectedOrder && (
             <div className="space-y-4">
@@ -366,6 +387,20 @@ export default function CustomerOrdersPage() {
                 </button>
               </div>
             </div>
+          )}
+        </Modal>
+
+        {/* Modal: Official Tax Invoice & Receipt */}
+        <Modal
+          isOpen={isReceiptModalOpen}
+          onClose={() => setIsReceiptModalOpen(false)}
+          className="max-w-3xl"
+        >
+          {receiptOrder && (
+            <OrderReceipt
+              order={receiptOrder}
+              onClose={() => setIsReceiptModalOpen(false)}
+            />
           )}
         </Modal>
       </div>
