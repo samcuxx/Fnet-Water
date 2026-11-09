@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
 import type { ApexOptions } from "apexcharts";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -21,6 +22,15 @@ export default function BottleDistributionChart({
   damaged,
   lost,
 }: BottleDistributionChartProps) {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === "dark";
+
   const series = [
     {
       name: "Bottles Count",
@@ -57,7 +67,7 @@ export default function BottleDistributionChart({
       style: {
         fontSize: "12px",
         fontWeight: "700",
-        colors: ["#374151"],
+        colors: [isDark ? "#F9FAFB" : "#374151"],
       },
       formatter: (val) => `${val}`,
     },
@@ -76,7 +86,7 @@ export default function BottleDistributionChart({
       axisBorder: { show: false },
       labels: {
         style: {
-          colors: "#6B7280",
+          colors: isDark ? "#9CA3AF" : "#6B7280",
           fontSize: "11px",
         },
       },
@@ -84,13 +94,13 @@ export default function BottleDistributionChart({
     yaxis: {
       labels: {
         style: {
-          colors: "#6B7280",
+          colors: isDark ? "#9CA3AF" : "#6B7280",
           fontSize: "11px",
         },
       },
     },
     grid: {
-      borderColor: "#E5E7EB",
+      borderColor: isDark ? "#1F2937" : "#E5E7EB",
       strokeDashArray: 4,
     },
     tooltip: {

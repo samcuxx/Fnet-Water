@@ -72,7 +72,7 @@ export default function DriverDashboardPage() {
     }
   };
 
-  // Open Handover / Bottle Exchange Modal
+  // Open Delivery Details & Bottle Exchange Modal
   const openExchangeModal = (stop: DeliveryStop) => {
     setActiveStop(stop);
     setFilledDelivered(stop.bottlesDelivering);
@@ -83,7 +83,7 @@ export default function DriverDashboardPage() {
     setIsExchangeModalOpen(true);
   };
 
-  // Submit Point-of-Delivery Handover
+  // Submit Point-of-Delivery Confirmation
   const handleSubmitExchange = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeStop) return;
@@ -387,9 +387,12 @@ export default function DriverDashboardPage() {
                     <button
                       type="button"
                       onClick={() => setFilledDelivered(Math.max(0, filledDelivered - 1))}
-                      className="size-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-white font-bold cursor-pointer"
+                      aria-label="Decrease bottles delivered"
+                      className="size-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-white font-bold flex items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
                     >
-                      -
+                      <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4 10a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H4.75A.75.75 0 014 10z" clipRule="evenodd" />
+                      </svg>
                     </button>
                     <span className="text-base font-bold text-brand-600 dark:text-blue-light-400">
                       {filledDelivered}
@@ -397,9 +400,12 @@ export default function DriverDashboardPage() {
                     <button
                       type="button"
                       onClick={() => setFilledDelivered(filledDelivered + 1)}
-                      className="size-8 rounded-lg bg-brand-500 text-white font-bold cursor-pointer"
+                      aria-label="Increase bottles delivered"
+                      className="size-8 rounded-lg bg-brand-500 text-white font-bold flex items-center justify-center cursor-pointer hover:bg-brand-600"
                     >
-                      +
+                      <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -413,9 +419,12 @@ export default function DriverDashboardPage() {
                     <button
                       type="button"
                       onClick={() => setEmptyCollected(Math.max(0, emptyCollected - 1))}
-                      className="size-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-white font-bold cursor-pointer"
+                      aria-label="Decrease empty bottles collected"
+                      className="size-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-white font-bold flex items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
                     >
-                      -
+                      <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4 10a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H4.75A.75.75 0 014 10z" clipRule="evenodd" />
+                      </svg>
                     </button>
                     <span className="text-base font-bold text-emerald-600 dark:text-emerald-400">
                       {emptyCollected}
@@ -423,9 +432,12 @@ export default function DriverDashboardPage() {
                     <button
                       type="button"
                       onClick={() => setEmptyCollected(emptyCollected + 1)}
-                      className="size-8 rounded-lg bg-emerald-600 text-white font-bold cursor-pointer"
+                      aria-label="Increase empty bottles collected"
+                      className="size-8 rounded-lg bg-emerald-600 text-white font-bold flex items-center justify-center cursor-pointer hover:bg-emerald-700"
                     >
-                      +
+                      <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -443,9 +455,12 @@ export default function DriverDashboardPage() {
                   <button
                     type="button"
                     onClick={() => setDamagedCount(Math.max(0, damagedCount - 1))}
-                    className="size-7 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-white font-bold cursor-pointer"
+                    aria-label="Decrease damaged bottles"
+                    className="size-7 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-white font-bold flex items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
                   >
-                    -
+                    <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4 10a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H4.75A.75.75 0 014 10z" clipRule="evenodd" />
+                    </svg>
                   </button>
                   <span className="w-5 text-center text-xs font-bold text-red-600">
                     {damagedCount}
@@ -453,9 +468,12 @@ export default function DriverDashboardPage() {
                   <button
                     type="button"
                     onClick={() => setDamagedCount(damagedCount + 1)}
-                    className="size-7 rounded-lg bg-red-600 text-white font-bold cursor-pointer"
+                    aria-label="Increase damaged bottles"
+                    className="size-7 rounded-lg bg-red-600 text-white font-bold flex items-center justify-center cursor-pointer hover:bg-red-700"
                   >
-                    +
+                    <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                    </svg>
                   </button>
                 </div>
               </div>

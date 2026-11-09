@@ -24,15 +24,18 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Grid Structure: Executive Dashboard Layout */}
+        {/* Grid Structure: Executive Dashboard Archetype (Ecommerce.tsx) */}
         <div className="grid grid-cols-12 gap-4 md:gap-6">
-          {/* Left Column: 4 KPI Metrics + Monthly 19L Sales Bar Chart (7 cols) */}
-          <div className="col-span-12 space-y-6 xl:col-span-7">
+          {/* Top Row: 4 KPI Metrics Cards (12 cols) */}
+          <div className="col-span-12">
             <EcommerceMetrics />
+          </div>
+
+          {/* Middle Row (7 / 5 Column Split): Bar Chart (7 cols) & Radial Gauge (5 cols) */}
+          <div className="col-span-12 xl:col-span-7">
             <MonthlySalesChart />
           </div>
 
-          {/* Right Column: Monthly Target RadialBar Gauge (5 cols) */}
           <div className="col-span-12 xl:col-span-5">
             <MonthlyTarget />
           </div>

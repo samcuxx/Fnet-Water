@@ -15,9 +15,9 @@ export default function HomePage() {
   const monthlyCost = monthlyBottles * refillPrice;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 selection:bg-sky-500 selection:text-white">
+    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       {/* 1. TOP NAVIGATION */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/90 dark:bg-gray-950/90 border-b border-gray-100 dark:border-gray-800 transition-colors">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/90 dark:bg-gray-950/90 border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Logo size="md" />
@@ -56,22 +56,18 @@ export default function HomePage() {
       </header>
 
       {/* 2. HERO SECTION */}
-      <section className="relative overflow-hidden pt-10 pb-16 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28">
+      <section className="relative overflow-hidden pt-12 pb-16 sm:pt-20 sm:pb-24 lg:pt-24 lg:pb-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            {/* Left Column: Clear, Punchy Copy */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+            {/* Left Column */}
             <div className="lg:col-span-7 flex flex-col justify-center text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-brand-600 dark:text-sky-300 text-xs font-semibold w-fit mb-4">
-                <span className="size-2 rounded-full bg-sky-500 animate-pulse" />
-                Pure Mineral Water • Fast Doorstep Delivery
-              </div>
-
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-gray-900 dark:text-white leading-[1.12]">
-                Pure Water Delivered to Your Door
+                Pure Water Delivered{" "}
+                <span className="text-brand-500 dark:text-blue-light-400">to Your Door</span>
               </h1>
 
-              <p className="mt-4 text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-xl leading-relaxed">
-                Order 19L refills, return empty bottles with zero deposit fee, and manage smart dispensers with ease.
+              <p className="mt-5 text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-xl leading-relaxed">
+                Order 19L refills, return empty bottles with zero deposit fee, and manage smart dispensers from your phone.
               </p>
 
               {/* Action Buttons */}
@@ -95,59 +91,41 @@ export default function HomePage() {
                 </a>
               </div>
 
-              {/* 3 Simple Value Points */}
-              <div className="mt-10 pt-6 border-t border-gray-200 dark:border-gray-800 grid grid-cols-3 gap-4 text-left">
-                <div>
-                  <div className="text-xl sm:text-2xl font-bold text-brand-600 dark:text-blue-light-400">GH₵ 25</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Per 19L refill</div>
+              {/* Value Points */}
+              <div className="mt-10 flex flex-wrap items-center gap-6 sm:gap-8 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center gap-2">
+                  <svg className="size-4 text-brand-500 dark:text-blue-light-400 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                  </svg>
+                  <span>GH₵ 25 per 19L refill</span>
                 </div>
-                <div>
-                  <div className="text-xl sm:text-2xl font-bold text-brand-600 dark:text-blue-light-400">Zero Fee</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">When returning empties</div>
+                <div className="flex items-center gap-2">
+                  <svg className="size-4 text-brand-500 dark:text-blue-light-400 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                  </svg>
+                  <span>Zero fee on empty returns</span>
                 </div>
-                <div>
-                  <div className="text-xl sm:text-2xl font-bold text-brand-600 dark:text-blue-light-400">100% Pure</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Reverse osmosis certified</div>
+                <div className="flex items-center gap-2">
+                  <svg className="size-4 text-brand-500 dark:text-blue-light-400 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                  </svg>
+                  <span>100% pure, certified</span>
                 </div>
               </div>
             </div>
 
-            {/* Right Column: Clean, Perfectly Sized Hero Visual */}
+            {/* Right Column: Hero Visual */}
             <div className="lg:col-span-5 relative">
               <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-                <div className="relative rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800 bg-sky-50/50 dark:bg-gray-900 aspect-4/3 flex items-center justify-center p-6">
+                <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-sky-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 aspect-[4/5] sm:aspect-[3/4]">
                   <Image
                     src="/images/product/fnet-18l-bottle.jpg"
                     alt="F Net 18.9L Water Refill Jug"
                     fill
                     priority
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-contain p-4"
+                    sizes="(max-width: 768px) 100vw, 40vw"
+                    className="object-cover"
                   />
-                  <div className="absolute top-4 left-4 bg-brand-500 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-sm">
-                    18.9L Pure Refill
-                  </div>
-                </div>
-
-                {/* Satellite Card: Live Delivery Tracker */}
-                <div className="mt-4 p-3.5 rounded-2xl bg-white dark:bg-gray-900 shadow-md border border-gray-200 dark:border-gray-800 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center size-9 rounded-xl bg-sky-100 dark:bg-sky-950 text-brand-600 dark:text-sky-400 shrink-0">
-                      <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-                        <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-gray-900 dark:text-white">
-                        Delivery Van Dispatched
-                      </div>
-                      <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-                        On route to your destination
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-xs font-semibold text-gray-400 font-mono">Today</span>
                 </div>
               </div>
             </div>
@@ -169,9 +147,9 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {/* PRODUCT 1: 18.9L Refill */}
-            <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between">
               <div>
-                <div className="relative w-full h-52 rounded-2xl overflow-hidden bg-sky-50/50 dark:bg-gray-800/40 mb-4 flex items-center justify-center border border-gray-100 dark:border-gray-800">
+                <div className="relative w-full h-52 rounded-2xl overflow-hidden bg-gray-50 dark:bg-gray-800/40 mb-4 flex items-center justify-center">
                   <Image
                     src="/images/product/fnet-18l-bottle.jpg"
                     alt="18.9L Refill Bottle"
@@ -205,9 +183,9 @@ export default function HomePage() {
             </div>
 
             {/* PRODUCT 2: Smart Dispenser */}
-            <div id="dispensers" className="bg-white dark:bg-gray-900 rounded-3xl p-6 border-2 border-brand-500/30 dark:border-brand-500/40 shadow-sm flex flex-col justify-between">
+            <div id="dispensers" className="bg-white dark:bg-gray-900 rounded-2xl p-6 border-2 border-brand-500/30 dark:border-brand-500/40 shadow-sm flex flex-col justify-between">
               <div>
-                <div className="relative w-full h-52 rounded-2xl overflow-hidden bg-sky-50/50 dark:bg-gray-800/40 mb-4 flex items-center justify-center border border-gray-100 dark:border-gray-800">
+                <div className="relative w-full h-52 rounded-2xl overflow-hidden bg-gray-50 dark:bg-gray-800/40 mb-4 flex items-center justify-center">
                   <Image
                     src="/images/product/fnet-smart-dispenser.jpg"
                     alt="Smart Digital Dispenser"
@@ -241,9 +219,9 @@ export default function HomePage() {
             </div>
 
             {/* PRODUCT 3: 24-Pack 500ml */}
-            <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between">
               <div>
-                <div className="relative w-full h-52 rounded-2xl overflow-hidden bg-sky-50/50 dark:bg-gray-800/40 mb-4 flex items-center justify-center border border-gray-100 dark:border-gray-800">
+                <div className="relative w-full h-52 rounded-2xl overflow-hidden bg-gray-50 dark:bg-gray-800/40 mb-4 flex items-center justify-center">
                   <Image
                     src="/images/product/fnet-water-bottles-pack.jpg"
                     alt="24-Pack 500ml Bottled Water"
@@ -279,7 +257,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. HOW IT WORKS (3 NON-TECHNICAL STEPS) */}
+      {/* 4. HOW IT WORKS */}
       <section id="how-it-works" className="py-16 sm:py-20 bg-white dark:bg-gray-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-xl mx-auto mb-12">
@@ -287,15 +265,13 @@ export default function HomePage() {
               How It Works
             </h2>
             <p className="mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              Three simple steps to doorstep hydration.
+              Three simple steps to get water delivered.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-3xl p-6 border border-gray-200 dark:border-gray-800">
-              <div className="size-10 rounded-xl bg-sky-100 dark:bg-sky-950 text-brand-600 dark:text-sky-400 font-bold text-base flex items-center justify-center mb-4">
-                1
-              </div>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800">
+              <div className="text-sm font-bold text-brand-500 dark:text-blue-light-400 mb-3">01</div>
               <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1.5">
                 Order Online
               </h3>
@@ -304,10 +280,8 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-3xl p-6 border border-gray-200 dark:border-gray-800">
-              <div className="size-10 rounded-xl bg-sky-100 dark:bg-sky-950 text-brand-600 dark:text-sky-400 font-bold text-base flex items-center justify-center mb-4">
-                2
-              </div>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800">
+              <div className="text-sm font-bold text-brand-500 dark:text-blue-light-400 mb-3">02</div>
               <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1.5">
                 Doorstep Bottle Exchange
               </h3>
@@ -316,10 +290,8 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-3xl p-6 border border-gray-200 dark:border-gray-800">
-              <div className="size-10 rounded-xl bg-sky-100 dark:bg-sky-950 text-brand-600 dark:text-sky-400 font-bold text-base flex items-center justify-center mb-4">
-                3
-              </div>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800">
+              <div className="text-sm font-bold text-brand-500 dark:text-blue-light-400 mb-3">03</div>
               <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1.5">
                 Pay with Ease
               </h3>
@@ -334,7 +306,7 @@ export default function HomePage() {
       {/* 5. REFILL CALCULATOR */}
       <section id="calculator" className="py-16 sm:py-20 bg-gray-50/60 dark:bg-gray-900/40 border-t border-gray-100 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 sm:p-10 border border-gray-200 dark:border-gray-800 shadow-sm">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 sm:p-10 border border-gray-200 dark:border-gray-800 shadow-sm">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-7">
                 <span className="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-blue-light-400">
@@ -403,7 +375,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-6">
-              <div className="relative w-full h-64 sm:h-80 rounded-3xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-800">
+              <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-800">
                 <Image
                   src="/images/logistics/delivery-van.jpg"
                   alt="F Net Water Delivery Fleet"
@@ -464,7 +436,7 @@ export default function HomePage() {
             <ul className="space-y-1.5">
               <li><Link href="/customer" className="hover:text-white transition">Customer Portal</Link></li>
               <li><Link href="/driver" className="hover:text-white transition">Driver Delivery App</Link></li>
-              <li><Link href="/manager" className="hover:text-white transition">Dispatch &amp; Operations</Link></li>
+              <li><Link href="/manager" className="hover:text-white transition">Dispatch and Operations</Link></li>
               <li><Link href="/admin" className="hover:text-white transition">Admin Overview</Link></li>
             </ul>
           </div>

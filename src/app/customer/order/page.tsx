@@ -279,7 +279,7 @@ export default function OrderWaterPage() {
             </div>
           </div>
         ) : (
-          /* SEAMLESS 1-PAGE CHECKOUT */
+          /* ONE-PAGE CHECKOUT */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* LEFT COLUMN: Products, Address, Payment */}
             <div className="lg:col-span-7 space-y-5">
@@ -329,16 +329,18 @@ export default function OrderWaterPage() {
                               </div>
                             </div>
 
-                            {/* Stepper Buttons */}
+                            {/* Quantity Buttons */}
                             <div className="flex items-center gap-2 shrink-0 bg-gray-50 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700">
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange(prod.id, -1)}
                                 disabled={qty === 0}
                                 aria-label={`Decrease ${prod.name}`}
-                                className="size-7 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-white font-bold flex items-center justify-center disabled:opacity-40 transition shadow-xs cursor-pointer"
+                                className="size-7 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-white font-bold flex items-center justify-center disabled:opacity-40 transition shadow-xs cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                               >
-                                -
+                                <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M4 10a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H4.75A.75.75 0 014 10z" clipRule="evenodd" />
+                                </svg>
                               </button>
                               <span className="w-5 text-center text-xs font-bold text-gray-900 dark:text-white">
                                 {qty}
@@ -349,7 +351,9 @@ export default function OrderWaterPage() {
                                 aria-label={`Increase ${prod.name}`}
                                 className="size-7 rounded-lg bg-brand-500 text-white font-bold flex items-center justify-center hover:bg-brand-600 transition shadow-xs cursor-pointer"
                               >
-                                +
+                                <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                                </svg>
                               </button>
                             </div>
                           </div>

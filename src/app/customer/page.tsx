@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
 import type { ApexOptions } from "apexcharts";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/Badge";
@@ -45,12 +46,20 @@ const RECENT_ORDERS: RecentOrder[] = [
 ];
 
 export default function CustomerDashboardPage() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [profile, setProfile] = useState<StoredCustomerProfile | null>(null);
   const [userName, setUserName] = useState<string>("Ama Osei");
   const [addresses, setAddresses] = useState<StoredAddress[]>([]);
   const [chartTab, setChartTab] = useState<"consumption" | "dispenser">("consumption");
   const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === "dark";
 
   // Load customer profile and addresses
   const loadCustomerData = useCallback(async () => {
@@ -102,18 +111,18 @@ export default function CustomerDashboardPage() {
     dataLabels: { enabled: false },
     xaxis: {
       categories: ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov"],
-      labels: { style: { colors: "#667085", fontSize: "11px" } },
+      labels: { style: { colors: isDark ? "#9CA3AF" : "#667085", fontSize: "11px" } },
       axisBorder: { show: false },
       axisTicks: { show: false },
     },
     yaxis: {
       labels: {
-        style: { colors: "#667085", fontSize: "11px" },
+        style: { colors: isDark ? "#9CA3AF" : "#667085", fontSize: "11px" },
         formatter: (val) => `${val}`,
       },
     },
     grid: {
-      borderColor: "#F2F4F7",
+      borderColor: isDark ? "#1F2937" : "#F2F4F7",
       strokeDashArray: 3,
     },
     tooltip: {
@@ -147,7 +156,7 @@ export default function CustomerDashboardPage() {
         endAngle: 85,
         hollow: { size: "72%" },
         track: {
-          background: "#E4E7EC",
+          background: isDark ? "#1F2937" : "#E4E7EC",
           strokeWidth: "100%",
           margin: 5,
         },
@@ -157,7 +166,7 @@ export default function CustomerDashboardPage() {
             fontSize: "26px",
             fontWeight: "700",
             offsetY: -25,
-            color: "#1D2939",
+            color: isDark ? "#F9FAFB" : "#1D2939",
             formatter: (val) => `${val}%`,
           },
         },
@@ -222,49 +231,46 @@ export default function CustomerDashboardPage() {
 
           <Link
             href="/customer/order"
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs self-start sm:self-auto cursor-pointer"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs self-start sm:self-auto cursor-pointer"
           >
-            <svg className="size-4 fill-current" viewBox="0 0 24 24">
-              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-            </svg>
             Order Water Refill
           </Link>
         </div>
 
         {/* 3-Pill Status Summary Strip */}
-        <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
-          <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs text-center">
+        <div className="grid grid-cols-3 gap-3 sm:gap-4">
+          <div className="p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs text-center">
             <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 block truncate">
               Bottles Held
             </span>
-            <div className="mt-1 text-base sm:text-xl font-bold text-gray-900 dark:text-white">
+            <div className="mt-1.5 text-base sm:text-xl font-bold text-gray-900 dark:text-white">
               {profile?.bottlesHeld ?? 4}
             </div>
-            <span className="text-[10px] sm:text-[11px] text-brand-600 dark:text-blue-light-400 font-medium block truncate">
+            <span className="mt-0.5 text-[10px] sm:text-[11px] text-brand-600 dark:text-blue-light-400 font-medium block truncate">
               Empty bottles ready
             </span>
           </div>
 
-          <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs text-center">
+          <div className="p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs text-center">
             <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 block truncate">
               Free Credits
             </span>
-            <div className="mt-1 text-base sm:text-xl font-bold text-emerald-600 dark:text-emerald-400">
+            <div className="mt-1.5 text-base sm:text-xl font-bold text-emerald-600 dark:text-emerald-400">
               {profile?.freeBottleBalance ?? 1}
             </div>
-            <span className="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 font-medium block truncate">
+            <span className="mt-0.5 text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 font-medium block truncate">
               Referral reward
             </span>
           </div>
 
-          <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs text-center">
+          <div className="p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs text-center">
             <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 block truncate">
               Dispenser Plan
             </span>
-            <div className="mt-1 text-base sm:text-xl font-bold text-gray-900 dark:text-white">
+            <div className="mt-1.5 text-base sm:text-xl font-bold text-gray-900 dark:text-white">
               {paidMonths}/{totalMonths}m
             </div>
-            <span className="text-[10px] sm:text-[11px] text-blue-light-600 dark:text-blue-light-400 font-medium block truncate">
+            <span className="mt-0.5 text-[10px] sm:text-[11px] text-blue-light-600 dark:text-blue-light-400 font-medium block truncate">
               Rent-to-own
             </span>
           </div>
@@ -286,7 +292,7 @@ export default function CustomerDashboardPage() {
                 My Orders
               </h3>
               <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
-                Track deliveries &amp; history
+                Track deliveries and history
               </p>
             </div>
           </Link>
@@ -423,9 +429,12 @@ export default function CustomerDashboardPage() {
             {RECENT_ORDERS.map((ord) => (
               <div key={ord.id} className="py-3 flex items-center justify-between gap-3 first:pt-0 last:pb-0">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-blue-light-400 flex items-center justify-center shrink-0">
-                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                  <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <rect x="3" y="2" width="14" height="16" rx="2" />
+                      <line x1="6.5" y1="6" x2="13.5" y2="6" />
+                      <line x1="6.5" y1="9" x2="13.5" y2="9" />
+                      <line x1="6.5" y1="12" x2="10" y2="12" />
                     </svg>
                   </div>
                   <div className="min-w-0">
@@ -458,7 +467,7 @@ export default function CustomerDashboardPage() {
         <Modal
           isOpen={isReferralModalOpen}
           onClose={() => setIsReferralModalOpen(false)}
-          title="Refer Friends & Earn Free Refills"
+          title="Refer Friends, Earn Free Refills"
         >
           <div className="space-y-4">
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">

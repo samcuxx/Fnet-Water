@@ -2,6 +2,7 @@
 
 import React from "react";
 import Badge from "@/components/ui/badge/Badge";
+import { LogoIcon } from "@/components/brand/Logo";
 import type { StoredOrder } from "@/lib/order-store";
 
 interface OrderReceiptProps {
@@ -32,9 +33,7 @@ export default function OrderReceipt({
       {/* Top Header Bar */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 print:bg-transparent print:border-b-2 print:border-black">
         <div className="flex items-center gap-3">
-          <div className="size-9 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-sm tracking-tight print:bg-blue-600">
-            FNW
-          </div>
+          <LogoIcon className="size-9 shrink-0" />
           <div>
             <h3 className="font-bold text-base sm:text-lg text-gray-900 dark:text-white print:text-black leading-tight">
               F-Net Water Hub

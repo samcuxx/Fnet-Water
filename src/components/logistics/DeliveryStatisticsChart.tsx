@@ -1,12 +1,22 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
 import type { ApexOptions } from "apexcharts";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function DeliveryStatisticsChart() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === "dark";
+
   const options: ApexOptions = {
     chart: {
       type: "bar",
@@ -45,7 +55,7 @@ export default function DeliveryStatisticsChart() {
       axisBorder: { show: false },
       labels: {
         style: {
-          colors: "#667085",
+          colors: isDark ? "#9CA3AF" : "#667085",
           fontSize: "12px",
         },
       },
@@ -53,7 +63,7 @@ export default function DeliveryStatisticsChart() {
     yaxis: {
       labels: {
         formatter: (val: number) => `${val}`,
-        style: { fontSize: "12px", colors: "#667085" },
+        style: { fontSize: "12px", colors: isDark ? "#9CA3AF" : "#667085" },
       },
     },
     fill: {
@@ -70,11 +80,11 @@ export default function DeliveryStatisticsChart() {
       horizontalAlign: "left",
       fontFamily: "Outfit, sans-serif",
       labels: {
-        colors: "#667085",
+        colors: isDark ? "#9CA3AF" : "#667085",
       },
     },
     grid: {
-      borderColor: "#F2F4F7",
+      borderColor: isDark ? "#1F2937" : "#F2F4F7",
       strokeDashArray: 3,
     },
   };

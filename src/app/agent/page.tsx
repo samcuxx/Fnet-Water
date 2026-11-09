@@ -8,7 +8,13 @@ import Badge from "@/components/ui/Badge";
 export default function AgentDashboardPage() {
   const [copied, setCopied] = useState(false);
   const referralCode = "FNW-AGENT-KOFI";
-  const referralLink = `http://localhost:3000/register?ref=${referralCode}`;
+  const [referralLink, setReferralLink] = useState(`/register?ref=${referralCode}`);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      setReferralLink(`${window.location.origin}/register?ref=${referralCode}`);
+    }
+  }, [referralCode]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(referralLink);

@@ -285,9 +285,12 @@ export default function ResetPasswordPage() {
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="font-medium text-gray-700 dark:text-gray-300 hover:underline"
+              className="inline-flex items-center gap-1 font-medium text-gray-700 dark:text-gray-300 hover:underline"
             >
-              &larr; Change number
+              <svg className="size-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                <path d="M12.5 15L7.5 10L12.5 5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span>Change number</span>
             </button>
           </div>
 
@@ -304,9 +307,12 @@ export default function ResetPasswordPage() {
       <div className="mt-6 pt-5 border-t border-gray-100 dark:border-gray-800 text-center">
         <Link
           href="/login"
-          className="text-xs font-semibold text-brand-600 dark:text-blue-light-400 hover:underline"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 dark:text-blue-light-400 hover:underline"
         >
-          &larr; Back to Sign In
+          <svg className="size-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+            <path d="M12.5 15L7.5 10L12.5 5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span>Back to Sign In</span>
         </Link>
       </div>
     </AuthPageLayout>

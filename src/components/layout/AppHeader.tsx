@@ -33,7 +33,7 @@ export const AppHeader: React.FC = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 flex w-full border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-950/90 backdrop-blur-sm transition-colors">
+    <header className="sticky top-0 z-40 flex w-full border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-950/90 backdrop-blur-sm">
       <div className="flex w-full items-center justify-between px-4 py-3 sm:px-6">
         {/* Left: Sidebar toggle + Global Quick Search */}
         <div className="flex items-center gap-3 sm:gap-4 flex-1 max-w-lg">

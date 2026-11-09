@@ -1,13 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
 import type { ApexOptions } from "apexcharts";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function StatisticsChart() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<"all" | "refills" | "dispensers">("all");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === "dark";
 
   const options: ApexOptions = {
     legend: {
@@ -16,7 +25,7 @@ export default function StatisticsChart() {
       horizontalAlign: "left",
       fontFamily: "Outfit, sans-serif",
       labels: {
-        colors: "#667085",
+        colors: isDark ? "#9CA3AF" : "#667085",
       },
     },
     colors: ["#0057B8", "#00AEEF"],
@@ -46,7 +55,7 @@ export default function StatisticsChart() {
       },
     },
     grid: {
-      borderColor: "#F2F4F7",
+      borderColor: isDark ? "#1F2937" : "#F2F4F7",
       strokeDashArray: 3,
       yaxis: {
         lines: {
@@ -81,7 +90,7 @@ export default function StatisticsChart() {
       },
       labels: {
         style: {
-          colors: "#667085",
+          colors: isDark ? "#9CA3AF" : "#667085",
           fontSize: "12px",
         },
       },
@@ -89,7 +98,7 @@ export default function StatisticsChart() {
     yaxis: {
       labels: {
         style: {
-          colors: "#667085",
+          colors: isDark ? "#9CA3AF" : "#667085",
           fontSize: "12px",
         },
         formatter: (val: number) => `GH₵ ${val}`,

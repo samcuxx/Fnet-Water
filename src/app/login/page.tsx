@@ -453,9 +453,12 @@ export default function LoginPage() {
                 setSmsStep(1);
                 setErrorMsg(null);
               }}
-              className="font-medium text-gray-700 dark:text-gray-300 hover:underline"
+              className="inline-flex items-center gap-1 font-medium text-gray-700 dark:text-gray-300 hover:underline"
             >
-              &larr; Change number
+              <svg className="size-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                <path d="M12.5 15L7.5 10L12.5 5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span>Change number</span>
             </button>
 
             {countdown > 0 ? (

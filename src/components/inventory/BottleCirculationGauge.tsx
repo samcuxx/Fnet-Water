@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
 import type { ApexOptions } from "apexcharts";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -19,6 +20,14 @@ export default function BottleCirculationGauge({
   withCustomers,
   inWarehouse,
 }: BottleCirculationGaugeProps) {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === "dark";
   const series = [ratePercent];
 
   const options: ApexOptions = {
@@ -39,7 +48,7 @@ export default function BottleCirculationGauge({
           size: "74%",
         },
         track: {
-          background: "#E4E7EC",
+          background: isDark ? "#1F2937" : "#E4E7EC",
           strokeWidth: "100%",
           margin: 4,
         },
@@ -51,7 +60,7 @@ export default function BottleCirculationGauge({
             fontSize: "28px",
             fontWeight: "700",
             offsetY: -30,
-            color: "#1D2939",
+            color: isDark ? "#F9FAFB" : "#1D2939",
             formatter: (val) => `${val}%`,
           },
         },

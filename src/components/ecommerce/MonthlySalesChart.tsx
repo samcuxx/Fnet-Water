@@ -1,13 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
 import type { ApexOptions } from "apexcharts";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function MonthlySalesChart() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [timeframe, setTimeframe] = useState<"2026" | "2025">("2026");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === "dark";
 
   const options: ApexOptions = {
     colors: ["#0057B8"],
@@ -58,7 +67,7 @@ export default function MonthlySalesChart() {
       },
       labels: {
         style: {
-          colors: "#667085",
+          colors: isDark ? "#9CA3AF" : "#667085",
           fontSize: "12px",
         },
       },
@@ -66,14 +75,14 @@ export default function MonthlySalesChart() {
     yaxis: {
       labels: {
         style: {
-          colors: "#667085",
+          colors: isDark ? "#9CA3AF" : "#667085",
           fontSize: "12px",
         },
         formatter: (val: number) => `${val}`,
       },
     },
     grid: {
-      borderColor: "#F2F4F7",
+      borderColor: isDark ? "#1F2937" : "#F2F4F7",
       strokeDashArray: 3,
       yaxis: {
         lines: {

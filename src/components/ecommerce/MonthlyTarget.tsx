@@ -1,12 +1,21 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
 import type { ApexOptions } from "apexcharts";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function MonthlyTarget() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === "dark";
   const series = [75.55];
 
   const options: ApexOptions = {
@@ -27,7 +36,7 @@ export default function MonthlyTarget() {
           size: "78%",
         },
         track: {
-          background: "#E4E7EC",
+          background: isDark ? "#1F2937" : "#E4E7EC",
           strokeWidth: "100%",
           margin: 5,
         },
@@ -39,7 +48,7 @@ export default function MonthlyTarget() {
             fontSize: "32px",
             fontWeight: "700",
             offsetY: -35,
-            color: "#1D2939",
+            color: isDark ? "#F9FAFB" : "#1D2939",
             formatter: (val) => `${val}%`,
           },
         },
