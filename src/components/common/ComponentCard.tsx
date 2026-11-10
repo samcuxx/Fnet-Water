@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { motion } from "framer-motion";
 
 interface ComponentCardProps {
   title: string;
@@ -7,6 +10,7 @@ interface ComponentCardProps {
   desc?: string;
   spacing?: boolean;
   action?: React.ReactNode;
+  hoverable?: boolean;
 }
 
 const ComponentCard: React.FC<ComponentCardProps> = ({
@@ -16,15 +20,24 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
   desc = "",
   spacing = true,
   action,
+  hoverable = false,
 }) => {
   return (
-    <div
-      className={`rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 ${className}`}
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      whileHover={
+        hoverable
+          ? { y: -3, transition: { duration: 0.2, ease: "easeOut" } }
+          : undefined
+      }
+      className={`rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs overflow-hidden transition-shadow ${className}`}
     >
       {/* Card Header */}
-      <div className="px-6 py-4.5 flex items-center justify-between border-b border-gray-100 dark:border-gray-800">
+      <div className="px-6 py-5 flex items-center justify-between border-b border-gray-100/80 dark:border-gray-800/60">
         <div>
-          <h3 className="text-sm font-semibold text-gray-800 dark:text-white">
+          <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
             {title}
           </h3>
           {desc && (
@@ -37,10 +50,10 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
       </div>
 
       {/* Card Body */}
-      <div className="p-4 sm:p-6">
+      <div className="p-5 sm:p-6">
         <div className={spacing ? "space-y-4" : ""}>{children}</div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

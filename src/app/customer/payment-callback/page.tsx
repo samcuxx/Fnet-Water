@@ -3,8 +3,11 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/badge/Badge";
+import Skeleton from "@/components/ui/skeleton";
+import { scaleIn, fadeInUp } from "@/lib/animations";
 
 function CallbackContent() {
   const searchParams = useSearchParams();
@@ -53,23 +56,36 @@ function CallbackContent() {
   return (
     <div className="max-w-lg mx-auto py-10 px-4">
       {loading ? (
-        <div className="p-8 text-center bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-theme-md space-y-4">
-          <div className="size-14 rounded-full border-4 border-brand-500 border-t-transparent animate-spin mx-auto" />
-          <div>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+        <div className="p-8 text-center bg-white dark:bg-gray-900/70 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs space-y-4">
+          <div className="size-16 rounded-full mx-auto relative flex items-center justify-center">
+            <Skeleton className="size-16 rounded-full" />
+            <div className="absolute inset-0 size-16 rounded-full border-2 border-brand-500 border-t-transparent animate-spin" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-xl font-black text-gray-900 dark:text-white">
               Verifying Payment
             </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               Please wait while we confirm your payment and settle your transaction.
             </p>
           </div>
-          <span className="font-mono text-[11px] text-gray-400 block">
-            Reference: {reference}
-          </span>
+          <div className="pt-2">
+            <Skeleton className="h-4 w-48 mx-auto rounded-lg" />
+          </div>
         </div>
       ) : success ? (
-        <div className="p-6 sm:p-8 text-center bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-theme-md space-y-5">
-          <div className="size-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto ring-8 ring-emerald-50 dark:ring-emerald-950/30">
+        <motion.div
+          variants={scaleIn}
+          initial="initial"
+          animate="animate"
+          className="p-6 sm:p-8 text-center bg-white dark:bg-gray-900/70 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs space-y-5"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            className="size-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto ring-8 ring-emerald-50 dark:ring-emerald-950/30"
+          >
             <svg className="size-8" viewBox="0 0 20 20" fill="currentColor">
               <path
                 fillRule="evenodd"
@@ -77,13 +93,13 @@ function CallbackContent() {
                 clipRule="evenodd"
               />
             </svg>
-          </div>
+          </motion.div>
 
           <div>
             <Badge color="success" size="sm">
               Settled &amp; Verified
             </Badge>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white mt-2">
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 dark:text-white mt-2">
               Payment Confirmed!
             </h2>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -91,7 +107,7 @@ function CallbackContent() {
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 text-xs space-y-2 text-left">
+          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/60 text-xs space-y-2 text-left">
             <div className="flex justify-between items-center">
               <span className="text-gray-500">Payment Reference:</span>
               <span className="font-mono font-bold text-gray-900 dark:text-white">
@@ -109,7 +125,7 @@ function CallbackContent() {
             {orderData && (
               <div className="flex justify-between items-center">
                 <span className="text-gray-500">Order ID:</span>
-                <span className="font-mono font-bold text-brand-600 dark:text-blue-light-400">
+                <span className="font-mono font-bold text-brand-600 dark:text-sky-400">
                   {orderData.orderNumber}
                 </span>
               </div>
@@ -117,7 +133,7 @@ function CallbackContent() {
             {transactionData?.type === "DISPENSER_INSTALLMENT" && (
               <div className="flex justify-between items-center">
                 <span className="text-gray-500">Payment Category:</span>
-                <span className="font-bold text-brand-600 dark:text-blue-light-400">
+                <span className="font-bold text-brand-600 dark:text-sky-400">
                   Smart Dispenser Installment
                 </span>
               </div>
@@ -128,7 +144,7 @@ function CallbackContent() {
             {orderData && (
               <Link
                 href={`/customer/orders/${orderData.id}/receipt`}
-                className="w-full py-3 rounded-xl text-xs font-semibold text-white bg-brand-500 hover:bg-brand-600 transition flex items-center justify-center gap-1.5 shadow-theme-xs cursor-pointer"
+                className="w-full py-3 rounded-2xl text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
               >
                 <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
                   <path
@@ -144,7 +160,7 @@ function CallbackContent() {
             {transactionData?.type === "DISPENSER_INSTALLMENT" && (
               <Link
                 href="/customer/dispenser"
-                className="w-full py-3 rounded-xl text-xs font-semibold text-white bg-brand-500 hover:bg-brand-600 transition flex items-center justify-center gap-1.5 shadow-theme-xs cursor-pointer"
+                className="w-full py-3 rounded-2xl text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
               >
                 <span>Return to Smart Dispenser</span>
               </Link>
@@ -153,7 +169,7 @@ function CallbackContent() {
             {orderData && (
               <Link
                 href="/customer/orders"
-                className="w-full py-2.5 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition block"
+                className="w-full py-2.5 rounded-2xl text-xs font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-750 hover:bg-gray-50 dark:hover:bg-gray-800 transition block"
               >
                 Go to My Deliveries
               </Link>
@@ -166,9 +182,9 @@ function CallbackContent() {
               Return to Dashboard
             </Link>
           </div>
-        </div>
+        </motion.div>
       ) : (
-        <div className="p-6 sm:p-8 text-center bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-theme-md space-y-5">
+        <div className="p-6 sm:p-8 text-center bg-white dark:bg-gray-900/70 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs space-y-5">
           <div className="size-16 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto ring-8 ring-rose-50 dark:ring-rose-950/30">
             <svg className="size-8" viewBox="0 0 20 20" fill="currentColor">
               <path
@@ -195,14 +211,14 @@ function CallbackContent() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="w-full py-3 rounded-xl text-xs font-semibold text-white bg-brand-500 hover:bg-brand-600 transition shadow-theme-xs cursor-pointer"
+              className="w-full py-3 rounded-2xl text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 transition shadow-xs cursor-pointer"
             >
               Try Again
             </button>
 
             <Link
               href="/customer/order"
-              className="w-full py-2.5 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition block"
+              className="w-full py-2.5 rounded-2xl text-xs font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-750 hover:bg-gray-50 dark:hover:bg-gray-800 transition block"
             >
               Return to Refill Checkout
             </Link>

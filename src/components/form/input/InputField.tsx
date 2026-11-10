@@ -25,7 +25,7 @@ const Input: FC<InputProps> = ({
   endIcon,
   ...props
 }) => {
-  let inputClasses = `h-10 w-full rounded-lg border appearance-none text-xs sm:text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-2 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 transition-colors ${
+  let inputClasses = `h-10.5 w-full rounded-2xl border appearance-none text-xs sm:text-sm shadow-2xs placeholder:text-gray-400 focus:outline-hidden focus:ring-2 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 transition-all ${
     startIcon ? "pl-10" : "px-3.5"
   } ${endIcon ? "pr-10" : "px-3.5"} ${className}`;
 

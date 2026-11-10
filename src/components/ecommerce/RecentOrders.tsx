@@ -59,10 +59,10 @@ const recentWaterOrders: OrderItem[] = [
 
 export default function RecentOrders() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 shadow-theme-xs">
-      <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-7 shadow-xs">
+      <div className="flex flex-col gap-2 mb-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white">
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
             Recent Delivery &amp; Refill Orders
           </h3>
           <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
@@ -72,7 +72,7 @@ export default function RecentOrders() {
 
         <Link
           href="/admin/orders"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 self-start sm:self-auto transition cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 self-start sm:self-auto transition cursor-pointer"
         >
           View All Orders
         </Link>

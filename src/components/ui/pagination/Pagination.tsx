@@ -27,12 +27,12 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="relative inline-flex items-center rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="relative inline-flex items-center rounded-2xl border border-gray-200 dark:border-gray-750 bg-white dark:bg-gray-800 px-3.5 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xs cursor-pointer"
         >
           Previous
         </button>
 
-        <div className="hidden sm:flex items-center gap-1">
+        <div className="hidden sm:flex items-center gap-1.5">
           {pages.map((p) => {
             const isActive = p === currentPage;
             return (
@@ -40,10 +40,10 @@ export const Pagination: React.FC<PaginationProps> = ({
                 key={p}
                 type="button"
                 onClick={() => onPageChange(p)}
-                className={`relative inline-flex items-center justify-center size-8 rounded-lg text-xs font-medium transition ${
+                className={`relative inline-flex items-center justify-center size-8 rounded-2xl text-xs font-semibold transition cursor-pointer ${
                   isActive
-                    ? "bg-brand-500 text-white font-semibold"
-                    : "border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    ? "bg-brand-500 text-white font-bold shadow-xs"
+                    : "border border-gray-200 dark:border-gray-750 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-2xs"
                 }`}
               >
                 {p}
@@ -56,7 +56,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
-          className="relative inline-flex items-center rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="relative inline-flex items-center rounded-2xl border border-gray-200 dark:border-gray-750 bg-white dark:bg-gray-800 px-3.5 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xs cursor-pointer"
         >
           Next
         </button>

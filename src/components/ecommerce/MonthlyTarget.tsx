@@ -16,93 +16,64 @@ export default function MonthlyTarget() {
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
-  const series = [75.55];
+  const series = [72];
 
   const options: ApexOptions = {
-    colors: ["#0057B8"],
+    colors: ["#10B981"],
     chart: {
       fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       type: "radialBar",
-      height: 300,
+      height: 220,
       sparkline: {
         enabled: true,
       },
     },
     plotOptions: {
       radialBar: {
-        startAngle: -85,
-        endAngle: 85,
+        startAngle: -90,
+        endAngle: 90,
         hollow: {
-          size: "78%",
+          size: "72%",
         },
         track: {
           background: isDark ? "#1F2937" : "#E4E7EC",
           strokeWidth: "100%",
-          margin: 5,
+          margin: 0,
         },
         dataLabels: {
           name: {
             show: false,
           },
           value: {
-            fontSize: "32px",
-            fontWeight: "700",
-            offsetY: -35,
-            color: isDark ? "#F9FAFB" : "#1D2939",
-            formatter: (val) => `${val}%`,
+            show: false,
           },
         },
       },
     },
-    fill: {
-      type: "solid",
-      colors: ["#0057B8"],
-    },
     stroke: {
       lineCap: "round",
     },
-    labels: ["Monthly Target"],
   };
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 shadow-theme-xs flex flex-col justify-between h-full">
+    <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs flex flex-col justify-between h-full">
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white">
-            Monthly Target
-          </h3>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400 font-semibold">
-            On Track
-          </span>
+        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+          Refill Quota &amp; Bottle Returns
+        </span>
+        <div className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight mt-3">
+          72%
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          Target set for refill delivery &amp; dispenser financing
-        </p>
       </div>
 
-      <div className="my-2 flex justify-center">
-        <Chart options={options} series={series} type="radialBar" height={280} />
+      <div className="my-2 flex justify-center items-center relative overflow-hidden -mb-4">
+        <Chart options={options} series={series} type="radialBar" height={220} width="100%" />
       </div>
 
-      <div className="grid grid-cols-3 gap-2 pt-4 border-t border-gray-100 dark:border-gray-800 text-center">
-        <div>
-          <span className="text-[11px] text-gray-400 block">Target</span>
-          <span className="text-xs sm:text-sm font-bold text-gray-800 dark:text-white">
-            GH₵ 150K
-          </span>
-        </div>
-        <div>
-          <span className="text-[11px] text-gray-400 block">Revenue</span>
-          <span className="text-xs sm:text-sm font-bold text-brand-600 dark:text-blue-light-400">
-            GH₵ 113.3K
-          </span>
-        </div>
-        <div>
-          <span className="text-[11px] text-gray-400 block">Today</span>
-          <span className="text-xs sm:text-sm font-bold text-green-600 dark:text-green-400">
-            GH₵ 4,250
-          </span>
-        </div>
+      <div className="text-center pt-2">
+        <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500">
+          Deviation Index 2% · 11,200 of 15,000 Refills
+        </span>
       </div>
     </div>
   );

@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { useSidebar } from "@/context/SidebarContext";
 import Logo from "@/components/brand/Logo";
-import SidebarWidget from "./SidebarWidget";
 
 export interface NavItem {
   name: string;
@@ -25,6 +25,7 @@ interface AppSidebarProps {
 
 export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } =
     useSidebar();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
@@ -241,7 +242,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
     <aside
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`fixed top-0 left-0 z-50 flex flex-col h-screen border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 transition-all duration-300 ease-in-out ${
+      className={`fixed top-0 left-0 z-50 flex flex-col h-screen bg-[#071E3D] text-white border-blue-900/40 shadow-xl transition-all duration-300 ease-in-out ${
         isSidebarVisible ? "w-[270px]" : "w-[80px]"
       } ${
         isMobileOpen
@@ -251,12 +252,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
     >
       {/* Sidebar Header with Brand Logo */}
       <div
-        className={`flex items-center h-16 border-b border-gray-200 dark:border-gray-800 transition-all duration-300 ${
+        className={`flex items-center h-18 border-b border-blue-900/30 transition-all duration-300 ${
           isSidebarVisible ? "justify-between px-5" : "justify-center px-0"
         }`}
       >
         <div className="flex items-center justify-center overflow-hidden">
-          <Logo size="sm" iconOnly={!isSidebarVisible} />
+          <Logo size="sm" variant="dark" iconOnly={!isSidebarVisible} />
         </div>
 
         {isSidebarVisible && isMobileOpen && (
@@ -264,7 +265,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
             type="button"
             onClick={toggleMobileSidebar}
             aria-label="Close sidebar"
-            className="xl:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 p-1"
+            className="xl:hidden text-blue-200 hover:text-white p-1"
           >
             <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
               <path
@@ -277,8 +278,15 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
         )}
       </div>
 
+      {/* Navigation Section Header */}
+      {isSidebarVisible && (
+        <div className="px-5 pt-5 pb-1 text-[10px] font-bold tracking-widest text-blue-200/50 uppercase">
+          Navigation
+        </div>
+      )}
+
       {/* Navigation Links */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1.5 custom-scrollbar">
         {navItems.map((item) => {
           const hasSubItems = item.subItems && item.subItems.length > 0;
           const isItemActive =
@@ -293,15 +301,17 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
                   <button
                     type="button"
                     onClick={() => toggleSubmenu(item.name)}
-                    className={`menu-item group ${
-                      isItemActive ? "menu-item-active" : "menu-item-inactive"
+                    className={`flex items-center w-full gap-3 px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-medium transition-all group ${
+                      isItemActive
+                        ? "bg-white/15 text-white font-semibold shadow-xs"
+                        : "text-blue-100/75 hover:text-white hover:bg-white/10"
                     } ${!isSidebarVisible ? "justify-center px-0" : ""}`}
                   >
                     <span
-                      className={`shrink-0 ${
+                      className={`shrink-0 transition-colors ${
                         isItemActive
-                          ? "text-brand-500 dark:text-brand-400"
-                          : "text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300"
+                          ? "text-sky-400"
+                          : "text-blue-200/70 group-hover:text-white"
                       }`}
                     >
                       {item.icon}
@@ -313,7 +323,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
                           {item.name}
                         </span>
                         <svg
-                          className={`size-3.5 text-gray-400 transition-transform ${
+                          className={`size-3.5 text-blue-300/70 transition-transform ${
                             isSubmenuOpen ? "rotate-180" : ""
                           }`}
                           viewBox="0 0 20 20"
@@ -341,10 +351,10 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
                             onClick={() => {
                               if (isMobileOpen) toggleMobileSidebar();
                             }}
-                            className={`block py-1.5 px-2.5 rounded-lg text-xs font-medium transition ${
+                            className={`block py-1.5 px-3 rounded-xl text-xs font-medium transition ${
                               isSubActive
-                                ? "bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-semibold"
-                                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                                ? "bg-white/20 text-white font-semibold shadow-xs"
+                                : "text-blue-100/70 hover:text-white hover:bg-white/10"
                             }`}
                           >
                             {sub.name}
@@ -360,15 +370,17 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
                   onClick={() => {
                     if (isMobileOpen) toggleMobileSidebar();
                   }}
-                  className={`menu-item group ${
-                    isItemActive ? "menu-item-active" : "menu-item-inactive"
+                  className={`flex items-center w-full gap-3 px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-medium transition-all group ${
+                    isItemActive
+                      ? "bg-white/15 text-white font-semibold shadow-xs"
+                      : "text-blue-100/75 hover:text-white hover:bg-white/10"
                   } ${!isSidebarVisible ? "justify-center px-0" : ""}`}
                 >
                   <span
-                    className={`shrink-0 ${
+                    className={`shrink-0 transition-colors ${
                       isItemActive
-                        ? "text-brand-500 dark:text-brand-400"
-                        : "text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300"
+                        ? "text-sky-400"
+                        : "text-blue-200/70 group-hover:text-white"
                     }`}
                   >
                     {item.icon}
@@ -380,7 +392,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
                         {item.name}
                       </span>
                       {item.badge && (
-                        <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
+                        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-sky-400/20 text-sky-200 border border-sky-400/30">
                           {item.badge}
                         </span>
                       )}
@@ -393,8 +405,61 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
         })}
       </div>
 
-      {/* Support / Quick Hotline Widget */}
-      {isSidebarVisible && <SidebarWidget />}
+      {/* USER ACCOUNT Section at Bottom of Sidebar matching reference */}
+      <div className="p-3.5 border-t border-blue-900/30">
+        {isSidebarVisible ? (
+          <div>
+            <div className="text-[10px] font-bold tracking-widest text-blue-200/50 uppercase px-2 mb-2">
+              User Account
+            </div>
+            <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-white/10 hover:bg-white/15 transition-colors">
+              <Link
+                href="/profile"
+                className="flex items-center gap-3 flex-1 min-w-0 group"
+                title="View Profile Settings"
+              >
+                <div className="relative size-9 rounded-full bg-gradient-to-tr from-brand-400 to-sky-300 flex items-center justify-center text-xs font-bold text-white shadow-xs shrink-0">
+                  {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "A"}
+                  <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-400 ring-2 ring-[#071E3D]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-bold text-white truncate group-hover:text-sky-300 transition-colors">
+                    {session?.user?.name || "Alex Williamson"}
+                  </div>
+                  <div className="text-[10px] text-blue-200/70 truncate">
+                    #{role.toLowerCase()}-2026
+                  </div>
+                </div>
+              </Link>
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                title="Sign out of account"
+                className="size-7 rounded-xl hover:bg-white/20 text-blue-200 hover:text-white flex items-center justify-center transition shrink-0 cursor-pointer"
+              >
+                <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fillRule="evenodd"
+                    d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center py-1">
+            <Link
+              href="/profile"
+              title="View Profile Settings"
+              className="relative size-9 rounded-full bg-gradient-to-tr from-brand-400 to-sky-300 flex items-center justify-center text-xs font-bold text-white shadow-xs hover:scale-105 transition"
+            >
+              {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "A"}
+              <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-400 ring-2 ring-[#071E3D]" />
+            </Link>
+          </div>
+        )}
+      </div>
     </aside>
   );
 };

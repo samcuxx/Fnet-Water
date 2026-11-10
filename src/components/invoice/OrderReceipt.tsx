@@ -29,9 +29,9 @@ export default function OrderReceipt({
   });
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-theme-md text-gray-900 dark:text-white print:border-none print:shadow-none print:bg-white print:text-black">
+    <div className="bg-white dark:bg-gray-900 rounded-[28px] border border-gray-100 dark:border-gray-800/80 overflow-hidden shadow-xs text-gray-900 dark:text-white print:border-none print:shadow-none print:bg-white print:text-black print:rounded-none">
       {/* Top Header Bar */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 print:bg-transparent print:border-b-2 print:border-black">
+      <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 print:bg-transparent print:border-b-2 print:border-black">
         <div className="flex items-center gap-3">
           <LogoIcon className="size-9 shrink-0" />
           <div>
@@ -45,7 +45,7 @@ export default function OrderReceipt({
         </div>
 
         <div className="text-right">
-          <span className="text-xs font-mono font-bold text-brand-600 dark:text-blue-light-400 print:text-black block">
+          <span className="text-xs font-mono font-bold text-brand-600 dark:text-sky-400 print:text-black block">
             {order.orderNumber}
           </span>
           <span className="text-[11px] text-gray-400 print:text-gray-600">
@@ -179,7 +179,7 @@ export default function OrderReceipt({
               Bottle Return Policy:
             </span>
             <p className="text-[11px] leading-relaxed">
-              Standard 18.9L bottles remain the property of F-Net Water Hub or are exchanged on a 1-for-1 basis upon delivery. Empties returned in clean, undamaged condition waive all bottle deposit charges.
+              Standard 18.9L bottles remain the property of F-Net Water Hub or are exchanged on a clean bottle exchange basis upon delivery. Empties returned in clean, undamaged condition waive all bottle deposit charges.
             </p>
           </div>
 
@@ -226,7 +226,7 @@ export default function OrderReceipt({
               <span className="text-sm font-bold text-gray-900 dark:text-white print:text-black">
                 Total Paid:
               </span>
-              <span className="text-lg font-bold text-brand-600 dark:text-blue-light-400 print:text-black font-mono">
+              <span className="text-lg font-bold text-brand-600 dark:text-sky-400 print:text-black font-mono">
                 GH₵ {order.totalAmount.toFixed(2)}
               </span>
             </div>
@@ -236,7 +236,7 @@ export default function OrderReceipt({
         {/* Verification Footer & Paid Stamp */}
         <div className="pt-4 border-t border-gray-100 dark:border-gray-800 print:border-gray-300 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
           <div className="flex items-center gap-2">
-            <div className="size-8 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center font-mono text-[9px] text-gray-400">
+            <div className="size-8 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center font-mono text-[9px] text-gray-400">
               QR
             </div>
             <span>
@@ -244,7 +244,7 @@ export default function OrderReceipt({
             </span>
           </div>
 
-          <div className="px-3 py-1 rounded-full border border-emerald-500 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold tracking-wider uppercase">
+          <div className="px-3.5 py-1 rounded-full border border-emerald-500 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold tracking-wider uppercase">
             Official F-Net Receipt
           </div>
         </div>
@@ -255,7 +255,7 @@ export default function OrderReceipt({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
+              className="px-4 py-2 text-xs font-semibold rounded-2xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
             >
               Close
             </button>
@@ -265,7 +265,7 @@ export default function OrderReceipt({
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-semibold rounded-2xl text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs cursor-pointer"
             >
               <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clipRule="evenodd" />

@@ -2,9 +2,12 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Modal from "@/components/ui/Modal";
 import Badge from "@/components/ui/Badge";
+import Skeleton from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { RoleType } from "@/types/next-auth";
 
 interface UserProfileData {
@@ -231,9 +234,9 @@ export default function ProfilePage() {
         )}
 
         {/* Page Container */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6 shadow-theme-xs">
+        <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-6 sm:p-8 shadow-xs">
           <div className="mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
               Account Profile
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
@@ -242,17 +245,34 @@ export default function ProfilePage() {
           </div>
 
           {loading ? (
-            <div className="py-12 flex flex-col items-center justify-center gap-3">
-              <div className="size-8 rounded-full border-2 border-brand-500 border-t-transparent animate-spin" />
-              <span className="text-xs text-gray-500 dark:text-gray-400">Loading profile data...</span>
+            <div className="space-y-6">
+              <div className="p-6 border border-gray-100 dark:border-gray-800/80 rounded-2xl bg-gray-50/40 dark:bg-gray-800/20 flex flex-col sm:flex-row items-center gap-5">
+                <Skeleton className="size-20 rounded-full shrink-0" />
+                <div className="space-y-2 flex-1 w-full text-center sm:text-left">
+                  <Skeleton className="h-6 w-48 mx-auto sm:mx-0 rounded-lg" />
+                  <Skeleton className="h-4 w-32 mx-auto sm:mx-0 rounded-lg" />
+                </div>
+              </div>
+              <div className="p-6 border border-gray-100 dark:border-gray-800/80 rounded-2xl bg-gray-50/40 dark:bg-gray-800/20 space-y-4">
+                <Skeleton className="h-5 w-40 rounded-lg" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Skeleton className="h-10 w-full rounded-xl" />
+                  <Skeleton className="h-10 w-full rounded-xl" />
+                </div>
+              </div>
             </div>
           ) : (
-            <div className="space-y-6">
+            <motion.div
+              variants={staggerContainer}
+              initial="initial"
+              animate="animate"
+              className="space-y-6"
+            >
               {/* CARD 1: UserMetaCard */}
-              <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
+              <div className="p-5 sm:p-6 border border-gray-100 dark:border-gray-800/80 rounded-2xl bg-gray-50/40 dark:bg-gray-800/20">
                 <div className="flex flex-col gap-5 mb-6 xl:flex-row xl:items-center xl:justify-between">
                   <div className="flex flex-col items-center w-full gap-5 sm:flex-row">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-full bg-brand-500 text-white font-bold text-2xl sm:text-3xl shrink-0 ring-4 ring-brand-100 dark:ring-brand-950">
+                    <div className="size-16 sm:size-20 flex items-center justify-center rounded-full bg-gradient-to-tr from-brand-500 to-sky-400 text-white font-black text-2xl sm:text-3xl shrink-0 ring-4 ring-brand-100 dark:ring-brand-950 shadow-xs">
                       {profile?.name?.charAt(0).toUpperCase() || "U"}
                     </div>
 
@@ -282,7 +302,7 @@ export default function ProfilePage() {
                       setFormError(null);
                       setIsEditInfoOpen(true);
                     }}
-                    className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2.5 text-xs sm:text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700/60 lg:inline-flex lg:w-auto shrink-0 cursor-pointer"
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-5 py-2.5 text-xs sm:text-sm font-bold text-gray-700 shadow-2xs hover:bg-gray-50 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700/60 lg:inline-flex lg:w-auto shrink-0 cursor-pointer"
                   >
                     <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
@@ -292,7 +312,7 @@ export default function ProfilePage() {
                         d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                       />
                     </svg>
-                    Edit Info
+                    <span>Edit Info</span>
                   </button>
                 </div>
 
@@ -425,7 +445,7 @@ export default function ProfilePage() {
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
 

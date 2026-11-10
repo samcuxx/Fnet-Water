@@ -101,10 +101,10 @@ export default function DeliveryStatisticsChart() {
   ];
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03] shadow-theme-xs">
+    <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
-          <h3 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white">
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
             Daily Delivery Run Statistics
           </h3>
           <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -112,7 +112,7 @@ export default function DeliveryStatisticsChart() {
           </p>
         </div>
 
-        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-blue-light-400 self-start sm:self-auto">
+        <span className="text-xs font-bold px-3 py-1 rounded-full bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-sky-400 self-start sm:self-auto border border-brand-200/50 dark:border-brand-500/20">
           Weekly Fulfillment: 98.4%
         </span>
       </div>

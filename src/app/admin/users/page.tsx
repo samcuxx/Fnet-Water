@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Modal from "@/components/ui/Modal";
 import Badge from "@/components/ui/Badge";
+import { SkeletonMetrics, SkeletonTable } from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { RoleType, StatusType } from "@/types/next-auth";
 
 interface StaffItem {
@@ -362,13 +365,13 @@ export default function AdminStaffPage() {
         )}
 
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
               Staff Directory
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              Manage operations personnel, driver assignments, and portal access credentials.
+              Manage operations personnel, driver assignments, and portal access credentials across Ghana.
             </p>
           </div>
           <button
@@ -377,42 +380,75 @@ export default function AdminStaffPage() {
               setFormError(null);
               setIsAddModalOpen(true);
             }}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs sm:text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs self-start sm:self-auto cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs self-start sm:self-auto cursor-pointer"
           >
             <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
             </svg>
-            Add Staff Member
+            <span>+ Add Staff Member</span>
           </button>
         </div>
 
         {/* Operational KPI Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Staff</span>
-            <div className="mt-1 text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-              {metrics.total}
-            </div>
-          </div>
-          <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Delivery Drivers</span>
-            <div className="mt-1 text-xl sm:text-2xl font-bold text-brand-600 dark:text-brand-400">
-              {metrics.drivers}
-            </div>
-          </div>
-          <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Field Agents</span>
-            <div className="mt-1 text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">
-              {metrics.agents}
-            </div>
-          </div>
-          <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Managers &amp; Admin</span>
-            <div className="mt-1 text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {metrics.managers}
-            </div>
-          </div>
-        </div>
+        {initialLoading ? (
+          <SkeletonMetrics count={4} />
+        ) : (
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"
+          >
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Staff</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {metrics.total}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Active personnel</span>
+            </motion.div>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Delivery Drivers</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-brand-600 dark:text-sky-400">
+                {metrics.drivers}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Fleet operators</span>
+            </motion.div>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Field Agents</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400">
+                {metrics.agents}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Community sales</span>
+            </motion.div>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Managers &amp; Admin</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-blue-600 dark:text-blue-400">
+                {metrics.managers}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Hub dispatch control</span>
+            </motion.div>
+          </motion.div>
+        )}
 
         {/* Instant Filter Controls (No lag, client-side) */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -422,10 +458,10 @@ export default function AdminStaffPage() {
               placeholder="Search staff by name, email, or phone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-10 pl-9 pr-3 text-xs sm:text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
+              className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition shadow-2xs"
             />
             <svg
-              className="size-4 text-gray-400 absolute left-3 top-3 pointer-events-none"
+              className="size-4 text-gray-400 absolute left-3.5 top-3.5 pointer-events-none"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -443,7 +479,7 @@ export default function AdminStaffPage() {
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="w-full h-10 px-3 text-xs sm:text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
+              className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition cursor-pointer shadow-2xs"
             >
               <option value="ALL">All Staff Roles</option>
               <option value="ADMIN">Administrator</option>
@@ -457,7 +493,7 @@ export default function AdminStaffPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full h-10 px-3 text-xs sm:text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
+              className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition cursor-pointer shadow-2xs"
             >
               <option value="ALL">All Statuses</option>
               <option value="ACTIVE">Active Staff</option>
@@ -467,33 +503,35 @@ export default function AdminStaffPage() {
         </div>
 
         {/* Staff Table */}
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs sm:text-sm border-collapse">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 text-gray-600 dark:text-gray-400 font-semibold">
-                  <th className="py-3 px-4">Staff Member</th>
-                  <th className="py-3 px-4">Contact Phone</th>
-                  <th className="py-3 px-4">Role</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Added</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
-                {initialLoading ? (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-center text-gray-500 dark:text-gray-400">
-                      Loading staff directory...
-                    </td>
+        {initialLoading ? (
+          <SkeletonTable rows={6} columns={6} />
+        ) : (
+          <motion.div
+            variants={fadeInUp}
+            initial="initial"
+            animate="animate"
+            className="bg-white dark:bg-gray-900/70 border border-gray-100 dark:border-gray-800/80 rounded-[28px] overflow-hidden shadow-xs"
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs sm:text-sm border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 text-gray-600 dark:text-gray-400 font-semibold">
+                    <th className="py-3 px-4">Staff Member</th>
+                    <th className="py-3 px-4">Contact Phone</th>
+                    <th className="py-3 px-4">Role</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4">Added</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
-                ) : filteredStaff.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-center text-gray-500 dark:text-gray-400">
-                      No staff members match the selected criteria.
-                    </td>
-                  </tr>
-                ) : (
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
+                  {filteredStaff.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-gray-500 dark:text-gray-400">
+                        No staff members match the selected criteria.
+                      </td>
+                    </tr>
+                  ) : (
                   filteredStaff.map((staff) => (
                     <tr
                       key={staff.id}
@@ -625,7 +663,8 @@ export default function AdminStaffPage() {
               </tbody>
             </table>
           </div>
-        </div>
+        </motion.div>
+      )}
 
         {/* Modal 1: Add Staff */}
         <Modal

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/badge/Badge";
 import Alert from "@/components/ui/alert/Alert";
@@ -12,6 +13,8 @@ import Label from "@/components/form/Label";
 import Select from "@/components/form/Select";
 import TextArea from "@/components/form/input/TextArea";
 import DispenserPayoffGauge from "@/components/dispenser/DispenserPayoffGauge";
+import { SkeletonTelemetry } from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import {
   StoredDispenserPlan,
   StoredDispenserPayment,
@@ -180,8 +183,8 @@ export default function CustomerDispenserPage() {
   if (isLoading) {
     return (
       <AppLayout role="CUSTOMER">
-        <div className="flex items-center justify-center min-h-[50vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500" />
+        <div className="py-2">
+          <SkeletonTelemetry />
         </div>
       </AppLayout>
     );
@@ -234,10 +237,10 @@ export default function CustomerDispenserPage() {
         )}
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
                 Smart Water Dispenser
               </h1>
               <Badge color={plan?.isFullyPaid ? "success" : "info"} size="sm">
@@ -258,9 +261,9 @@ export default function CustomerDispenserPage() {
                   setPayAmount(plan.monthlyDue.toString());
                   setIsPayModalOpen(true);
                 }}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs cursor-pointer"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <span>Pay Monthly Installment</span>
@@ -273,46 +276,71 @@ export default function CustomerDispenserPage() {
         {plan ? (
           <>
             {/* 4 Metric Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+            <motion.div
+              variants={staggerContainer}
+              initial="initial"
+              animate="animate"
+              className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+            >
+              <motion.div
+                variants={fadeInUp}
+                whileHover={cardHoverMotion.whileHover}
+                transition={cardHoverMotion.transition}
+                className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+              >
                 <span className="text-xs text-gray-500 dark:text-gray-400 font-medium block">
                   Amount Paid
                 </span>
-                <div className="mt-1 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                <div className="mt-1 text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
                   GH₵ {plan.amountPaid.toFixed(2)}
                 </div>
-                <span className="text-[11px] text-gray-400">
+                <span className="text-[11px] text-gray-400 mt-1 block">
                   {plan.installmentsPaidCount} payments completed
                 </span>
-              </div>
+              </motion.div>
 
-              <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+              <motion.div
+                variants={fadeInUp}
+                whileHover={cardHoverMotion.whileHover}
+                transition={cardHoverMotion.transition}
+                className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+              >
                 <span className="text-xs text-gray-500 dark:text-gray-400 font-medium block">
                   Remaining Balance
                 </span>
-                <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
                   GH₵ {plan.outstandingBalance.toFixed(2)}
                 </div>
-                <span className="text-[11px] text-gray-400">
+                <span className="text-[11px] text-gray-400 mt-1 block">
                   {plan.isFullyPaid ? "Fully paid off" : "To own outright"}
                 </span>
-              </div>
+              </motion.div>
 
-              <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+              <motion.div
+                variants={fadeInUp}
+                whileHover={cardHoverMotion.whileHover}
+                transition={cardHoverMotion.transition}
+                className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+              >
                 <span className="text-xs text-gray-500 dark:text-gray-400 font-medium block">
                   Monthly Payment
                 </span>
-                <div className="mt-1 text-2xl font-bold text-brand-600 dark:text-blue-light-400">
+                <div className="mt-1 text-2xl sm:text-3xl font-black text-brand-600 dark:text-sky-400">
                   GH₵ {plan.monthlyDue.toFixed(2)}
                 </div>
-                <span className="text-[11px] text-gray-400">Per month (10 months total)</span>
-              </div>
+                <span className="text-[11px] text-gray-400 mt-1 block">Per month (10 months total)</span>
+              </motion.div>
 
-              <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+              <motion.div
+                variants={fadeInUp}
+                whileHover={cardHoverMotion.whileHover}
+                transition={cardHoverMotion.transition}
+                className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+              >
                 <span className="text-xs text-gray-500 dark:text-gray-400 font-medium block">
                   Next Due Date
                 </span>
-                <div className="mt-1 text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                <div className="mt-1 text-lg sm:text-2xl font-black text-gray-900 dark:text-white">
                   {plan.isFullyPaid
                     ? "Complete"
                     : new Date(plan.nextPaymentDate).toLocaleDateString("en-GB", {
@@ -321,17 +349,17 @@ export default function CustomerDispenserPage() {
                         year: "numeric",
                       })}
                 </div>
-                <span className="text-[11px] text-gray-400">
+                <span className="text-[11px] text-gray-400 mt-1 block">
                   {plan.isFullyPaid ? "No future dues" : "Automatic reminder sent"}
                 </span>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* 7 / 5 Grid Split: Device & IoT Details vs Payoff Gauge */}
             <div className="grid grid-cols-12 gap-4 md:gap-6">
               {/* Left (7 cols): Device & Smart Telemetry */}
               <div className="col-span-12 lg:col-span-7 space-y-4">
-                <div className="p-5 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs space-y-4">
+                <div className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs space-y-4">
                   <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
                     <div>
                       <span className="text-[11px] font-mono text-gray-400 block">
@@ -441,7 +469,7 @@ export default function CustomerDispenserPage() {
             </div>
 
             {/* Payment History Table */}
-            <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 sm:p-6 shadow-theme-xs space-y-4">
+            <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-bold text-gray-900 dark:text-white">

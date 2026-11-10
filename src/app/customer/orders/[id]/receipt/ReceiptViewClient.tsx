@@ -2,8 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import OrderReceipt from "@/components/invoice/OrderReceipt";
+import { SkeletonReceipt } from "@/components/ui/skeleton";
+import { fadeInUp } from "@/lib/animations";
 import type { StoredOrder } from "@/lib/order-store";
 
 export default function ReceiptViewClient({ orderId }: { orderId: string }) {
@@ -45,15 +48,15 @@ export default function ReceiptViewClient({ orderId }: { orderId: string }) {
         </div>
 
         {loading ? (
-          <div className="py-16 text-center text-xs text-gray-400">
-            Generating official receipt...
-          </div>
+          <SkeletonReceipt />
         ) : error || !order ? (
-          <div className="p-8 text-center text-xs text-rose-500 bg-rose-50 dark:bg-rose-950/20 rounded-2xl border border-rose-200 dark:border-rose-800">
+          <div className="p-8 text-center text-xs text-rose-500 bg-rose-50 dark:bg-rose-950/20 rounded-[28px] border border-rose-200 dark:border-rose-800">
             {error || "Receipt not found."}
           </div>
         ) : (
-          <OrderReceipt order={order} />
+          <motion.div variants={fadeInUp} initial="initial" animate="animate">
+            <OrderReceipt order={order} />
+          </motion.div>
         )}
       </div>
     </AppLayout>

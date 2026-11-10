@@ -49,7 +49,7 @@ const Select: React.FC<SelectProps> = ({
         disabled={disabled}
         value={selectedValue}
         onChange={handleChange}
-        className={`h-10 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3.5 pr-10 text-xs sm:text-sm shadow-theme-xs placeholder:text-gray-400 focus:border-brand-500 focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:opacity-60 transition-colors ${
+        className={`h-10.5 w-full appearance-none rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 pr-10 text-xs sm:text-sm shadow-2xs placeholder:text-gray-400 focus:border-brand-500 focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:opacity-60 transition-all cursor-pointer ${
           selectedValue
             ? "text-gray-800 dark:text-white"
             : "text-gray-400 dark:text-gray-500"

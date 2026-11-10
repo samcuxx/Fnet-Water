@@ -1,11 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/badge/Badge";
 import Input from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
 import { Modal } from "@/components/ui/Modal";
+import { SkeletonMetrics, SkeletonTable } from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { StoredTransaction } from "@/lib/transaction-store";
 
 export default function AdminTransactionsPage() {
@@ -70,14 +73,14 @@ export default function AdminTransactionsPage() {
     <AppLayout role="ADMIN">
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
                 Payment Transactions &amp; Revenue
               </h1>
               <Badge color="primary" size="sm">
-                Finance
+                Finance Ledger
               </Badge>
             </div>
             <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
@@ -87,51 +90,76 @@ export default function AdminTransactionsPage() {
         </div>
 
         {/* 4 Financial KPI Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-brand-600 dark:text-blue-light-400 font-medium block">
-              Total Collections
-            </span>
-            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-              GH₵ {metrics.totalRevenue.toFixed(2)}
-            </div>
-            <span className="text-[11px] text-gray-400">
-              {metrics.successfulCount} successful payments
-            </span>
-          </div>
+        {isLoading ? (
+          <SkeletonMetrics count={4} />
+        ) : (
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+          >
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs text-brand-600 dark:text-sky-400 font-medium block">
+                Total Collections
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                GH₵ {metrics.totalRevenue.toFixed(2)}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">
+                {metrics.successfulCount} successful payments
+              </span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-amber-600 dark:text-amber-400 font-medium block">
-              Mobile Money Volume
-            </span>
-            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-              GH₵ {metrics.momoRevenue.toFixed(2)}
-            </div>
-            <span className="text-[11px] text-gray-400">
-              MTN, Telecel &amp; AT Money
-            </span>
-          </div>
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs text-amber-600 dark:text-amber-400 font-medium block">
+                Mobile Money Volume
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400">
+                GH₵ {metrics.momoRevenue.toFixed(2)}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">
+                MTN, Telecel &amp; AT Money
+              </span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-purple-600 dark:text-purple-400 font-medium block">
-              Card Payments
-            </span>
-            <div className="mt-1 text-2xl font-bold text-purple-600 dark:text-purple-400">
-              GH₵ {metrics.cardRevenue.toFixed(2)}
-            </div>
-            <span className="text-[11px] text-gray-400">Visa &amp; Mastercard</span>
-          </div>
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs text-purple-600 dark:text-purple-400 font-medium block">
+                Card Payments
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-purple-600 dark:text-purple-400">
+                GH₵ {metrics.cardRevenue.toFixed(2)}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Visa &amp; Mastercard</span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium block">
-              Today&apos;s Collections
-            </span>
-            <div className="mt-1 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-              GH₵ {metrics.todayRevenue.toFixed(2)}
-            </div>
-            <span className="text-[11px] text-gray-400">Settled within past 24h</span>
-          </div>
-        </div>
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium block">
+                Today&apos;s Collections
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
+                GH₵ {metrics.todayRevenue.toFixed(2)}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Settled within past 24h</span>
+            </motion.div>
+          </motion.div>
+        )}
 
         {/* Filters & Search */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
@@ -177,14 +205,19 @@ export default function AdminTransactionsPage() {
         </div>
 
         {/* Transactions Table */}
-        <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-          {isLoading ? (
-            <div className="py-12 text-center text-xs text-gray-400">Loading live financial ledger...</div>
-          ) : transactions.length === 0 ? (
-            <div className="p-8 text-center text-xs text-gray-400">
-              No transactions match your search or filters.
-            </div>
-          ) : (
+        {isLoading ? (
+          <SkeletonTable rows={6} columns={8} />
+        ) : transactions.length === 0 ? (
+          <div className="p-8 text-center text-xs text-gray-400 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs">
+            No transactions match your search or filters.
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+          >
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
@@ -203,7 +236,7 @@ export default function AdminTransactionsPage() {
                   {transactions.map((t) => (
                     <tr
                       key={t.id}
-                      className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition cursor-pointer"
+                      className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors cursor-pointer"
                       onClick={() => setSelectedTx(t)}
                     >
                       <td className="py-3 px-4 text-gray-500 font-mono text-[11px]">
@@ -253,7 +286,7 @@ export default function AdminTransactionsPage() {
                             e.stopPropagation();
                             setSelectedTx(t);
                           }}
-                          className="px-2.5 py-1 text-xs font-semibold rounded-lg text-brand-600 dark:text-blue-light-400 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition cursor-pointer"
+                          className="px-3 py-1.5 text-xs font-semibold rounded-2xl text-brand-600 dark:text-sky-400 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition cursor-pointer"
                         >
                           Details
                         </button>
@@ -263,8 +296,8 @@ export default function AdminTransactionsPage() {
                 </tbody>
               </table>
             </div>
-          )}
-        </div>
+          </motion.div>
+        )}
 
         {/* MODAL: Transaction Details Audit */}
         <Modal
@@ -274,7 +307,7 @@ export default function AdminTransactionsPage() {
         >
           {selectedTx && (
             <div className="space-y-4 text-xs">
-              <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 space-y-2">
+              <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500">Gross Settlement Amount:</span>
                   <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono">
@@ -327,7 +360,7 @@ export default function AdminTransactionsPage() {
               </div>
 
               {selectedTx.metadata && Object.keys(selectedTx.metadata).length > 0 && (
-                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
+                <div className="p-3.5 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
                   <span className="text-[11px] font-bold text-gray-400 block mb-1">
                     System Audit Metadata:
                   </span>
@@ -341,7 +374,7 @@ export default function AdminTransactionsPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedTx(null)}
-                  className="px-4 py-2 text-xs font-semibold rounded-lg text-white bg-brand-500 hover:bg-brand-600 transition shadow-theme-xs cursor-pointer"
+                  className="px-5 py-2.5 text-xs font-semibold rounded-2xl text-white bg-brand-500 hover:bg-brand-600 transition shadow-xs cursor-pointer"
                 >
                   Close Audit
                 </button>

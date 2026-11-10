@@ -2,10 +2,13 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
 import OrderReceipt from "@/components/invoice/OrderReceipt";
+import { SkeletonFeed } from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { StoredOrder, OrderStatus } from "@/lib/order-store";
 
 export default function CustomerOrdersPage() {
@@ -75,41 +78,41 @@ export default function CustomerOrdersPage() {
 
   return (
     <AppLayout role="CUSTOMER">
-      <div className="max-w-4xl mx-auto space-y-5 pb-10">
+      <div className="max-w-4xl mx-auto space-y-6 pb-12">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
               My Orders &amp; Deliveries
             </h1>
-            <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-              Track active water deliveries and view refill receipts.
+            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              Track active water deliveries and view refill receipts across Ghana.
             </p>
           </div>
 
           <Link
             href="/customer/order"
-            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs self-start sm:self-auto cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs self-start sm:self-auto cursor-pointer"
           >
             <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
             </svg>
-            + Order Refill
+            <span>+ Order Refill</span>
           </Link>
         </div>
 
         {/* Filter Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="sm:col-span-2 relative">
             <input
               type="text"
               placeholder="Search by order number (FNW-...), area, or product..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-9.5 pl-8.5 pr-3 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+              className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition shadow-2xs"
             />
             <svg
-              className="size-3.5 text-gray-400 absolute left-3 top-3 pointer-events-none"
+              className="size-4 text-gray-400 absolute left-3.5 top-3.5 pointer-events-none"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -127,7 +130,8 @@ export default function CustomerOrdersPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full h-9.5 px-3 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition cursor-pointer"
+              aria-label="Filter by order status"
+              className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition cursor-pointer shadow-2xs"
             >
               <option value="ALL">All Statuses</option>
               <option value="PENDING">Order Placed</option>
@@ -141,25 +145,33 @@ export default function CustomerOrdersPage() {
 
         {/* Orders List */}
         {loading ? (
-          <div className="py-12 text-center text-xs text-gray-400">Loading your orders...</div>
+          <SkeletonFeed count={4} />
         ) : filteredOrders.length === 0 ? (
-          <div className="p-8 text-center bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
+          <div className="p-8 text-center bg-white dark:bg-gray-900/70 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs">
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               No orders found matching your search.
             </p>
             <Link
               href="/customer/order"
-              className="mt-3 inline-block px-4 py-2 rounded-xl text-xs font-semibold bg-brand-500 text-white"
+              className="mt-3.5 inline-block px-5 py-2.5 rounded-2xl text-xs font-bold bg-brand-500 hover:bg-brand-600 text-white transition shadow-xs"
             >
               Place Your First Refill Order
             </Link>
           </div>
         ) : (
-          <div className="space-y-3">
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="space-y-4"
+          >
             {filteredOrders.map((ord) => (
-              <div
+              <motion.div
                 key={ord.id}
-                className="p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs space-y-3"
+                variants={fadeInUp}
+                whileHover={cardHoverMotion.whileHover}
+                transition={cardHoverMotion.transition}
+                className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs space-y-3.5"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-gray-100 dark:border-gray-800">
                   <div className="flex items-center gap-2">
@@ -176,9 +188,9 @@ export default function CustomerOrdersPage() {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <div className="flex items-center gap-3 self-start sm:self-auto">
                     {getStatusBadge(ord.status)}
-                    <span className="text-xs font-bold text-gray-900 dark:text-white">
+                    <span className="text-sm font-black text-gray-900 dark:text-white">
                       GH₵ {ord.totalAmount.toFixed(2)}
                     </span>
                   </div>
@@ -187,12 +199,12 @@ export default function CustomerOrdersPage() {
                 {/* Items & Address Summary */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div>
-                    <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block mb-1">
+                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
                       Ordered Products
                     </span>
                     <div className="space-y-1">
                       {ord.items.map((it) => (
-                        <div key={it.id} className="text-gray-800 dark:text-gray-200 font-medium">
+                        <div key={it.id} className="text-gray-800 dark:text-gray-200 font-semibold">
                           {it.productName} × {it.quantity}
                         </div>
                       ))}
@@ -200,10 +212,10 @@ export default function CustomerOrdersPage() {
                   </div>
 
                   <div>
-                    <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block mb-1">
+                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
                       Delivery Location &amp; Time
                     </span>
-                    <div className="text-gray-800 dark:text-gray-200">
+                    <div className="text-gray-800 dark:text-gray-200 font-medium">
                       {ord.deliveryAddressText}
                     </div>
                     <div className="font-mono text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
@@ -214,7 +226,7 @@ export default function CustomerOrdersPage() {
 
                 {/* Tracking Action & Details */}
                 <div className="pt-2 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
-                  <span className="text-[11px] text-gray-500 dark:text-gray-400">
+                  <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
                     {ord.hasEmptyBottleExchange ? "Empty Bottles Exchanged" : "Bottle Deposit Paid"}
                   </span>
 
@@ -225,7 +237,7 @@ export default function CustomerOrdersPage() {
                         setReceiptOrder(ord);
                         setIsReceiptModalOpen(true);
                       }}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition cursor-pointer"
                     >
                       <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
@@ -236,7 +248,7 @@ export default function CustomerOrdersPage() {
                     <button
                       type="button"
                       onClick={() => openTracking(ord)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-600 dark:text-blue-light-400 bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 dark:hover:bg-brand-900/60 transition cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-brand-600 dark:text-sky-400 bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 dark:hover:bg-brand-900/60 transition cursor-pointer"
                     >
                       <span>Track Delivery</span>
                       <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
@@ -245,9 +257,9 @@ export default function CustomerOrdersPage() {
                     </button>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
 
         {/* Modal: Live Delivery Tracking Stepper */}

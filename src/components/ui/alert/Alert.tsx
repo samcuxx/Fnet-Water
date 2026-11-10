@@ -59,7 +59,7 @@ const Alert: React.FC<AlertProps> = ({
 
   return (
     <div
-      className={`rounded-xl border p-4 flex items-start gap-3.5 ${currentVariant.container} ${className}`}
+      className={`rounded-2xl border p-4 flex items-start gap-3.5 ${currentVariant.container} ${className}`}
       role="alert"
     >
       <div className={`shrink-0 mt-0.5 ${currentVariant.icon}`}>

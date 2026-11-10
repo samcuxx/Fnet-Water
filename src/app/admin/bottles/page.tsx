@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/badge/Badge";
 import Input from "@/components/form/input/InputField";
+import { SkeletonMetrics, SkeletonTable } from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { BottleExchangeRecord } from "@/lib/dispatch-store";
 
 export default function AdminBottlesPage() {
@@ -48,10 +51,10 @@ export default function AdminBottlesPage() {
     <AppLayout role="ADMIN">
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
                 Bottle Exchanges &amp; Returns Log
               </h1>
               <Badge color="primary" size="sm">
@@ -65,39 +68,64 @@ export default function AdminBottlesPage() {
         </div>
 
         {/* 4 Metric Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-brand-600 font-medium block">Bottles Delivered</span>
-            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-              {summary.totalFilledDelivered}
-            </div>
-            <span className="text-[11px] text-gray-400">Filled 18.9L bottles</span>
-          </div>
+        {isLoading ? (
+          <SkeletonMetrics count={4} />
+        ) : (
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+          >
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs text-brand-600 dark:text-sky-400 font-medium block">Bottles Delivered</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {summary.totalFilledDelivered}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Filled 18.9L bottles</span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-cyan-600 font-medium block">Empty Bottles Collected</span>
-            <div className="mt-1 text-2xl font-bold text-cyan-600">
-              {summary.totalEmptyCollected}
-            </div>
-            <span className="text-[11px] text-gray-400">Returned from customers</span>
-          </div>
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs text-cyan-600 font-medium block">Empty Bottles Collected</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-cyan-600">
+                {summary.totalEmptyCollected}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Returned from customers</span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-amber-600 font-medium block">Damaged Bottles</span>
-            <div className="mt-1 text-2xl font-bold text-amber-600">
-              {summary.totalDamaged}
-            </div>
-            <span className="text-[11px] text-gray-400">Cracked or decommissioned</span>
-          </div>
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs text-amber-600 font-medium block">Damaged Bottles</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-amber-600">
+                {summary.totalDamaged}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Cracked or decommissioned</span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-emerald-600 font-medium block">Cash Collected</span>
-            <div className="mt-1 text-2xl font-bold text-emerald-600">
-              GH₵ {summary.totalCashCollected.toFixed(2)}
-            </div>
-            <span className="text-[11px] text-gray-400">Point-of-delivery cash</span>
-          </div>
-        </div>
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs text-emerald-600 font-medium block">Cash Collected</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-emerald-600">
+                GH₵ {summary.totalCashCollected.toFixed(2)}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Point-of-delivery cash</span>
+            </motion.div>
+          </motion.div>
+        )}
 
         {/* Table Filter */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -114,59 +142,68 @@ export default function AdminBottlesPage() {
         </div>
 
         {/* Table */}
-        <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
-                <th className="py-3 px-4">Date &amp; Time</th>
-                <th className="py-3 px-4">Record ID</th>
-                <th className="py-3 px-4">Bottles Delivered</th>
-                <th className="py-3 px-4">Empties Returned</th>
-                <th className="py-3 px-4">Damaged</th>
-                <th className="py-3 px-4">Cash Collected</th>
-                <th className="py-3 px-4">Customer Notes</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {filtered.map((e) => (
-                <tr key={e.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
-                  <td className="py-3 px-4 text-gray-500 font-mono text-[11px]">
-                    {new Date(e.createdAt).toLocaleString("en-GB", {
-                      dateStyle: "medium",
-                      timeStyle: "short",
-                    })}
-                  </td>
-                  <td className="py-3 px-4 font-mono font-semibold text-gray-900 dark:text-white">
-                    {e.id}
-                  </td>
-                  <td className="py-3 px-4">
-                    <span className="font-bold text-gray-900 dark:text-white">
-                      {e.filledDelivered} Bottles
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <span className="font-bold text-cyan-600">
-                      {e.emptyCollected} Empties
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">
-                    {e.damagedCount > 0 ? (
-                      <span className="font-bold text-amber-600">{e.damagedCount}</span>
-                    ) : (
-                      <span className="text-gray-400">0</span>
-                    )}
-                  </td>
-                  <td className="py-3 px-4 font-bold text-gray-900 dark:text-white">
-                    {e.cashCollected > 0 ? `GH₵ ${e.cashCollected.toFixed(2)}` : "-"}
-                  </td>
-                  <td className="py-3 px-4 text-gray-500 max-w-xs truncate">
-                    {e.customerNotes || "Standard exchange signoff"}
-                  </td>
+        {isLoading ? (
+          <SkeletonTable rows={5} columns={7} />
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+          >
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
+                  <th className="py-3 px-4">Date &amp; Time</th>
+                  <th className="py-3 px-4">Record ID</th>
+                  <th className="py-3 px-4">Bottles Delivered</th>
+                  <th className="py-3 px-4">Empties Returned</th>
+                  <th className="py-3 px-4">Damaged</th>
+                  <th className="py-3 px-4">Cash Collected</th>
+                  <th className="py-3 px-4">Customer Notes</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                {filtered.map((e) => (
+                  <tr key={e.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                    <td className="py-3 px-4 text-gray-500 font-mono text-[11px]">
+                      {new Date(e.createdAt).toLocaleString("en-GB", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
+                    </td>
+                    <td className="py-3 px-4 font-mono font-semibold text-gray-900 dark:text-white">
+                      {e.id}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="font-bold text-gray-900 dark:text-white">
+                        {e.filledDelivered} Bottles
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="font-bold text-cyan-600">
+                        {e.emptyCollected} Empties
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      {e.damagedCount > 0 ? (
+                        <span className="font-bold text-amber-600">{e.damagedCount}</span>
+                      ) : (
+                        <span className="text-gray-400">0</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 font-bold text-gray-900 dark:text-white">
+                      {e.cashCollected > 0 ? `GH₵ ${e.cashCollected.toFixed(2)}` : "-"}
+                    </td>
+                    <td className="py-3 px-4 text-gray-500 max-w-xs truncate">
+                      {e.customerNotes || "Standard exchange signoff"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </motion.div>
+        )}
       </div>
     </AppLayout>
   );

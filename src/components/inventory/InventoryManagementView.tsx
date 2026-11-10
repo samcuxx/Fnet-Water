@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/badge/Badge";
 import Alert from "@/components/ui/alert/Alert";
@@ -11,6 +12,8 @@ import Select from "@/components/form/Select";
 import TextArea from "@/components/form/input/TextArea";
 import BottleDistributionChart from "@/components/inventory/BottleDistributionChart";
 import BottleCirculationGauge from "@/components/inventory/BottleCirculationGauge";
+import { SkeletonMetrics, SkeletonTable } from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import {
   BottleInventoryData,
   DispenserItem,
@@ -229,10 +232,10 @@ export default function InventoryManagementView({
         )}
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
                 Inventory &amp; Stock Tracking
               </h1>
               <Badge color="info" size="sm">
@@ -240,7 +243,7 @@ export default function InventoryManagementView({
               </Badge>
             </div>
             <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              Track warehouse bottles, dispenser assets, circulation rates, and stock audits.
+              Track warehouse bottles, dispenser assets, circulation rates, and stock audits across Ghana.
             </p>
           </div>
 
@@ -251,9 +254,9 @@ export default function InventoryManagementView({
                 setFormError("");
                 setIsAdjustModalOpen(true);
               }}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs cursor-pointer"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               <span>Adjust Stock</span>
@@ -262,73 +265,102 @@ export default function InventoryManagementView({
         </div>
 
         {/* 4 KPI Metric Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {/* Card 1: Filled Warehouse Bottles */}
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-brand-600 dark:text-blue-light-400 font-medium block">
-                Filled in Warehouse
-              </span>
-              {(bottles?.filledWarehouse || 0) < 150 ? (
-                <Badge color="warning" size="sm">Low Stock</Badge>
-              ) : (
-                <Badge color="success" size="sm">Ready</Badge>
-              )}
-            </div>
-            <div className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
-              {bottles?.filledWarehouse ?? 520}
-            </div>
-            <span className="text-[11px] text-gray-400">18.9L bottles ready for delivery</span>
-          </div>
+        {isLoading ? (
+          <SkeletonMetrics count={4} />
+        ) : (
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+          >
+            {/* Card 1: Filled Warehouse Bottles */}
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-brand-600 dark:text-sky-400 font-medium block">
+                  Filled in Warehouse
+                </span>
+                {(bottles?.filledWarehouse || 0) < 150 ? (
+                  <Badge color="warning" size="sm">Low Stock</Badge>
+                ) : (
+                  <Badge color="success" size="sm">Ready</Badge>
+                )}
+              </div>
+              <div className="mt-2 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {bottles?.filledWarehouse ?? 520}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">18.9L bottles ready for delivery</span>
+            </motion.div>
 
-          {/* Card 2: Empty Warehouse Bottles */}
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-cyan-600 dark:text-cyan-400 font-medium block">
-                Empties in Warehouse
-              </span>
-              <Badge color="info" size="sm">Awaiting Wash</Badge>
-            </div>
-            <div className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
-              {bottles?.emptyWarehouse ?? 280}
-            </div>
-            <span className="text-[11px] text-gray-400">Awaiting sanitation &amp; refill</span>
-          </div>
+            {/* Card 2: Empty Warehouse Bottles */}
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-cyan-600 dark:text-cyan-400 font-medium block">
+                  Empties in Warehouse
+                </span>
+                <Badge color="info" size="sm">Awaiting Wash</Badge>
+              </div>
+              <div className="mt-2 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {bottles?.emptyWarehouse ?? 280}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Awaiting sanitation &amp; refill</span>
+            </motion.div>
 
-          {/* Card 3: Bottles with Customers */}
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium block">
-                With Customers
-              </span>
-              <Badge color="success" size="sm">In Field</Badge>
-            </div>
-            <div className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
-              {bottles?.withCustomers ?? 1200}
-            </div>
-            <span className="text-[11px] text-gray-400">Circulating with customers</span>
-          </div>
+            {/* Card 3: Bottles with Customers */}
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium block">
+                  With Customers
+                </span>
+                <Badge color="success" size="sm">In Field</Badge>
+              </div>
+              <div className="mt-2 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {bottles?.withCustomers ?? 1200}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Circulating with customers</span>
+            </motion.div>
 
-          {/* Card 4: Available Dispensers */}
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-purple-600 dark:text-purple-400 font-medium block">
-                Available Dispensers
+            {/* Card 4: Available Dispensers */}
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-purple-600 dark:text-purple-400 font-medium block">
+                  Available Dispensers
+                </span>
+                {availableDispensersCount < 5 ? (
+                  <Badge color="warning" size="sm">Restock Soon</Badge>
+                ) : (
+                  <Badge color="info" size="sm">Warehouse</Badge>
+                )}
+              </div>
+              <div className="mt-2 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {availableDispensersCount} Units
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">
+                {onPlanDispensersCount} installed on plans
               </span>
-              {availableDispensersCount < 5 ? (
-                <Badge color="warning" size="sm">Restock Soon</Badge>
-              ) : (
-                <Badge color="info" size="sm">Warehouse</Badge>
-              )}
-            </div>
-            <div className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
-              {availableDispensersCount} Units
-            </div>
-            <span className="text-[11px] text-gray-400">
-              {onPlanDispensersCount} installed on plans
-            </span>
-          </div>
-        </div>
+            </motion.div>
+          </motion.div>
+        )}
 
         {/* Charts Grid: 7 / 5 Column Split */}
         <div className="grid grid-cols-12 gap-4 md:gap-6">
@@ -413,7 +445,7 @@ export default function InventoryManagementView({
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs space-y-3">
+            <div className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs space-y-3">
               <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                 Field Circulation &amp; Customers
               </h4>
@@ -433,7 +465,7 @@ export default function InventoryManagementView({
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs space-y-3">
+            <div className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs space-y-3">
               <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                 Exceptions &amp; Loss Prevention
               </h4>
@@ -488,66 +520,75 @@ export default function InventoryManagementView({
               </span>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
-                    <th className="py-3 px-4">Serial &amp; Model</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4">Deployment / Location</th>
-                    <th className="py-3 px-4">Sensors</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                  {filteredDispensers.map((disp) => (
-                    <tr key={disp.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
-                      <td className="py-3 px-4">
-                        <span className="font-mono font-bold text-gray-900 dark:text-white block">
-                          {disp.serialNumber}
-                        </span>
-                        <span className="text-gray-500 text-[11px]">{disp.modelName}</span>
-                      </td>
-                      <td className="py-3 px-4">
-                        {disp.status === "AVAILABLE" && <Badge color="success" size="sm">Available</Badge>}
-                        {disp.status === "INSTALLED_ON_PLAN" && <Badge color="info" size="sm">Rent-to-Own</Badge>}
-                        {disp.status === "INSTALLED_OWNED" && <Badge color="primary" size="sm">Customer Owned</Badge>}
-                        {disp.status === "FAULTY" && <Badge color="error" size="sm">Faulty</Badge>}
-                        {disp.status === "MAINTENANCE" && <Badge color="warning" size="sm">In Maintenance</Badge>}
-                      </td>
-                      <td className="py-3 px-4">
-                        {disp.customerName ? (
-                          <div>
-                            <span className="font-semibold text-gray-800 dark:text-gray-200 block">
-                              {disp.customerName}
-                            </span>
-                            <span className="text-gray-400 text-[11px]">{disp.location}</span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-500 italic">{disp.location || "Central Warehouse"}</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-3 text-[11px]">
-                          <span>Water: {disp.waterLevelPercent}%</span>
-                          <span>Battery: {disp.batteryPercent}%</span>
-                          <span className={`size-2 rounded-full ${disp.isOnline ? "bg-emerald-500" : "bg-gray-400"}`} />
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <button
-                          type="button"
-                          onClick={() => openDispenserModal(disp)}
-                          className="px-2.5 py-1 text-xs font-semibold rounded-lg text-brand-600 dark:text-blue-light-400 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition cursor-pointer"
-                        >
-                          Update Status
-                        </button>
-                      </td>
+            {isLoading ? (
+              <SkeletonTable rows={5} columns={5} />
+            ) : (
+              <motion.div
+                variants={fadeInUp}
+                initial="initial"
+                animate="animate"
+                className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+              >
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
+                      <th className="py-3 px-4">Serial &amp; Model</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4">Deployment / Location</th>
+                      <th className="py-3 px-4">Sensors</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                    {filteredDispensers.map((disp) => (
+                      <tr key={disp.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="py-3 px-4">
+                          <span className="font-mono font-bold text-gray-900 dark:text-white block">
+                            {disp.serialNumber}
+                          </span>
+                          <span className="text-gray-500 text-[11px]">{disp.modelName}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                          {disp.status === "AVAILABLE" && <Badge color="success" size="sm">Available</Badge>}
+                          {disp.status === "INSTALLED_ON_PLAN" && <Badge color="info" size="sm">Rent-to-Own</Badge>}
+                          {disp.status === "INSTALLED_OWNED" && <Badge color="primary" size="sm">Customer Owned</Badge>}
+                          {disp.status === "FAULTY" && <Badge color="error" size="sm">Faulty</Badge>}
+                          {disp.status === "MAINTENANCE" && <Badge color="warning" size="sm">In Maintenance</Badge>}
+                        </td>
+                        <td className="py-3 px-4">
+                          {disp.customerName ? (
+                            <div>
+                              <span className="font-semibold text-gray-800 dark:text-gray-200 block">
+                                {disp.customerName}
+                              </span>
+                              <span className="text-gray-400 text-[11px]">{disp.location}</span>
+                            </div>
+                          ) : (
+                            <span className="text-gray-500 italic">{disp.location || "Central Warehouse"}</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-3 text-[11px]">
+                            <span>Water: {disp.waterLevelPercent}%</span>
+                            <span>Battery: {disp.batteryPercent}%</span>
+                            <span className={`size-2 rounded-full ${disp.isOnline ? "bg-emerald-500" : "bg-gray-400"}`} />
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <button
+                            type="button"
+                            onClick={() => openDispenserModal(disp)}
+                            className="px-2.5 py-1 text-xs font-semibold rounded-lg text-brand-600 dark:text-blue-light-400 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition cursor-pointer"
+                          >
+                            Update Status
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </motion.div>
+            )}
           </div>
         )}
 
@@ -567,64 +608,73 @@ export default function InventoryManagementView({
               </span>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
-                    <th className="py-3 px-4">Date &amp; Time</th>
-                    <th className="py-3 px-4">Staff Member</th>
-                    <th className="py-3 px-4">Action</th>
-                    <th className="py-3 px-4">Item Type</th>
-                    <th className="py-3 px-4">Change Delta</th>
-                    <th className="py-3 px-4">Reason / Notes</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                  {filteredLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
-                      <td className="py-3 px-4 text-gray-500 font-mono text-[11px]">
-                        {new Date(log.timestamp).toLocaleString("en-GB", {
-                          dateStyle: "medium",
-                          timeStyle: "short",
-                        })}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="font-semibold text-gray-800 dark:text-gray-200 block">
-                          {log.userName}
-                        </span>
-                        <span className="text-[10px] text-gray-400">{log.userEmail}</span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                          {log.action}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">
-                        {log.itemType.replace("_", " ")}
-                      </td>
-                      <td className="py-3 px-4">
-                        {log.delta !== 0 ? (
-                          <span
-                            className={`font-bold font-mono ${
-                              log.delta > 0
-                                ? "text-emerald-600 dark:text-emerald-400"
-                                : "text-rose-600 dark:text-rose-400"
-                            }`}
-                          >
-                            {log.delta > 0 ? `+${log.delta}` : log.delta}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400">0</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4 text-gray-600 dark:text-gray-400 max-w-xs truncate">
-                        {log.reason}
-                      </td>
+            {isLoading ? (
+              <SkeletonTable rows={5} columns={6} />
+            ) : (
+              <motion.div
+                variants={fadeInUp}
+                initial="initial"
+                animate="animate"
+                className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+              >
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
+                      <th className="py-3 px-4">Date &amp; Time</th>
+                      <th className="py-3 px-4">Staff Member</th>
+                      <th className="py-3 px-4">Action</th>
+                      <th className="py-3 px-4">Item Type</th>
+                      <th className="py-3 px-4">Change Delta</th>
+                      <th className="py-3 px-4">Reason / Notes</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                    {filteredLogs.map((log) => (
+                      <tr key={log.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="py-3 px-4 text-gray-500 font-mono text-[11px]">
+                          {new Date(log.timestamp).toLocaleString("en-GB", {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          })}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="font-semibold text-gray-800 dark:text-gray-200 block">
+                            {log.userName}
+                          </span>
+                          <span className="text-[10px] text-gray-400">{log.userEmail}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                            {log.action}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">
+                          {log.itemType.replace("_", " ")}
+                        </td>
+                        <td className="py-3 px-4">
+                          {log.delta !== 0 ? (
+                            <span
+                              className={`font-bold font-mono ${
+                                log.delta > 0
+                                  ? "text-emerald-600 dark:text-emerald-400"
+                                  : "text-rose-600 dark:text-rose-400"
+                              }`}
+                            >
+                              {log.delta > 0 ? `+${log.delta}` : log.delta}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">0</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-gray-600 dark:text-gray-400 max-w-xs truncate">
+                          {log.reason}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </motion.div>
+            )}
           </div>
         )}
 

@@ -53,10 +53,10 @@ export default function AdminAgentsPage() {
     <AppLayout role="ADMIN">
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
                 Field Sales Agents
               </h1>
               <Badge color="primary" size="sm">
@@ -64,40 +64,40 @@ export default function AdminAgentsPage() {
               </Badge>
             </div>
             <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              Community agents onboarding new residential, shop, and corporate pure water accounts.
+              Community agents onboarding new residential, shop, and corporate pure water accounts across Ghana.
             </p>
           </div>
         </div>
 
         {/* 3 Metric Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          <div className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs">
             <span className="text-xs text-gray-500 font-medium block">Active Field Agents</span>
-            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+            <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
               {mockAgents.length} Agents
             </div>
-            <span className="text-[11px] text-gray-400">Operational across assigned territories</span>
+            <span className="text-[11px] text-gray-400 mt-1 block">Operational across assigned territories</span>
           </div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-brand-600 font-medium block">Agent Customer Accounts</span>
-            <div className="mt-1 text-2xl font-bold text-brand-600 dark:text-blue-light-400">
+          <div className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs">
+            <span className="text-xs text-brand-600 dark:text-sky-400 font-medium block">Agent Customer Accounts</span>
+            <div className="mt-1 text-2xl sm:text-3xl font-black text-brand-600 dark:text-sky-400">
               {mockAgents.reduce((acc, a) => acc + a.activeAccounts, 0)} Accounts
             </div>
-            <span className="text-[11px] text-gray-400">Onboarded through field sales</span>
+            <span className="text-[11px] text-gray-400 mt-1 block">Onboarded through field sales</span>
           </div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+          <div className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs">
             <span className="text-xs text-emerald-600 font-medium block">Dispensers Deployed</span>
-            <div className="mt-1 text-2xl font-bold text-emerald-600">
+            <div className="mt-1 text-2xl sm:text-3xl font-black text-emerald-600">
               {mockAgents.reduce((acc, a) => acc + a.dispensersDeployed, 0)} Units
             </div>
-            <span className="text-[11px] text-gray-400">Rent-to-own signed via agents</span>
+            <span className="text-[11px] text-gray-400 mt-1 block">Rent-to-own signed via agents</span>
           </div>
         </div>
 
         {/* Agents Table */}
-        <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+        <div className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs">
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">

@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Modal from "@/components/ui/Modal";
 import Badge from "@/components/ui/Badge";
+import { SkeletonMetrics, SkeletonTable } from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { StatusType } from "@/types/next-auth";
 
 interface CustomerItem {
@@ -287,9 +290,9 @@ export default function AdminCustomersPage() {
         )}
 
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
               Customer Directory
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
@@ -302,42 +305,71 @@ export default function AdminCustomersPage() {
               setFormError(null);
               setIsAddModalOpen(true);
             }}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs sm:text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs self-start sm:self-auto cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs self-start sm:self-auto cursor-pointer"
           >
             <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
             </svg>
-            Add Customer
+            <span>+ Add Customer</span>
           </button>
         </div>
 
         {/* KPI Summary Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Accounts</span>
-            <div className="mt-1 text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-              {metrics.total}
-            </div>
-          </div>
-          <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Active Refill Users</span>
-            <div className="mt-1 text-xl sm:text-2xl font-bold text-brand-600 dark:text-brand-400">
-              {metrics.active}
-            </div>
-          </div>
-          <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Bottles in Custody</span>
-            <div className="mt-1 text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {metrics.totalBottles}
-            </div>
-          </div>
-          <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Active Dispenser Leases</span>
-            <div className="mt-1 text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">
-              {metrics.dispenserPlans}
-            </div>
-          </div>
-        </div>
+        {initialLoading ? (
+          <SkeletonMetrics count={4} />
+        ) : (
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"
+          >
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Accounts</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {metrics.total}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Registered customers</span>
+            </motion.div>
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Active Refill Users</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-brand-600 dark:text-sky-400">
+                {metrics.active}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Active water subscribers</span>
+            </motion.div>
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Bottles in Custody</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-blue-600 dark:text-blue-400">
+                {metrics.totalBottles}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">18.9L bottles in field</span>
+            </motion.div>
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Active Dispenser Leases</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400">
+                {metrics.dispenserPlans}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Rent-to-own dispensers</span>
+            </motion.div>
+          </motion.div>
+        )}
 
         {/* Filter & Search Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -347,10 +379,10 @@ export default function AdminCustomersPage() {
               placeholder="Search by customer name, code (CUST-...), phone, or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-10 pl-9 pr-3 text-xs sm:text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
+              className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition shadow-2xs"
             />
             <svg
-              className="size-4 text-gray-400 absolute left-3 top-3 pointer-events-none"
+              className="size-4 text-gray-400 absolute left-3.5 top-3.5 pointer-events-none"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -368,7 +400,7 @@ export default function AdminCustomersPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full h-10 px-3 text-xs sm:text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
+              className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition cursor-pointer shadow-2xs"
             >
               <option value="ALL">All Statuses</option>
               <option value="ACTIVE">Active Customers</option>
@@ -378,43 +410,45 @@ export default function AdminCustomersPage() {
         </div>
 
         {/* Customers Table */}
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs sm:text-sm border-collapse">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 text-gray-600 dark:text-gray-400 font-semibold">
-                  <th className="py-3 px-4">Customer</th>
-                  <th className="py-3 px-4">Account ID</th>
-                  <th className="py-3 px-4">Contact Phone</th>
-                  <th className="py-3 px-4">Bottles Held</th>
-                  <th className="py-3 px-4">Dispenser Plan</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
-                {initialLoading ? (
-                  <tr>
-                    <td colSpan={7} className="py-8 text-center text-gray-500 dark:text-gray-400">
-                      Loading customer directory...
-                    </td>
+        {initialLoading ? (
+          <SkeletonTable rows={6} columns={7} />
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white dark:bg-gray-900/70 border border-gray-100 dark:border-gray-800/80 rounded-[28px] overflow-hidden shadow-xs"
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs sm:text-sm border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 text-gray-600 dark:text-gray-400 font-semibold">
+                    <th className="py-3 px-4">Customer</th>
+                    <th className="py-3 px-4">Account ID</th>
+                    <th className="py-3 px-4">Contact Phone</th>
+                    <th className="py-3 px-4">Bottles Held</th>
+                    <th className="py-3 px-4">Dispenser Plan</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
-                ) : filteredCustomers.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="py-8 text-center text-gray-500 dark:text-gray-400">
-                      No customers match your criteria.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredCustomers.map((cust) => (
-                    <tr
-                      key={cust.id}
-                      className="hover:bg-gray-50/60 dark:hover:bg-gray-800/30 transition-colors"
-                    >
-                      <td className="py-3.5 px-4">
-                        <div className="font-medium text-gray-900 dark:text-white">{cust.name}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">{cust.email}</div>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
+                  {filteredCustomers.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="py-8 text-center text-gray-500 dark:text-gray-400">
+                        No customers match your criteria.
                       </td>
+                    </tr>
+                  ) : (
+                    filteredCustomers.map((cust) => (
+                      <tr
+                        key={cust.id}
+                        className="hover:bg-gray-50/60 dark:hover:bg-gray-800/30 transition-colors"
+                      >
+                        <td className="py-3.5 px-4">
+                          <div className="font-medium text-gray-900 dark:text-white">{cust.name}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">{cust.email}</div>
+                        </td>
 
                       <td className="py-3.5 px-4">
                         <span className="font-mono text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-semibold">
@@ -522,7 +556,8 @@ export default function AdminCustomersPage() {
               </tbody>
             </table>
           </div>
-        </div>
+        </motion.div>
+      )}
 
         {/* Modal: Add Customer */}
         <Modal

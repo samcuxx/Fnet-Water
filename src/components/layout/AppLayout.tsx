@@ -2,11 +2,13 @@
 
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { motion } from "framer-motion";
 import { SidebarProvider, useSidebar } from "@/context/SidebarContext";
 import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
 import Backdrop from "./Backdrop";
 import MobileDock from "./MobileDock";
+import { SkeletonAppShell } from "@/components/ui/skeleton";
 import type { RoleType } from "@/types/next-auth";
 
 interface AppLayoutProps {
@@ -27,20 +29,24 @@ const LayoutContent: React.FC<{
   const activeRole: RoleType = sessionRole || (Array.isArray(role) ? role[0] : role);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-[#071E3D] text-gray-900 dark:text-gray-100 flex p-0 sm:p-2.5 lg:p-3 xl:p-3.5 antialiased selection:bg-brand-500 selection:text-white">
       <AppSidebar role={activeRole} />
       <Backdrop />
 
-      <div
-        className={`flex flex-col min-h-screen transition-all duration-300 ease-in-out ${
-          isSidebarVisible ? "xl:ml-[270px]" : "xl:ml-[80px]"
+      {/* Floating Island: Elevated white canvas with ultra-smooth rounded corners */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.995 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.28, ease: "easeOut" }}
+        className={`flex-1 flex flex-col min-h-[calc(100vh-1rem)] sm:min-h-[calc(100vh-1.5rem)] bg-white dark:bg-gray-950 rounded-none sm:rounded-[28px] lg:rounded-[36px] shadow-2xl shadow-black/35 overflow-hidden transition-all duration-300 ease-in-out ${
+          isSidebarVisible ? "xl:ml-[270px]" : "xl:ml-[84px]"
         } ${isMobileOpen ? "ml-0" : ""}`}
       >
         <AppHeader />
-        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto pb-24 lg:pb-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 w-full max-w-[1600px] mx-auto pb-24 lg:pb-8 overflow-y-auto">
           {children}
         </main>
-      </div>
+      </motion.div>
 
       {/* Floating Mobile Dock for Task Navigation */}
       <MobileDock role={activeRole} />
@@ -95,16 +101,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, role = "ADMIN" }
     }
   }, [status, session, role]);
 
-  // If session is loading, show clean loading placeholder rather than raw unauthenticated screen
+  // If session is loading, show clean skeleton shell rather than raw spinner
   if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center gap-3">
-        <div className="size-8 rounded-full border-2 border-brand-500 border-t-transparent animate-spin" />
-        <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-          Verifying security session...
-        </span>
-      </div>
-    );
+    return <SkeletonAppShell />;
   }
 
   // Never render protected children if unauthenticated

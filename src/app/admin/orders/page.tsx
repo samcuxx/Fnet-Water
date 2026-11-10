@@ -1,12 +1,15 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/badge/Badge";
 import Input from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
 import { Modal } from "@/components/ui/Modal";
 import OrderReceipt from "@/components/invoice/OrderReceipt";
+import { SkeletonMetrics, SkeletonTable } from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { StoredOrder, OrderStatus } from "@/lib/order-store";
 
 export default function AdminOrdersPage() {
@@ -71,10 +74,10 @@ export default function AdminOrdersPage() {
     <AppLayout role="ADMIN">
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
                 Customer Water Orders
               </h1>
               <Badge color="primary" size="sm">
@@ -88,39 +91,64 @@ export default function AdminOrdersPage() {
         </div>
 
         {/* 4 KPI Metric Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-gray-500 font-medium block">Total Orders</span>
-            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-              {orders.length}
-            </div>
-            <span className="text-[11px] text-gray-400">All customer submissions</span>
-          </div>
+        {isLoading ? (
+          <SkeletonMetrics count={4} />
+        ) : (
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+          >
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs text-gray-500 font-medium block">Total Orders</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {orders.length}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">All customer submissions</span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-amber-600 font-medium block">Awaiting Dispatch</span>
-            <div className="mt-1 text-2xl font-bold text-amber-600">
-              {pendingCount}
-            </div>
-            <span className="text-[11px] text-gray-400">Ready for driver assignment</span>
-          </div>
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs text-amber-600 font-medium block">Awaiting Dispatch</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-amber-600">
+                {pendingCount}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Ready for driver assignment</span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-brand-600 font-medium block">In Transit</span>
-            <div className="mt-1 text-2xl font-bold text-brand-600 dark:text-blue-light-400">
-              {inTransitCount}
-            </div>
-            <span className="text-[11px] text-gray-400">En route to customers</span>
-          </div>
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs text-brand-600 font-medium block">In Transit</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-brand-600 dark:text-sky-400">
+                {inTransitCount}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">En route to customers</span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-emerald-600 font-medium block">Completed</span>
-            <div className="mt-1 text-2xl font-bold text-emerald-600">
-              {deliveredCount}
-            </div>
-            <span className="text-[11px] text-gray-400">Delivered and fulfilled</span>
-          </div>
-        </div>
+            <motion.div
+              variants={fadeInUp}
+              {...cardHoverMotion}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
+            >
+              <span className="text-xs text-emerald-600 font-medium block">Completed</span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-emerald-600">
+                {deliveredCount}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Delivered and fulfilled</span>
+            </motion.div>
+          </motion.div>
+        )}
 
         {/* Search & Filter Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -151,60 +179,69 @@ export default function AdminOrdersPage() {
         </div>
 
         {/* Orders Table */}
-        <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
-                <th className="py-3 px-4">Order ID</th>
-                <th className="py-3 px-4">Customer</th>
-                <th className="py-3 px-4">Delivery Location</th>
-                <th className="py-3 px-4">Items</th>
-                <th className="py-3 px-4">Total</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {filteredOrders.map((ord) => (
-                <tr key={ord.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
-                  <td className="py-3 px-4 font-mono font-bold text-gray-900 dark:text-white">
-                    {ord.orderNumber}
-                  </td>
-                  <td className="py-3 px-4">
-                    <span className="font-semibold text-gray-800 dark:text-gray-200 block">
-                      {ord.customerName}
-                    </span>
-                    <span className="text-[11px] text-gray-400">{ord.customerPhone}</span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <span className="block text-gray-800 dark:text-gray-200 truncate max-w-xs">
-                      {ord.deliveryAddressText}
-                    </span>
-                    <span className="text-[10px] font-mono text-gray-400">
-                      {ord.deliveryDigitalAddress}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-gray-600 dark:text-gray-400">
-                    {ord.items.map((it) => `${it.productName} (${it.quantity})`).join(", ")}
-                  </td>
-                  <td className="py-3 px-4 font-bold text-gray-900 dark:text-white">
-                    GH₵ {ord.totalAmount.toFixed(2)}
-                  </td>
-                  <td className="py-3 px-4">{getStatusBadge(ord.status)}</td>
-                  <td className="py-3 px-4 text-right">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedOrder(ord)}
-                      className="px-2.5 py-1 text-xs font-semibold rounded-lg text-brand-600 dark:text-blue-light-400 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition cursor-pointer"
-                    >
-                      View Details
-                    </button>
-                  </td>
+        {isLoading ? (
+          <SkeletonTable rows={6} columns={7} />
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+          >
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
+                  <th className="py-3 px-4">Order ID</th>
+                  <th className="py-3 px-4">Customer</th>
+                  <th className="py-3 px-4">Delivery Location</th>
+                  <th className="py-3 px-4">Items</th>
+                  <th className="py-3 px-4">Total</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                {filteredOrders.map((ord) => (
+                  <tr key={ord.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                    <td className="py-3 px-4 font-mono font-bold text-gray-900 dark:text-white">
+                      {ord.orderNumber}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="font-semibold text-gray-800 dark:text-gray-200 block">
+                        {ord.customerName}
+                      </span>
+                      <span className="text-[11px] text-gray-400">{ord.customerPhone}</span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="block text-gray-800 dark:text-gray-200 truncate max-w-xs">
+                        {ord.deliveryAddressText}
+                      </span>
+                      <span className="text-[10px] font-mono text-gray-400">
+                        {ord.deliveryDigitalAddress}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-gray-600 dark:text-gray-400">
+                      {ord.items.map((it) => `${it.productName} (${it.quantity})`).join(", ")}
+                    </td>
+                    <td className="py-3 px-4 font-bold text-gray-900 dark:text-white">
+                      GH₵ {ord.totalAmount.toFixed(2)}
+                    </td>
+                    <td className="py-3 px-4">{getStatusBadge(ord.status)}</td>
+                    <td className="py-3 px-4 text-right">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedOrder(ord)}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-2xl text-brand-600 dark:text-sky-400 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition cursor-pointer"
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </motion.div>
+        )}
 
         {/* Order Details Modal */}
         <Modal

@@ -1,11 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/badge/Badge";
 import Alert from "@/components/ui/alert/Alert";
 import Input from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
+import { SkeletonMetrics, SkeletonTable } from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import { StoredDispenserPlan, StoredDispenserFault } from "@/lib/dispenser-store";
 
 export default function DispensersManagementView({
@@ -98,10 +101,10 @@ export default function DispensersManagementView({
     <AppLayout role={role}>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
                 Smart Dispenser Fleet &amp; IoT Telemetry
               </h1>
               <Badge color="info" size="sm">
@@ -115,47 +118,76 @@ export default function DispensersManagementView({
         </div>
 
         {/* 4 KPI Metric Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-brand-600 dark:text-blue-light-400 font-medium block">
-              Active Rent-to-Own
-            </span>
-            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-              {dispensers.filter((d) => !d.isFullyPaid).length} Units
-            </div>
-            <span className="text-[11px] text-gray-400">Monthly installments active</span>
-          </div>
+        {isLoading ? (
+          <SkeletonMetrics count={4} />
+        ) : (
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+          >
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs text-brand-600 dark:text-sky-400 font-medium block">
+                Active Rent-to-Own
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {dispensers.filter((d) => !d.isFullyPaid).length} Units
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Monthly installments active</span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium block">
-              Customer Owned
-            </span>
-            <div className="mt-1 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-              {dispensers.filter((d) => d.isFullyPaid).length} Units
-            </div>
-            <span className="text-[11px] text-gray-400">100% paid off and transferred</span>
-          </div>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium block">
+                Customer Owned
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
+                {dispensers.filter((d) => d.isFullyPaid).length} Units
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">100% paid off and transferred</span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-purple-600 dark:text-purple-400 font-medium block">
-              IoT Online Telemetry
-            </span>
-            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-              {dispensers.filter((d) => d.isOnline).length} / {dispensers.length}
-            </div>
-            <span className="text-[11px] text-gray-400">Active telemetry ping</span>
-          </div>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs text-purple-600 dark:text-purple-400 font-medium block">
+                IoT Online Telemetry
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {dispensers.filter((d) => d.isOnline).length} / {dispensers.length}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Active telemetry ping</span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-rose-600 dark:text-rose-400 font-medium block">
-              Open Service Tickets
-            </span>
-            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-              {faults.filter((f) => f.status !== "RESOLVED").length} Tickets
-            </div>
-            <span className="text-[11px] text-gray-400">Service visits queued</span>
-          </div>
-        </div>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs text-rose-600 dark:text-rose-400 font-medium block">
+                Open Service Tickets
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {faults.filter((f) => f.status !== "RESOLVED").length} Tickets
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Service visits queued</span>
+            </motion.div>
+          </motion.div>
+        )}
 
         {/* Tab Navigation */}
         <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800">
@@ -222,76 +254,85 @@ export default function DispensersManagementView({
               </span>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 bg-gray-50/50 dark:bg-gray-800/50">
-                    <th className="py-3 px-4">Serial &amp; Model</th>
-                    <th className="py-3 px-4">Customer &amp; Phone</th>
-                    <th className="py-3 px-4">Contract Status</th>
-                    <th className="py-3 px-4">Financial Progress</th>
-                    <th className="py-3 px-4">Live IoT Telemetry</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                  {filteredDispensers.map((disp) => (
-                    <tr key={disp.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
-                      <td className="py-3 px-4">
-                        <span className="font-mono font-bold text-gray-900 dark:text-white block">
-                          {disp.serialNumber}
-                        </span>
-                        <span className="text-gray-500 text-[11px]">{disp.modelName}</span>
-                      </td>
-
-                      <td className="py-3 px-4">
-                        <span className="font-semibold text-gray-800 dark:text-gray-200 block">
-                          {disp.customerName}
-                        </span>
-                        <span className="text-gray-400 text-[11px] font-mono">{disp.customerPhone}</span>
-                      </td>
-
-                      <td className="py-3 px-4">
-                        {disp.isFullyPaid ? (
-                          <Badge color="success" size="sm">
-                            Customer Owned
-                          </Badge>
-                        ) : (
-                          <Badge color="info" size="sm">
-                            Rent-to-Own ({disp.installmentsPaidCount}/{disp.totalInstallmentsCount})
-                          </Badge>
-                        )}
-                      </td>
-
-                      <td className="py-3 px-4">
-                        <div className="space-y-1">
-                          <div className="flex justify-between text-[11px]">
-                            <span className="text-emerald-600 font-bold">GH₵ {disp.amountPaid.toFixed(2)}</span>
-                            <span className="text-gray-400">/ GH₵ {disp.totalCost.toFixed(2)}</span>
-                          </div>
-                          <div className="w-28 bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${disp.isFullyPaid ? "bg-emerald-500" : "bg-brand-500"}`}
-                              style={{ width: `${Math.min(100, (disp.amountPaid / disp.totalCost) * 100)}%` }}
-                            />
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2 text-[11px]">
-                          <span className={`size-2 rounded-full ${disp.isOnline ? "bg-emerald-500" : "bg-rose-500"}`} />
-                          <span className={disp.waterLevelPercent < 15 ? "text-amber-600 font-bold" : "text-gray-700 dark:text-gray-300"}>
-                            Water: {disp.waterLevelPercent}%
-                          </span>
-                          <span className="text-gray-400">•</span>
-                          <span className="text-gray-500">Bat: {disp.batteryPercent}%</span>
-                        </div>
-                      </td>
+            {isLoading ? (
+              <SkeletonTable rows={5} columns={5} />
+            ) : (
+              <motion.div
+                variants={fadeInUp}
+                initial="initial"
+                animate="animate"
+                className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+              >
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 bg-gray-50/50 dark:bg-gray-800/50">
+                      <th className="py-3 px-4">Serial &amp; Model</th>
+                      <th className="py-3 px-4">Customer &amp; Phone</th>
+                      <th className="py-3 px-4">Contract Status</th>
+                      <th className="py-3 px-4">Financial Progress</th>
+                      <th className="py-3 px-4">Live IoT Telemetry</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                    {filteredDispensers.map((disp) => (
+                      <tr key={disp.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="py-3 px-4">
+                          <span className="font-mono font-bold text-gray-900 dark:text-white block">
+                            {disp.serialNumber}
+                          </span>
+                          <span className="text-gray-500 text-[11px]">{disp.modelName}</span>
+                        </td>
+
+                        <td className="py-3 px-4">
+                          <span className="font-semibold text-gray-800 dark:text-gray-200 block">
+                            {disp.customerName}
+                          </span>
+                          <span className="text-gray-400 text-[11px] font-mono">{disp.customerPhone}</span>
+                        </td>
+
+                        <td className="py-3 px-4">
+                          {disp.isFullyPaid ? (
+                            <Badge color="success" size="sm">
+                              Customer Owned
+                            </Badge>
+                          ) : (
+                            <Badge color="info" size="sm">
+                              Rent-to-Own ({disp.installmentsPaidCount}/{disp.totalInstallmentsCount})
+                            </Badge>
+                          )}
+                        </td>
+
+                        <td className="py-3 px-4">
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-[11px]">
+                              <span className="text-emerald-600 font-bold">GH₵ {disp.amountPaid.toFixed(2)}</span>
+                              <span className="text-gray-400">/ GH₵ {disp.totalCost.toFixed(2)}</span>
+                            </div>
+                            <div className="w-28 bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full ${disp.isFullyPaid ? "bg-emerald-500" : "bg-brand-500"}`}
+                                style={{ width: `${Math.min(100, (disp.amountPaid / disp.totalCost) * 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-2 text-[11px]">
+                            <span className={`size-2 rounded-full ${disp.isOnline ? "bg-emerald-500" : "bg-rose-500"}`} />
+                            <span className={disp.waterLevelPercent < 15 ? "text-amber-600 font-bold" : "text-gray-700 dark:text-gray-300"}>
+                              Water: {disp.waterLevelPercent}%
+                            </span>
+                            <span className="text-gray-400">•</span>
+                            <span className="text-gray-500">Bat: {disp.batteryPercent}%</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </motion.div>
+            )}
           </div>
         )}
 
@@ -497,66 +538,75 @@ export default function DispensersManagementView({
 
         {/* TAB 3: CUSTOMER SERVICE & FAULT REQUESTS */}
         {activeTab === "faults" && (
-          <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 bg-gray-50/50 dark:bg-gray-800/50">
-                  <th className="py-3 px-4">Date</th>
-                  <th className="py-3 px-4">Dispenser &amp; Customer</th>
-                  <th className="py-3 px-4">Issue Reported</th>
-                  <th className="py-3 px-4">Urgency</th>
-                  <th className="py-3 px-4 text-right">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {faults.map((flt) => (
-                  <tr key={flt.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
-                    <td className="py-3 px-4 text-gray-500">
-                      {new Date(flt.createdAt).toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </td>
-
-                    <td className="py-3 px-4">
-                      <span className="font-mono font-bold text-gray-900 dark:text-white block">
-                        {flt.serialNumber}
-                      </span>
-                      <span className="text-gray-600 dark:text-gray-400">
-                        {flt.customerName} ({flt.customerPhone})
-                      </span>
-                    </td>
-
-                    <td className="py-3 px-4">
-                      <span className="font-semibold text-gray-800 dark:text-gray-200 block">
-                        {flt.issueType.replace("_", " ")}
-                      </span>
-                      <p className="text-[11px] text-gray-500 max-w-sm truncate">
-                        {flt.description}
-                      </p>
-                    </td>
-
-                    <td className="py-3 px-4">
-                      {flt.urgency === "HIGH" && <Badge color="error" size="sm">High</Badge>}
-                      {flt.urgency === "NORMAL" && <Badge color="warning" size="sm">Normal</Badge>}
-                      {flt.urgency === "LOW" && <Badge color="info" size="sm">Low</Badge>}
-                    </td>
-
-                    <td className="py-3 px-4 text-right">
-                      {flt.status === "RESOLVED" ? (
-                        <span className="text-emerald-600 font-semibold">Resolved</span>
-                      ) : (
-                        <Badge color="warning" size="sm">
-                          {flt.status === "IN_PROGRESS" ? "In Progress" : "Open"}
-                        </Badge>
-                      )}
-                    </td>
+          isLoading ? (
+            <SkeletonTable rows={4} columns={5} />
+          ) : (
+            <motion.div
+              variants={fadeInUp}
+              initial="initial"
+              animate="animate"
+              className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 bg-gray-50/50 dark:bg-gray-800/50">
+                    <th className="py-3 px-4">Date</th>
+                    <th className="py-3 px-4">Dispenser &amp; Customer</th>
+                    <th className="py-3 px-4">Issue Reported</th>
+                    <th className="py-3 px-4">Urgency</th>
+                    <th className="py-3 px-4 text-right">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                  {faults.map((flt) => (
+                    <tr key={flt.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                      <td className="py-3 px-4 text-gray-500">
+                        {new Date(flt.createdAt).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </td>
+
+                      <td className="py-3 px-4">
+                        <span className="font-mono font-bold text-gray-900 dark:text-white block">
+                          {flt.serialNumber}
+                        </span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {flt.customerName} ({flt.customerPhone})
+                        </span>
+                      </td>
+
+                      <td className="py-3 px-4">
+                        <span className="font-semibold text-gray-800 dark:text-gray-200 block">
+                          {flt.issueType.replace("_", " ")}
+                        </span>
+                        <p className="text-[11px] text-gray-500 max-w-sm truncate">
+                          {flt.description}
+                        </p>
+                      </td>
+
+                      <td className="py-3 px-4">
+                        {flt.urgency === "HIGH" && <Badge color="error" size="sm">High</Badge>}
+                        {flt.urgency === "NORMAL" && <Badge color="warning" size="sm">Normal</Badge>}
+                        {flt.urgency === "LOW" && <Badge color="info" size="sm">Low</Badge>}
+                      </td>
+
+                      <td className="py-3 px-4 text-right">
+                        {flt.status === "RESOLVED" ? (
+                          <span className="text-emerald-600 font-semibold">Resolved</span>
+                        ) : (
+                          <Badge color="warning" size="sm">
+                            {flt.status === "IN_PROGRESS" ? "In Progress" : "Open"}
+                          </Badge>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </motion.div>
+          )
         )}
       </div>
     </AppLayout>

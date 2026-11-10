@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Modal from "@/components/ui/Modal";
 import Badge from "@/components/ui/Badge";
+import { SkeletonCard } from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { StoredAddress, AddressCategory } from "@/lib/customer-store";
 
 export default function CustomerAddressesPage() {
@@ -276,13 +279,13 @@ export default function CustomerAddressesPage() {
         )}
 
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
               Delivery Addresses
             </h1>
-            <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-              Saved locations for water deliveries.
+            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              Manage saved GhanaPost GPS locations for quick doorstep delivery.
             </p>
           </div>
 
@@ -299,27 +302,27 @@ export default function CustomerAddressesPage() {
               setFormError(null);
               setIsAddModalOpen(true);
             }}
-            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs self-start sm:self-auto cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs self-start sm:self-auto cursor-pointer"
           >
             <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
             </svg>
-            Add Address
+            <span>+ Add Address</span>
           </button>
         </div>
 
         {/* Filter & Search Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="sm:col-span-2 relative">
             <input
               type="text"
               placeholder="Search addresses or digital codes..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-9.5 pl-8.5 pr-3 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
+              className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition shadow-2xs"
             />
             <svg
-              className="size-3.5 text-gray-400 absolute left-3 top-3 pointer-events-none"
+              className="size-4 text-gray-400 absolute left-3.5 top-3.5 pointer-events-none"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -337,7 +340,8 @@ export default function CustomerAddressesPage() {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-full h-9.5 px-3 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition cursor-pointer"
+              aria-label="Filter by address category"
+              className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition cursor-pointer shadow-2xs"
             >
               <option value="ALL">All Categories</option>
               <option value="HOME">Home</option>
@@ -352,25 +356,34 @@ export default function CustomerAddressesPage() {
 
         {/* Address Cards Grid */}
         {loading ? (
-          <div className="py-12 flex flex-col items-center justify-center gap-3">
-            <div className="size-8 rounded-full border-2 border-brand-500 border-t-transparent animate-spin" />
-            <span className="text-xs text-gray-500 dark:text-gray-400">Loading delivery addresses...</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <SkeletonCard lines={3} />
+            <SkeletonCard lines={3} />
+            <SkeletonCard lines={3} />
           </div>
         ) : filteredAddresses.length === 0 ? (
-          <div className="p-8 text-center bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
+          <div className="p-8 text-center bg-white dark:bg-gray-900/70 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               No delivery locations match your search criteria.
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          >
             {filteredAddresses.map((addr) => (
-              <div
+              <motion.div
                 key={addr.id}
-                className={`p-5 rounded-2xl border transition shadow-theme-xs flex flex-col justify-between ${
+                variants={fadeInUp}
+                whileHover={cardHoverMotion.whileHover}
+                transition={cardHoverMotion.transition}
+                className={`p-5 sm:p-6 rounded-[28px] border transition shadow-xs flex flex-col justify-between ${
                   addr.isDefault
-                    ? "border-brand-500 bg-brand-50/20 dark:bg-brand-950/20 ring-1 ring-brand-500/30"
-                    : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
+                    ? "border-brand-500/80 bg-brand-50/20 dark:bg-brand-950/20 ring-1 ring-brand-500/20"
+                    : "border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70"
                 }`}
               >
                 <div>
@@ -452,9 +465,9 @@ export default function CustomerAddressesPage() {
                     </button>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
 
         {/* MODAL: Add Delivery Address */}

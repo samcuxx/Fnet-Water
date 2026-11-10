@@ -77,7 +77,7 @@ export default function BottleCirculationGauge({
   };
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 shadow-theme-xs flex flex-col justify-between h-full">
+    <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between">
           <div>

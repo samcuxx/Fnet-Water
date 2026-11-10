@@ -4,11 +4,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import type { ApexOptions } from "apexcharts";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { StoredAddress, StoredCustomerProfile } from "@/lib/customer-store";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -202,15 +204,20 @@ export default function CustomerDashboardPage() {
 
   return (
     <AppLayout role="CUSTOMER">
-      <div className="space-y-5 max-w-5xl mx-auto">
+      <motion.div
+        variants={staggerContainer}
+        initial="initial"
+        animate="animate"
+        className="space-y-6 max-w-5xl mx-auto"
+      >
         {/* Header: Greeting & Primary Order Action */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white dark:bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs">
+        <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-gray-900/70 p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 dark:text-white">
                 Hello, {userName}
               </h1>
-              <span className="px-2 py-0.5 rounded-full text-[11px] font-mono font-medium bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-blue-light-400 border border-brand-200 dark:border-brand-800/80">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-sky-400 border border-brand-200 dark:border-brand-800/80">
                 {profile?.customerCode || "CUST-8802"}
               </span>
             </div>
@@ -218,7 +225,7 @@ export default function CustomerDashboardPage() {
             {defaultAddress && (
               <Link
                 href="/customer/addresses"
-                className="mt-1 inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-brand-600 dark:text-gray-400 dark:hover:text-blue-light-400 transition"
+                className="mt-1.5 inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-brand-600 dark:text-gray-400 dark:hover:text-sky-400 transition"
               >
                 <svg className="size-3.5 text-brand-500 shrink-0 fill-current" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
@@ -231,83 +238,98 @@ export default function CustomerDashboardPage() {
 
           <Link
             href="/customer/order"
-            className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs self-start sm:self-auto cursor-pointer"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs self-start sm:self-auto cursor-pointer"
           >
             Order Water Refill
           </Link>
-        </div>
+        </motion.div>
 
         {/* 3-Pill Status Summary Strip */}
         <div className="grid grid-cols-3 gap-3 sm:gap-4">
-          <div className="p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs text-center">
-            <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 block truncate">
+          <motion.div
+            variants={fadeInUp}
+            whileHover={cardHoverMotion.whileHover}
+            transition={cardHoverMotion.transition}
+            className="p-4 sm:p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs text-center"
+          >
+            <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 block truncate font-medium">
               Bottles Held
             </span>
-            <div className="mt-1.5 text-base sm:text-xl font-bold text-gray-900 dark:text-white">
+            <div className="mt-1.5 text-xl sm:text-2xl font-black text-gray-900 dark:text-white">
               {profile?.bottlesHeld ?? 4}
             </div>
-            <span className="mt-0.5 text-[10px] sm:text-[11px] text-brand-600 dark:text-blue-light-400 font-medium block truncate">
+            <span className="mt-0.5 text-[10px] sm:text-[11px] text-brand-600 dark:text-sky-400 font-bold block truncate">
               Empty bottles ready
             </span>
-          </div>
+          </motion.div>
 
-          <div className="p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs text-center">
-            <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 block truncate">
+          <motion.div
+            variants={fadeInUp}
+            whileHover={cardHoverMotion.whileHover}
+            transition={cardHoverMotion.transition}
+            className="p-4 sm:p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs text-center"
+          >
+            <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 block truncate font-medium">
               Free Credits
             </span>
-            <div className="mt-1.5 text-base sm:text-xl font-bold text-emerald-600 dark:text-emerald-400">
+            <div className="mt-1.5 text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
               {profile?.freeBottleBalance ?? 1}
             </div>
-            <span className="mt-0.5 text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 font-medium block truncate">
+            <span className="mt-0.5 text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 font-semibold block truncate">
               Referral reward
             </span>
-          </div>
+          </motion.div>
 
-          <div className="p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs text-center">
-            <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 block truncate">
+          <motion.div
+            variants={fadeInUp}
+            whileHover={cardHoverMotion.whileHover}
+            transition={cardHoverMotion.transition}
+            className="p-4 sm:p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs text-center"
+          >
+            <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 block truncate font-medium">
               Dispenser Plan
             </span>
-            <div className="mt-1.5 text-base sm:text-xl font-bold text-gray-900 dark:text-white">
+            <div className="mt-1.5 text-xl sm:text-2xl font-black text-gray-900 dark:text-white">
               {paidMonths}/{totalMonths}m
             </div>
-            <span className="mt-0.5 text-[10px] sm:text-[11px] text-blue-light-600 dark:text-blue-light-400 font-medium block truncate">
+            <span className="mt-0.5 text-[10px] sm:text-[11px] text-sky-600 dark:text-sky-400 font-bold block truncate">
               Rent-to-own
             </span>
-          </div>
+          </motion.div>
         </div>
 
         {/* 4 Clean Quick Actions (2x2 on mobile, 4x1 on desktop) */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Link
             href="/customer/orders"
-            className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-brand-500 transition shadow-theme-xs flex items-center gap-3 cursor-pointer"
+            className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 hover:border-gray-300 dark:hover:border-gray-700 transition shadow-xs flex items-center gap-3 cursor-pointer"
           >
-            <div className="w-9 h-9 rounded-lg bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-blue-light-400 flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+            <div className="size-10 rounded-xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+              <svg className="size-5 fill-current" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 01-1.581.814L10 14.197l-4.419 2.617A1 1 0 014 16V4zm2 2v8.528l3.419-2.025a1 1 0 011.162 0L14 14.528V6H6z" clipRule="evenodd" />
               </svg>
             </div>
             <div className="min-w-0">
-              <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white truncate">
+              <h3 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white truncate">
                 My Orders
               </h3>
               <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
-                Track deliveries and history
+                Track deliveries
               </p>
             </div>
           </Link>
 
           <Link
             href="/customer/addresses"
-            className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-brand-500 transition shadow-theme-xs flex items-center gap-3 cursor-pointer"
+            className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 hover:border-gray-300 dark:hover:border-gray-700 transition shadow-xs flex items-center gap-3 cursor-pointer"
           >
-            <div className="w-9 h-9 rounded-lg bg-blue-light-50 dark:bg-blue-light-950/60 text-blue-light-600 dark:text-blue-light-400 flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <div className="size-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+              <svg className="size-5 fill-current" viewBox="0 0 24 24">
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z" />
               </svg>
             </div>
             <div className="min-w-0">
-              <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white truncate">
+              <h3 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white truncate">
                 Address Book
               </h3>
               <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
@@ -318,15 +340,15 @@ export default function CustomerDashboardPage() {
 
           <Link
             href="/customer/dispenser"
-            className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-brand-500 transition shadow-theme-xs flex items-center gap-3 cursor-pointer"
+            className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 hover:border-gray-300 dark:hover:border-gray-700 transition shadow-xs flex items-center gap-3 cursor-pointer"
           >
-            <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <div className="size-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <svg className="size-5 fill-current" viewBox="0 0 24 24">
                 <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
               </svg>
             </div>
             <div className="min-w-0">
-              <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white truncate">
+              <h3 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white truncate">
                 Smart Dispenser
               </h3>
               <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
@@ -338,18 +360,18 @@ export default function CustomerDashboardPage() {
           <button
             type="button"
             onClick={() => setIsReferralModalOpen(true)}
-            className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-brand-500 transition shadow-theme-xs flex items-center gap-3 text-left cursor-pointer"
+            className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 hover:border-gray-300 dark:hover:border-gray-700 transition shadow-xs flex items-center gap-3 text-left cursor-pointer"
           >
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <svg className="size-5 fill-current" viewBox="0 0 24 24">
                 <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.5 2.5 0 0 0-5 0c0 .35.07.69.18 1H11a2.5 2.5 0 0 0-5 0c0 .35.07.69.18 1H4a2 2 0 0 0-2 2v3a1 1 0 0 0 1 1h1v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7h1a1 1 0 0 0 1-1V8a2 2 0 0 0-2-2z" />
               </svg>
             </div>
             <div className="min-w-0">
-              <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white truncate">
+              <h3 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white truncate">
                 Refer Friends
               </h3>
-              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium truncate">
+              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold truncate">
                 Earn 1 free refill
               </p>
             </div>
@@ -357,16 +379,16 @@ export default function CustomerDashboardPage() {
         </div>
 
         {/* Clean Visual Hub with Tab Switcher */}
-        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-5 shadow-theme-xs">
+        <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs">
           <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
             {/* Pill Tab Switcher */}
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs">
+            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-gray-100 dark:bg-gray-800 text-xs">
               <button
                 type="button"
                 onClick={() => setChartTab("consumption")}
-                className={`px-3 py-1.5 rounded-lg font-medium transition cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
                   chartTab === "consumption"
-                    ? "bg-white dark:bg-gray-900 text-brand-600 dark:text-blue-light-400 shadow-xs"
+                    ? "bg-white dark:bg-gray-900 text-brand-600 dark:text-sky-400 shadow-xs"
                     : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                 }`}
               >
@@ -375,9 +397,9 @@ export default function CustomerDashboardPage() {
               <button
                 type="button"
                 onClick={() => setChartTab("dispenser")}
-                className={`px-3 py-1.5 rounded-lg font-medium transition cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
                   chartTab === "dispenser"
-                    ? "bg-white dark:bg-gray-900 text-brand-600 dark:text-blue-light-400 shadow-xs"
+                    ? "bg-white dark:bg-gray-900 text-brand-600 dark:text-sky-400 shadow-xs"
                     : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                 }`}
               >
@@ -417,9 +439,9 @@ export default function CustomerDashboardPage() {
         </div>
 
         {/* Recent Activity List (Mobile Friendly & Clean) */}
-        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sm:p-5 shadow-theme-xs">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+        <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-bold text-gray-900 dark:text-white">
               Recent Refills
             </h3>
             <span className="text-xs text-gray-400">Past 30 days</span>
@@ -518,7 +540,7 @@ export default function CustomerDashboardPage() {
             </div>
           </div>
         </Modal>
-      </div>
+      </motion.div>
     </AppLayout>
   );
 }

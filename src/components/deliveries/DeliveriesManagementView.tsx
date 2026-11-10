@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import { SkeletonMetrics, SkeletonTable } from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { DeliveryStop, DriverProfile } from "@/lib/dispatch-store";
 import type { OrderStatus } from "@/lib/order-store";
 
@@ -179,10 +182,10 @@ export default function DeliveriesManagementView({
         )}
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
                 Delivery Dispatch &amp; Queue
               </h1>
               <Badge color="info" size="sm">
@@ -190,66 +193,95 @@ export default function DeliveriesManagementView({
               </Badge>
             </div>
             <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              Assign delivery orders to drivers, track bottle returns, and monitor delivery routes.
+              Assign delivery orders to drivers, track bottle returns, and monitor delivery routes across Ghana.
             </p>
           </div>
         </div>
 
         {/* 4 Dispatch KPI Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-amber-600 dark:text-amber-400 font-medium block">
-              Unassigned Orders
-            </span>
-            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-              {pendingCount} Orders
-            </div>
-            <span className="text-[11px] text-gray-400">Awaiting driver assignment</span>
-          </div>
+        {loading ? (
+          <SkeletonMetrics count={4} />
+        ) : (
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+          >
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs text-amber-600 dark:text-amber-400 font-medium block">
+                Unassigned Orders
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {pendingCount} Orders
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Awaiting driver assignment</span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-brand-600 dark:text-blue-light-400 font-medium block">
-              Assigned to Vans
-            </span>
-            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-              {assignedCount} Orders
-            </div>
-            <span className="text-[11px] text-gray-400">Queued for run</span>
-          </div>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs text-brand-600 dark:text-sky-400 font-medium block">
+                Assigned to Vans
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {assignedCount} Orders
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Queued for run</span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-blue-light-600 dark:text-blue-light-400 font-medium block">
-              En Route (Live)
-            </span>
-            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-              {enRouteCount} Vans
-            </div>
-            <span className="text-[11px] text-gray-400">On doorstep delivery</span>
-          </div>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs text-sky-600 dark:text-sky-400 font-medium block">
+                En Route (Live)
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {enRouteCount} Vans
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">On doorstep delivery</span>
+            </motion.div>
 
-          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium block">
-              Delivered Today
-            </span>
-            <div className="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-              {deliveredCount} Stops
-            </div>
-            <span className="text-[11px] text-gray-400">Bottles exchanged</span>
-          </div>
-        </div>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium block">
+                Delivered Today
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
+                {deliveredCount} Stops
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Bottles exchanged</span>
+            </motion.div>
+          </motion.div>
+        )}
 
         {/* Filter & Search Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="sm:col-span-2 relative">
             <input
               type="text"
               placeholder="Search by order number (FNW-...), customer, location, or driver..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-9.5 pl-8.5 pr-3 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+              className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition shadow-2xs"
             />
             <svg
-              className="size-3.5 text-gray-400 absolute left-3 top-3 pointer-events-none"
+              className="size-4 text-gray-400 absolute left-3.5 top-3.5 pointer-events-none"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -267,7 +299,8 @@ export default function DeliveriesManagementView({
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full h-9.5 px-3 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition cursor-pointer"
+              aria-label="Filter by delivery status"
+              className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition cursor-pointer shadow-2xs"
             >
               <option value="ALL">All Statuses ({stops.length})</option>
               <option value="PENDING">Awaiting Driver ({pendingCount})</option>
@@ -279,16 +312,22 @@ export default function DeliveriesManagementView({
         </div>
 
         {/* Dispatch Orders Table */}
-        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs overflow-hidden">
-          {loading ? (
-            <div className="py-12 text-center text-xs text-gray-400">Loading dispatch queue...</div>
-          ) : filteredStops.length === 0 ? (
-            <div className="p-8 text-center text-xs text-gray-400">
-              No delivery orders match your filters.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+        {loading ? (
+          <SkeletonTable rows={6} columns={7} />
+        ) : (
+          <motion.div
+            variants={fadeInUp}
+            initial="initial"
+            animate="animate"
+            className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs overflow-hidden"
+          >
+            {filteredStops.length === 0 ? (
+              <div className="p-8 text-center text-xs text-gray-400">
+                No delivery orders match your filters.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
                 <thead className="bg-gray-50 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-200 dark:border-gray-800">
                   <tr>
                     <th className="px-4 py-3">Order</th>
@@ -372,7 +411,8 @@ export default function DeliveriesManagementView({
               </table>
             </div>
           )}
-        </div>
+        </motion.div>
+      )}
 
         {/* MODAL: Assign Driver & Van */}
         <Modal

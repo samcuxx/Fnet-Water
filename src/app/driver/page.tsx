@@ -2,9 +2,12 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import { SkeletonFeed } from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { DeliveryStop } from "@/lib/dispatch-store";
 
 export default function DriverDashboardPage() {
@@ -160,9 +163,9 @@ export default function DriverDashboardPage() {
         )}
 
         {/* Mobile Header: Driver Profile & Vehicle info with Van Visual */}
-        <div className="bg-white dark:bg-gray-900 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex items-center justify-between gap-3">
+        <div className="bg-white dark:bg-gray-900/70 p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="relative size-12 rounded-xl overflow-hidden bg-sky-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 shrink-0">
+            <div className="relative size-12 rounded-2xl overflow-hidden bg-sky-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 shrink-0">
               <Image
                 src="/images/logistics/delivery-van.jpg"
                 alt="Assigned Delivery Van"
@@ -190,31 +193,31 @@ export default function DriverDashboardPage() {
         </div>
 
         {/* 4-Stat Metric Strip */}
-        <div className="grid grid-cols-4 gap-2">
-          <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs text-center">
-            <span className="text-[10px] text-gray-400 block truncate">Pending</span>
-            <div className="text-base font-bold text-amber-600 dark:text-amber-400">
+        <div className="grid grid-cols-4 gap-2.5">
+          <div className="p-3.5 rounded-2xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs text-center">
+            <span className="text-[10px] text-gray-400 block truncate font-medium">Pending</span>
+            <div className="text-base font-black text-amber-600 dark:text-amber-400">
               {activeStops.length}
             </div>
           </div>
 
-          <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs text-center">
-            <span className="text-[10px] text-gray-400 block truncate">Completed</span>
-            <div className="text-base font-bold text-emerald-600 dark:text-emerald-400">
+          <div className="p-3.5 rounded-2xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs text-center">
+            <span className="text-[10px] text-gray-400 block truncate font-medium">Completed</span>
+            <div className="text-base font-black text-emerald-600 dark:text-emerald-400">
               {completedStops.length}
             </div>
           </div>
 
-          <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs text-center">
-            <span className="text-[10px] text-gray-400 block truncate">Exchanged</span>
-            <div className="text-base font-bold text-brand-600 dark:text-blue-light-400">
+          <div className="p-3.5 rounded-2xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs text-center">
+            <span className="text-[10px] text-gray-400 block truncate font-medium">Exchanged</span>
+            <div className="text-base font-black text-brand-600 dark:text-sky-400">
               {totalBottlesSwapped}
             </div>
           </div>
 
-          <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs text-center">
-            <span className="text-[10px] text-gray-400 block truncate">Cash to Collect</span>
-            <div className="text-base font-bold text-gray-900 dark:text-white truncate">
+          <div className="p-3.5 rounded-2xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs text-center">
+            <span className="text-[10px] text-gray-400 block truncate font-medium">Cash to Collect</span>
+            <div className="text-base font-black text-gray-900 dark:text-white truncate">
               GH₵ {totalCashCollected.toFixed(0)}
             </div>
           </div>
@@ -232,26 +235,34 @@ export default function DriverDashboardPage() {
 
         {/* Delivery Stops List */}
         {loading ? (
-          <div className="py-12 text-center text-xs text-gray-400">Loading delivery stops...</div>
+          <SkeletonFeed count={3} />
         ) : stops.length === 0 ? (
           <div className="p-8 text-center text-xs text-gray-400 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
             No delivery stops assigned to your van today.
           </div>
         ) : (
-          <div className="space-y-3">
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="space-y-3"
+          >
             {stops.map((stop) => {
               const isDelivered = stop.status === "DELIVERED";
               const isEnRoute = stop.status === "OUT_FOR_DELIVERY";
 
               return (
-                <div
+                <motion.div
                   key={stop.orderId}
-                  className={`p-4 rounded-2xl border transition shadow-theme-xs bg-white dark:bg-gray-900 space-y-3 ${
+                  variants={fadeInUp}
+                  whileHover={cardHoverMotion.whileHover}
+                  transition={cardHoverMotion.transition}
+                  className={`p-5 rounded-[28px] border transition shadow-xs bg-white dark:bg-gray-900/70 space-y-3.5 ${
                     isEnRoute
-                      ? "border-blue-light-500 ring-2 ring-blue-light-500/20"
+                      ? "border-sky-500 ring-2 ring-sky-500/20"
                       : isDelivered
-                      ? "border-gray-200 dark:border-gray-800 opacity-80"
-                      : "border-gray-200 dark:border-gray-800"
+                      ? "border-gray-100 dark:border-gray-800/60 opacity-80"
+                      : "border-gray-100 dark:border-gray-800/80"
                   }`}
                 >
                   {/* Top: Order & Status */}
@@ -347,10 +358,10 @@ export default function DriverDashboardPage() {
                       )}
                     </div>
                   )}
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         )}
 
         {/* MODAL: Complete Delivery */}

@@ -78,11 +78,11 @@ export default function DispenserPayoffGauge({
   };
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 shadow-theme-xs flex flex-col justify-between h-full">
+    <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
               Rent-to-Own Progress
             </h3>
             <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
@@ -92,11 +92,11 @@ export default function DispenserPayoffGauge({
             </p>
           </div>
           {isFullyPaid ? (
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+            <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
               Customer Owned
             </span>
           ) : (
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-brand-700 dark:bg-brand-950/40 dark:text-blue-light-400 border border-blue-200 dark:border-brand-800">
+            <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-sky-50 text-brand-700 dark:bg-brand-950/40 dark:text-sky-400 border border-sky-200 dark:border-brand-800">
               Active Plan
             </span>
           )}

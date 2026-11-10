@@ -123,10 +123,10 @@ export default function StatisticsChart() {
   ];
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 shadow-theme-xs">
+    <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-7 shadow-xs">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
-          <h3 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white">
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
             Daily Revenue Statistics
           </h3>
           <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
@@ -135,13 +135,13 @@ export default function StatisticsChart() {
         </div>
 
         {/* Tab Filter */}
-        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg self-start sm:self-auto">
+        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-2xl self-start sm:self-auto">
           <button
             type="button"
             onClick={() => setActiveTab("all")}
-            className={`px-3 py-1 text-xs font-semibold rounded-md transition ${
+            className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition ${
               activeTab === "all"
-                ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-theme-xs"
+                ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-theme-xs font-bold"
                 : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
             }`}
           >
@@ -150,9 +150,9 @@ export default function StatisticsChart() {
           <button
             type="button"
             onClick={() => setActiveTab("refills")}
-            className={`px-3 py-1 text-xs font-semibold rounded-md transition ${
+            className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition ${
               activeTab === "refills"
-                ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-theme-xs"
+                ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-theme-xs font-bold"
                 : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
             }`}
           >
@@ -161,9 +161,9 @@ export default function StatisticsChart() {
           <button
             type="button"
             onClick={() => setActiveTab("dispensers")}
-            className={`px-3 py-1 text-xs font-semibold rounded-md transition ${
+            className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition ${
               activeTab === "dispensers"
-                ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-theme-xs"
+                ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-theme-xs font-bold"
                 : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
             }`}
           >
