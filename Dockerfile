@@ -4,25 +4,47 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
 
 # 2. Dependencies
+# Ensure devDependencies are ALWAYS installed regardless of any build-time NODE_ENV args
 FROM base AS deps
+WORKDIR /app
+ENV NODE_ENV=development
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm ci --include=dev
 
 # 3. Builder
 FROM base AS builder
+WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client
+# Build-time environment variables for Next.js static page optimization
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder?schema=public"
+ENV NEXTAUTH_SECRET="fnet-water-hub-super-secret-jwt-key-2026"
+ENV NEXTAUTH_URL="https://fnetwater.samcux.com"
+ENV NEXT_PUBLIC_APP_URL="https://fnetwater.samcux.com"
+ENV PAYSTACK_SECRET_KEY="sk_test_placeholder"
+ENV NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY="pk_test_placeholder"
+ENV MNOTIFY_API_KEY="placeholder"
+
+# Generate Prisma client for all target platforms
 RUN npx prisma generate
 
 # Build Next.js in standalone mode
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_ENV=production
 RUN npm run build
 
-# 4. Runner
+# 4. Migration runner stage (optional target for database migration service)
+FROM base AS migrate
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json ./
+COPY prisma ./prisma
+CMD ["npx", "prisma", "db", "push", "--skip-generate"]
+
+# 5. Production Runner (default target)
 FROM base AS runner
+WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000

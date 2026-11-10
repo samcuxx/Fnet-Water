@@ -1,7 +1,8 @@
 # ==============================================================================
 # F NET WATER HUB — COOLIFY DOCKER COMPOSE TEMPLATE
+# Target App Domain: https://fnetwater.samcux.com
 # ==============================================================================
-# Paste this entire file into Coolify:
+# Paste this file into Coolify:
 #   Project -> Environment -> + New Resource -> Docker Compose
 # ==============================================================================
 
@@ -22,27 +23,43 @@ services:
       timeout: 5s
       retries: 5
 
-  web:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: fnet_water_web
+      target: runner
+    container_name: fnet_water_app
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-fnet_user}:${POSTGRES_PASSWORD:-fnet_secure_pass_2026}@db:5432/${POSTGRES_DB:-fnet_water_db}?schema=public
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-fnet-water-hub-super-secret-jwt-key-2026}
-      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
-      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
-      PAYSTACK_SECRET_KEY: ${PAYSTACK_SECRET_KEY}
-      NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY: ${NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY}
-      MNOTIFY_API_KEY: ${MNOTIFY_API_KEY}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-https://fnetwater.samcux.com}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-https://fnetwater.samcux.com}
+      PAYSTACK_SECRET_KEY: ${PAYSTACK_SECRET_KEY:-sk_test_e3dc4308aa829bb13669f66be490fadc1d120778}
+      NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY: ${NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY:-pk_test_eb0b32c0bf50b5e00420d9d175e41a082e601be4}
+      MNOTIFY_API_KEY: ${MNOTIFY_API_KEY:-EpyJqPefIbrTOBWOfr5ifgQXn}
       MNOTIFY_SENDER_ID: ${MNOTIFY_SENDER_ID:-Fnet}
       MNOTIFY_PROJECT: ${MNOTIFY_PROJECT:-Fnet}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-https://mgcg8808sw4ccss8gsw84k8g.samcux.com}
+      S3_ENDPOINT: ${S3_ENDPOINT:-https://mgcg8808sw4ccss8gsw84k8g.samcux.com}
       NODE_ENV: production
       PORT: 3000
       HOSTNAME: "0.0.0.0"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: migrate
+    container_name: fnet_water_migrate
+    restart: "no"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fnet_user}:${POSTGRES_PASSWORD:-fnet_secure_pass_2026}@db:5432/${POSTGRES_DB:-fnet_water_db}?schema=public
     depends_on:
       db:
         condition: service_healthy

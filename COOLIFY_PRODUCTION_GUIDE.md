@@ -108,25 +108,49 @@ volumes:
 ```
 
 #### Step 3: Configure Environment Variables
-Under the **Environment Variables** tab in Coolify, add your production values:
+Under the **Environment Variables** tab in Coolify, paste the following verified configuration block:
 
-| Variable Name | Production Value Example | Purpose |
-| :--- | :--- | :--- |
-| `POSTGRES_USER` | `fnet_user` | Database master user |
-| `POSTGRES_PASSWORD` | `UseAStrongRandomPassword2026!` | Database master password |
-| `POSTGRES_DB` | `fnet_water_db` | PostgreSQL database name |
-| `NEXTAUTH_SECRET` | `openssl rand -base64 32 output` | NextAuth JWT & session encryption |
-| `NEXTAUTH_URL` | `https://water.yourdomain.com` | Production domain URL |
-| `NEXT_PUBLIC_APP_URL` | `https://water.yourdomain.com` | Public base URL for links and receipts |
-| `PAYSTACK_SECRET_KEY` | `sk_live_...` (or test key) | Paystack server-side transaction key |
-| `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | `pk_live_...` (or test key) | Paystack client-side checkout key |
-| `MNOTIFY_API_KEY` | `EpyJqPefIbrTOBWOfr5ifgQXn` | mNotify SMS API key |
-| `MNOTIFY_SENDER_ID` | `Fnet` | Sender ID shown on customer phones |
-| `MNOTIFY_PROJECT` | `Fnet` | mNotify project identifier |
+```ini
+# Production URLs for fnetwater.samcux.com
+NODE_ENV=production
+PORT=3000
+HOSTNAME=0.0.0.0
+NEXTAUTH_URL=https://fnetwater.samcux.com
+NEXT_PUBLIC_APP_URL=https://fnetwater.samcux.com
+
+# NextAuth Security
+NEXTAUTH_SECRET=fnet-water-hub-super-secret-jwt-key-2026
+
+# Database (PostgreSQL 16)
+DATABASE_URL=postgresql://fnet_user:fnet_secure_pass_2026@db:5432/fnet_water_db?schema=public
+POSTGRES_USER=fnet_user
+POSTGRES_PASSWORD=fnet_secure_pass_2026
+POSTGRES_DB=fnet_water_db
+
+# Paystack Ghana Payment Gateway
+PAYSTACK_SECRET_KEY=sk_test_e3dc4308aa829bb13669f66be490fadc1d120778
+NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_eb0b32c0bf50b5e00420d9d175e41a082e601be4
+
+# mNotify Ghana SMS Gateway
+MNOTIFY_API_KEY=EpyJqPefIbrTOBWOfr5ifgQXn
+MNOTIFY_SENDER_ID=Fnet
+MNOTIFY_PROJECT=Fnet
+
+# MinIO S3 Object Storage
+MINIO_ENDPOINT=https://mgcg8808sw4ccss8gsw84k8g.samcux.com
+S3_ENDPOINT=https://mgcg8808sw4ccss8gsw84k8g.samcux.com
+S3_BUCKET_NAME=fnet-water-assets
+S3_REGION=us-east-1
+S3_USE_SSL=true
+
+# Database Migration Service
+MIGRATE_URL=https://i84c4scog4wkssoksoos4w88.samcux.com
+```
 
 #### Step 4: Configure Domain in Coolify
 In the web service settings in Coolify:
-- Under **Domains / FQDN**, enter your domain: `https://water.yourdomain.com`
+- Under **Domains / FQDN**, enter: `https://fnetwater.samcux.com`
+- Set **Healthcheck Path** to: `/api/health`
 - Coolify will automatically configure Traefik to route traffic on port 3000 and provision a valid SSL certificate.
 
 #### Step 5: Deploy
@@ -227,7 +251,7 @@ To ensure real-time payment capture for Mobile Money and Debit Cards:
 2. Navigate to **Settings** $\rightarrow$ **API Keys & Webhooks**.
 3. Under **Live Webhook URL** (or Test Webhook URL), enter:
    ```
-   https://water.yourdomain.com/api/webhooks/paystack
+   https://fnetwater.samcux.com/api/webhooks/paystack
    ```
 4. Click **"Save Changes"**.
 5. Paystack will now securely send automated signed POST requests on `charge.success` events to update orders to `PAID` instantly.
