@@ -25,10 +25,14 @@ export default withAuth(
     }
 
     // Check 3: RBAC Guards
-    // Rule A: /admin/* -> strictly ADMIN
+    // Rule A: /admin/* -> strictly ADMIN (Reports accessible to MANAGER)
     if (path.startsWith("/admin") && role !== "ADMIN") {
-      const redirectUrl = getRoleDashboard(role);
-      return NextResponse.redirect(new URL(redirectUrl, req.url));
+      if (path.startsWith("/admin/reports") && role === "MANAGER") {
+        // Allow managers to access operational & business reports
+      } else {
+        const redirectUrl = getRoleDashboard(role);
+        return NextResponse.redirect(new URL(redirectUrl, req.url));
+      }
     }
 
     // Rule B: /manager/* -> MANAGER or ADMIN

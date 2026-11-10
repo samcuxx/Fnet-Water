@@ -3,6 +3,12 @@ import { isDatabaseConnected } from "@/lib/auth-store";
 import { getOrderById, updateOrderStatus, StoredOrder, OrderStatus } from "@/lib/order-store";
 import { getCustomerProfile, updateCustomerProfileData } from "@/lib/customer-store";
 import { syncDeliveryExchangeToInventory } from "@/lib/inventory-store";
+import { createNotification } from "@/lib/notification-store";
+import {
+  sendDriverAssignedSms,
+  sendDriverDispatchSms,
+  sendDeliveryCompletedSms,
+} from "@/lib/mnotify";
 
 export interface DriverProfile {
   id: string;
@@ -351,6 +357,33 @@ export async function assignOrderToDriver(
     }
   }
 
+  // Trigger driver notification & SMS
+  if (stop) {
+    createNotification({
+      userId: driverId,
+      role: "DRIVER",
+      title: `New Delivery Assigned: ${stop.orderNumber}`,
+      message: `Assigned delivery to ${stop.deliveryAddress}. Total bottles: ${stop.bottlesDelivering}.`,
+      type: "DELIVERY",
+      linkUrl: "/driver",
+      metadata: { orderId, orderNumber: stop.orderNumber },
+    }).catch(() => {});
+
+    if (driver?.phone) {
+      sendDriverAssignedSms(driver.phone, stop.orderNumber, stop.deliveryAddress).catch(() => {});
+    }
+
+    // Customer status notification
+    createNotification({
+      role: "CUSTOMER",
+      title: `Driver Assigned: ${stop.orderNumber}`,
+      message: `Driver ${driverName} (${driverVan}) has been assigned to deliver your water.`,
+      type: "DELIVERY",
+      linkUrl: "/customer/orders",
+      metadata: { orderId, orderNumber: stop.orderNumber },
+    }).catch(() => {});
+  }
+
   return stop;
 }
 
@@ -394,6 +427,21 @@ export async function startDeliveryRoute(orderId: string): Promise<DeliveryStop 
       });
     } catch {
       // Memory fallback
+    }
+  }
+
+  if (stop) {
+    createNotification({
+      role: "CUSTOMER",
+      title: `Water Out for Delivery: ${stop.orderNumber}`,
+      message: `Driver ${stop.driverName || "Kwame Asante"} is en route to ${stop.deliveryAddress}.`,
+      type: "DELIVERY",
+      linkUrl: "/customer/orders",
+      metadata: { orderId, orderNumber: stop.orderNumber },
+    }).catch(() => {});
+
+    if (stop.customerPhone) {
+      sendDriverDispatchSms(stop.customerPhone, stop.driverName || "Kwame Asante", stop.orderNumber).catch(() => {});
     }
   }
 
@@ -518,6 +566,20 @@ export async function completeStopBottleExchange(data: {
     } catch {
       // Memory fallback
     }
+  }
+
+  // Trigger customer delivery completion notification & SMS
+  createNotification({
+    role: "CUSTOMER",
+    title: `Delivery Completed: ${stop.orderNumber}`,
+    message: `Your water delivery has been completed. ${data.filledDelivered} bottles delivered, ${data.emptyCollected} empties returned.`,
+    type: "DELIVERY",
+    linkUrl: "/customer/orders",
+    metadata: { orderId: data.orderId, orderNumber: stop.orderNumber },
+  }).catch(() => {});
+
+  if (stop.customerPhone) {
+    sendDeliveryCompletedSms(stop.customerPhone, stop.orderNumber, data.filledDelivered).catch(() => {});
   }
 
   return { stop, exchange };

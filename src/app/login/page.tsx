@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, getSession, useSession } from "next-auth/react";
@@ -22,7 +22,7 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
   { role: "CUSTOMER", label: "Customer", identifier: "customer@fnetwater.com", password: "customer123" },
 ];
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
@@ -608,5 +608,19 @@ export default function LoginPage() {
         </div>
       </div>
     </AuthPageLayout>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#071E3D] flex items-center justify-center text-white text-sm">
+          Loading sign in...
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   );
 }

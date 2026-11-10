@@ -28,6 +28,7 @@ export default function OrderWaterPage() {
   // Cart & Order Options
   const [cart, setCart] = useState<CartState>({ prod_001: 2 }); // Default 2 refill bottles
   const [hasEmptyBottleExchange, setHasEmptyBottleExchange] = useState(true);
+  const [redeemFreeBottle, setRedeemFreeBottle] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [deliverySlot, setDeliverySlot] = useState<"Morning (8am - 12pm)" | "Afternoon (12pm - 4pm)" | "Evening (4pm - 7pm)">("Morning (8am - 12pm)");
   const [deliveryDate, setDeliveryDate] = useState<string>("Today");
@@ -105,7 +106,8 @@ export default function OrderWaterPage() {
     : 0.0;
 
   const deliveryFee = subtotal >= 100 || refillBottlesCount >= 3 || totalItemsCount === 0 ? 0.0 : 10.0;
-  const totalAmount = Math.max(0, subtotal + depositFee + deliveryFee);
+  const discountAmount = redeemFreeBottle && (profile?.freeBottleBalance ?? 0) > 0 && refillBottlesCount > 0 ? 25.0 : 0.0;
+  const totalAmount = Math.max(0, subtotal + depositFee + deliveryFee - discountAmount);
 
   // Place Order
   const handlePlaceOrder = async () => {
@@ -138,7 +140,7 @@ export default function OrderWaterPage() {
           deliveryDate: deliveryDate === "Today" ? new Date().toISOString() : new Date(Date.now() + 86400000).toISOString(),
           deliveryInstructions,
           hasEmptyBottleExchange,
-          redeemFreeRefill: false,
+          redeemFreeRefill: redeemFreeBottle,
           paymentMethod,
         }),
       });
@@ -559,6 +561,26 @@ export default function OrderWaterPage() {
                   Order Summary
                 </span>
 
+                {/* Free Bottle Credit Reward Option */}
+                {(profile?.freeBottleBalance ?? 0) > 0 && refillBottlesCount > 0 && (
+                  <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 space-y-1">
+                    <label className="flex items-center gap-2.5 cursor-pointer text-xs">
+                      <input
+                        type="checkbox"
+                        checked={redeemFreeBottle}
+                        onChange={(e) => setRedeemFreeBottle(e.target.checked)}
+                        className="size-4 rounded-md border-emerald-400 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                      />
+                      <span className="font-bold text-emerald-900 dark:text-emerald-200">
+                        Use 1 Free Bottle Reward (-GH₵ 25.00)
+                      </span>
+                    </label>
+                    <span className="text-[11px] text-emerald-700 dark:text-emerald-300 pl-6.5 block">
+                      You have {profile?.freeBottleBalance} free bottle reward {profile?.freeBottleBalance === 1 ? "credit" : "credits"} available from your referrals!
+                    </span>
+                  </div>
+                )}
+
                 <div className="divide-y divide-gray-100 dark:divide-gray-800 text-xs">
                   {Object.entries(cart).map(([pId, qty]) => {
                     const prod = products.find((p) => p.id === pId);
@@ -592,6 +614,13 @@ export default function OrderWaterPage() {
                       )}
                     </span>
                   </div>
+
+                  {discountAmount > 0 && (
+                    <div className="py-2.5 flex items-center justify-between text-emerald-600 dark:text-emerald-400 font-semibold">
+                      <span>Free Bottle Reward (1 Refill)</span>
+                      <span>-GH₵ {discountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
 
                   <div className="pt-3.5 flex items-center justify-between">
                     <span className="text-sm font-bold text-gray-900 dark:text-white">Total</span>

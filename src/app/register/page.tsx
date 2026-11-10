@@ -26,6 +26,17 @@ export default function RegisterPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  // Check for referral code query parameter (?ref=FNW-AMA01)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref");
+      if (ref) {
+        setFormData((prev) => ({ ...prev, referralCode: ref.trim().toUpperCase() }));
+      }
+    }
+  }, []);
+
   // If already logged in, redirect to assigned portal
   useEffect(() => {
     if (status === "authenticated" && session?.user) {

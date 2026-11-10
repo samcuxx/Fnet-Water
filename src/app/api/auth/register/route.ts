@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { findUserByIdentifier, registerNewUser } from "@/lib/auth-store";
 import { normalizeGhanaPhone } from "@/lib/mnotify";
+import { recordReferralSignup } from "@/lib/referral-store";
 
 export async function POST(request: Request) {
   try {
@@ -60,8 +61,17 @@ export async function POST(request: Request) {
       phone: normalizedPhone,
       password,
       role: "CUSTOMER",
-      referralCode: referralCode?.trim(),
     });
+
+    // If a referral code was provided, register the referral relationship
+    if (referralCode && referralCode.trim()) {
+      await recordReferralSignup(
+        newUser.id,
+        newUser.name,
+        newUser.phone,
+        referralCode.trim()
+      );
+    }
 
     return NextResponse.json({
       success: true,

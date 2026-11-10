@@ -154,7 +154,7 @@ export default function Logo({
             <span
               className={`font-sans font-semibold tracking-widest uppercase ${selectedSize.sub} ${taglineColor} mt-0.5`}
             >
-              Smart Hydration &bull; Logistics
+              Smart Hydration • Logistics
             </span>
           )}
         </div>

@@ -1,3 +1,5 @@
+import { recordSmsDispatch } from "@/lib/notification-store";
+
 /**
  * mNotify Ghana SMS & OTP Service
  * Handles SMS dispatches for order updates, driver assignments,
@@ -99,7 +101,9 @@ export async function sendSms(
  */
 export async function sendOtpSms(phone: string, otpCode: string): Promise<SendSmsResponse> {
   const message = `Your F Net Water Hub verification code is: ${otpCode}. Valid for 10 minutes. Do not share this code.`;
-  return sendSms(phone, message);
+  const res = await sendSms(phone, message);
+  recordSmsDispatch(phone, message, "OTP_VERIFICATION", res.status === "success" ? "DELIVERED" : "FAILED");
+  return res;
 }
 
 /**
@@ -113,7 +117,9 @@ export async function sendOrderConfirmationSms(
   const message = `F Net Water Hub: Order #${orderNumber} confirmed! Total: GH₵ ${totalAmount.toFixed(
     2
   )}. We will notify you when a driver is dispatched.`;
-  return sendSms(phone, message);
+  const res = await sendSms(phone, message);
+  recordSmsDispatch(phone, message, "ORDER_CONFIRMATION", res.status === "success" ? "DELIVERED" : "FAILED");
+  return res;
 }
 
 /**
@@ -125,5 +131,76 @@ export async function sendDriverDispatchSms(
   orderNumber: string
 ): Promise<SendSmsResponse> {
   const message = `F Net Water Hub: Driver ${driverName} is on the way with your water delivery for Order #${orderNumber}.`;
-  return sendSms(customerPhone, message);
+  const res = await sendSms(customerPhone, message);
+  recordSmsDispatch(customerPhone, message, "DELIVERY_DISPATCH", res.status === "success" ? "DELIVERED" : "FAILED");
+  return res;
+}
+
+/**
+ * Convenience helper to send delivery completed SMS
+ */
+export async function sendDeliveryCompletedSms(
+  customerPhone: string,
+  orderNumber: string,
+  bottlesDelivered: number
+): Promise<SendSmsResponse> {
+  const message = `F Net Water Hub: Order #${orderNumber} completed. ${bottlesDelivered} bottles delivered. Thank you for choosing pure hydration!`;
+  const res = await sendSms(customerPhone, message);
+  recordSmsDispatch(customerPhone, message, "DELIVERY_COMPLETED", res.status === "success" ? "DELIVERED" : "FAILED");
+  return res;
+}
+
+/**
+ * Convenience helper to send 5:1 reward earned SMS
+ */
+export async function sendRewardEarnedSms(
+  customerPhone: string,
+  customerName: string,
+  freeBottleBalance: number
+): Promise<SendSmsResponse> {
+  const message = `F Net Water Hub: Congratulations ${customerName}! 5 friends joined and ordered. You earned 1 Free Water Bottle refill credit! Total balance: ${freeBottleBalance}.`;
+  const res = await sendSms(customerPhone, message);
+  recordSmsDispatch(customerPhone, message, "REWARD_EARNED", res.status === "success" ? "DELIVERED" : "FAILED");
+  return res;
+}
+
+/**
+ * Convenience helper to send driver assigned SMS
+ */
+export async function sendDriverAssignedSms(
+  driverPhone: string,
+  orderNumber: string,
+  deliveryAddress: string
+): Promise<SendSmsResponse> {
+  const message = `F Net Water Hub: New delivery assigned for Order #${orderNumber} at ${deliveryAddress}. Please check your driver dispatch queue.`;
+  const res = await sendSms(driverPhone, message);
+  recordSmsDispatch(driverPhone, message, "DRIVER_ASSIGNMENT", res.status === "success" ? "DELIVERED" : "FAILED");
+  return res;
+}
+
+/**
+ * Convenience helper to send low inventory alert SMS
+ */
+export async function sendLowInventoryAlertSms(
+  managerPhone: string,
+  bottleCount: number
+): Promise<SendSmsResponse> {
+  const message = `F Net Water Hub ALERT: Warehouse filled bottle inventory has dropped to ${bottleCount} units (below threshold). Please review production queue.`;
+  const res = await sendSms(managerPhone, message);
+  recordSmsDispatch(managerPhone, message, "INVENTORY_ALERT", res.status === "success" ? "DELIVERED" : "FAILED");
+  return res;
+}
+
+/**
+ * Convenience helper to send dispenser tamper alert SMS
+ */
+export async function sendTamperAlertSms(
+  adminPhone: string,
+  serialNumber: string,
+  location: string
+): Promise<SendSmsResponse> {
+  const message = `F Net Water Hub ALERT: Dispenser #${serialNumber} reported a sensor tilt / tamper alert at ${location}. Immediate inspection recommended.`;
+  const res = await sendSms(adminPhone, message);
+  recordSmsDispatch(adminPhone, message, "TAMPER_ALERT", res.status === "success" ? "DELIVERED" : "FAILED");
+  return res;
 }

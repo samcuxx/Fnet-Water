@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { isDatabaseConnected } from "@/lib/auth-store";
+import { createNotification } from "@/lib/notification-store";
+import { sendLowInventoryAlertSms } from "@/lib/mnotify";
 
 export type BottleItemType =
   | "FILLED_BOTTLES"
@@ -411,6 +413,18 @@ export async function adjustStock(params: {
     previousBalance = memoryBottleInventory.filledWarehouse;
     newBalance = Math.max(0, previousBalance + delta);
     memoryBottleInventory.filledWarehouse = newBalance;
+
+    if (newBalance < LOW_STOCK_THRESHOLD_FILLED) {
+      createNotification({
+        role: "MANAGER",
+        title: "Low Inventory Warning: Warehouse Refills",
+        message: `Warehouse stock of filled 18.9L bottles has dropped to ${newBalance} (threshold: ${LOW_STOCK_THRESHOLD_FILLED}). Initiate bottling cycle.`,
+        type: "INVENTORY",
+        linkUrl: "/admin/inventory",
+      }).catch(() => {});
+
+      sendLowInventoryAlertSms("0241000002", newBalance).catch(() => {});
+    }
   } else if (params.itemType === "EMPTY_BOTTLES") {
     previousBalance = memoryBottleInventory.emptyWarehouse;
     newBalance = Math.max(0, previousBalance + delta);

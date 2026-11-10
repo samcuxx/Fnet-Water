@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { isDatabaseConnected, getUserById } from "@/lib/auth-store";
 import { getCustomerProfile } from "@/lib/customer-store";
 import { DispenserStatusType } from "@/lib/inventory-store";
+import { createNotification } from "@/lib/notification-store";
+import { sendTamperAlertSms } from "@/lib/mnotify";
 
 export interface DispenserCatalogModel {
   id: string;
@@ -526,9 +528,30 @@ export function simulateDispenserIoT(
   if (event === "LOW_WATER") {
     plan.waterLevelPercent = 12; // Below 15% threshold
     plan.lastPingAt = new Date().toISOString();
+
+    createNotification({
+      userId,
+      role: "CUSTOMER",
+      title: `Low Water Alert: Dispenser #${plan.serialNumber}`,
+      message: `Your dispenser bottle has dropped to ${plan.waterLevelPercent}%. Reorder a replacement refill bottle to avoid running out.`,
+      type: "DISPENSER",
+      linkUrl: "/customer/dispenser",
+      metadata: { serialNumber: plan.serialNumber, userId },
+    }).catch(() => {});
   } else if (event === "TAMPER") {
     plan.tamperAlert = true;
     plan.lastPingAt = new Date().toISOString();
+
+    createNotification({
+      role: "ADMIN",
+      title: `Tamper Alert: Dispenser #${plan.serialNumber}`,
+      message: `Dispenser #${plan.serialNumber} at ${plan.deliveryAddressText} reported an irregular tilt or physical sensor movement.`,
+      type: "DISPENSER",
+      linkUrl: "/admin/dispensers",
+      metadata: { serialNumber: plan.serialNumber, userId },
+    }).catch(() => {});
+
+    sendTamperAlertSms("0241000001", plan.serialNumber, plan.deliveryAddressText).catch(() => {});
   } else if (event === "OFFLINE") {
     plan.isOnline = false;
   } else if (event === "RESET") {

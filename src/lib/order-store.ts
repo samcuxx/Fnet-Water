@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { isDatabaseConnected } from "@/lib/auth-store";
 import { getProductById } from "@/lib/product-store";
 import { getCustomerProfile, updateCustomerProfileData } from "@/lib/customer-store";
+import { createNotification } from "@/lib/notification-store";
+import { sendOrderConfirmationSms } from "@/lib/mnotify";
 
 export type OrderStatus =
   | "PENDING"
@@ -356,6 +358,32 @@ export async function createCustomerOrder(data: {
   }
 
   memoryOrders.set(newOrder.id, newOrder);
+
+  // Trigger customer notification & SMS confirmation
+  createNotification({
+    userId: data.userId,
+    role: "CUSTOMER",
+    title: `Order Confirmed: ${newOrder.orderNumber}`,
+    message: `Your water delivery order has been received. Total: GH₵ ${newOrder.totalAmount.toFixed(2)}.`,
+    type: "ORDER",
+    linkUrl: "/customer/orders",
+    metadata: { orderId: newOrder.id, orderNumber: newOrder.orderNumber },
+  }).catch(() => {});
+
+  if (data.customerPhone) {
+    sendOrderConfirmationSms(data.customerPhone, newOrder.orderNumber, newOrder.totalAmount).catch(() => {});
+  }
+
+  // Trigger operational notification for manager
+  createNotification({
+    role: "MANAGER",
+    title: `New Water Order: ${newOrder.orderNumber}`,
+    message: `${data.customerName} placed order for GH₵ ${newOrder.totalAmount.toFixed(2)} at ${data.deliveryAddressText}.`,
+    type: "ORDER",
+    linkUrl: "/admin/orders",
+    metadata: { orderId: newOrder.id, orderNumber: newOrder.orderNumber },
+  }).catch(() => {});
+
   return newOrder;
 }
 
@@ -585,6 +613,14 @@ export async function updateOrderStatus(
 
   if (status === "DELIVERED") {
     ord.paymentStatus = "PAID";
+    if (ord.userId) {
+      try {
+        const { qualifyReferralOnOrderPayment } = await import("@/lib/referral-store");
+        await qualifyReferralOnOrderPayment(ord.userId);
+      } catch (err) {
+        console.warn("[Referral] Delivery qualification notice:", err);
+      }
+    }
   }
 
   memoryOrders.set(ord.id, { ...ord });
@@ -605,6 +641,16 @@ export async function updateOrderPaymentStatus(
   ord.paymentStatus = paymentStatus;
   if (paymentReference) ord.paymentReference = paymentReference;
   ord.updatedAt = new Date().toISOString();
+
+  // If order was marked as PAID, check if it qualifies referee's first order
+  if (paymentStatus === "PAID" && ord.userId) {
+    try {
+      const { qualifyReferralOnOrderPayment } = await import("@/lib/referral-store");
+      await qualifyReferralOnOrderPayment(ord.userId);
+    } catch (err) {
+      console.warn("[Referral] Payment qualification notice:", err);
+    }
+  }
 
   const dbOnline = await isDatabaseConnected();
   if (dbOnline) {

@@ -357,9 +357,8 @@ export default function CustomerDashboardPage() {
             </div>
           </Link>
 
-          <button
-            type="button"
-            onClick={() => setIsReferralModalOpen(true)}
+          <Link
+            href="/customer/referrals"
             className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 hover:border-gray-300 dark:hover:border-gray-700 transition shadow-xs flex items-center gap-3 text-left cursor-pointer"
           >
             <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
@@ -372,10 +371,10 @@ export default function CustomerDashboardPage() {
                 Refer Friends
               </h3>
               <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold truncate">
-                Earn 1 free refill
+                5:1 Free bottle rule
               </p>
             </div>
-          </button>
+          </Link>
         </div>
 
         {/* Clean Visual Hub with Tab Switcher */}

@@ -95,9 +95,19 @@ export async function POST(req: Request) {
         }
       }
 
+      // Check referral qualification on successful payment
+      const targetUserId = metadata.userId || existing?.customerProfileId;
+      if (targetUserId) {
+        try {
+          const { qualifyReferralOnOrderPayment } = await import("@/lib/referral-store");
+          await qualifyReferralOnOrderPayment(targetUserId);
+        } catch (err) {
+          console.warn("[Webhook] Referral qualification notice:", err);
+        }
+      }
+
       // 6. Fulfill Dispenser Installment if linked
       const targetPlanId = metadata.planId || existing?.planId;
-      const targetUserId = metadata.userId || existing?.customerProfileId;
       if (targetPlanId && targetUserId) {
         try {
           await recordInstallmentPayment(targetUserId, {
