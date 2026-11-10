@@ -89,20 +89,20 @@ export default function HomePage() {
               {/* Trust Badge */}
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-200/80 text-brand-700 text-xs font-bold w-fit mb-4 sm:mb-5 shadow-xs">
                 <span className="flex size-2 rounded-full bg-brand-500 animate-pulse" />
-                <span>Ghana&apos;s Premium Pure Water & Dispenser Service</span>
+                <span>Fresh Mineral Water &amp; Dispensers Across Greater Accra</span>
               </div>
 
               {/* Main Headline */}
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-gray-900 leading-[1.12]">
-                Pure Water Delivered{" "}
+                Fresh Mineral Water Delivered{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-sky-500">
-                  to Your Door.
+                  to Your Doorstep.
                 </span>
               </h1>
 
               {/* Concise Storytelling Copy */}
               <p className="mt-4 sm:mt-5 text-sm sm:text-lg text-gray-600 max-w-xl leading-relaxed">
-                Fresh 19L mineral refills, zero-deposit bottle exchanges, and modern hot and cold dispensers delivered directly to your home or office.
+                Order sealed 19L refills for GH₵ 25, swap any brand of empty bottle for free, and enjoy hot or chilled water on tap at your home or office.
               </p>
 
               {/* Mobile Side-by-Side CTAs (Grid on mobile, flex on desktop) */}
@@ -115,7 +115,7 @@ export default function HomePage() {
                     <svg className="size-4 sm:size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                     </svg>
-                    <span>Order Refill</span>
+                    <span>Order 19L Refill (GH₵ 25)</span>
                   </Link>
                 </motion.div>
 
@@ -124,7 +124,7 @@ export default function HomePage() {
                     href="#dispensers"
                     className="w-full h-12 sm:h-13 px-3 sm:px-6 rounded-xl sm:rounded-2xl text-xs sm:text-base font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-200/90 transition cursor-pointer flex items-center justify-center gap-1.5 text-center"
                   >
-                    <span>Dispensers</span>
+                    <span>Explore Dispensers</span>
                     <svg className="size-3.5 sm:size-4 shrink-0 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
@@ -298,13 +298,13 @@ export default function HomePage() {
             className="text-center max-w-xl mx-auto mb-10 sm:mb-14"
           >
             <span className="text-xs font-bold uppercase tracking-wider text-brand-600">
-              Pure Drinking Solutions
+              Clear Pricing
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1 tracking-tight">
-              Simple Products. Clear Pricing.
+              Simple Refills. Zero Hidden Fees.
             </h2>
             <p className="mt-2 text-xs sm:text-sm text-gray-500">
-              Clean mineral water and smart dispensing hardware for homes and offices.
+              Bottled under strict quality standards. Swap any standard bottle brand at delivery with zero deposit penalty.
             </p>
           </motion.div>
 
@@ -344,7 +344,7 @@ export default function HomePage() {
                 </div>
 
                 <p className="text-xs text-gray-500 mb-4 leading-relaxed">
-                  Food-grade shatter-proof bottle with handle. Hand over any empty bottle to pay zero deposit.
+                  Food-grade bottle with an ergonomic carry handle. Hand your empty bottle to our driver and pay only GH₵ 25 for fresh mineral water.
                 </p>
 
                 <ul className="space-y-1.5 text-xs text-gray-600 mb-5 border-t border-gray-100 pt-3.5">
@@ -374,7 +374,7 @@ export default function HomePage() {
                   href="/customer/order?product=19L"
                   className="w-full inline-block text-center py-2.5 sm:py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 transition shadow-sm cursor-pointer"
                 >
-                  Order Refill
+                  Order 19L Refill (GH₵ 25)
                 </Link>
               </motion.div>
             </motion.div>
@@ -415,7 +415,7 @@ export default function HomePage() {
                 </div>
 
                 <p className="text-xs text-gray-500 mb-4 leading-relaxed">
-                  Dual hot/cold faucets with child lock. Pay monthly towards full ownership in 12 months.
+                  Instant hot tea and chilled water on tap. Pay GH₵ 120 monthly and own the dispenser outright in 12 months with free maintenance included.
                 </p>
 
                 <ul className="space-y-1.5 text-xs text-gray-600 mb-5 border-t border-gray-100 pt-3.5">
@@ -445,7 +445,7 @@ export default function HomePage() {
                   href="/customer/dispenser"
                   className="w-full inline-block text-center py-2.5 sm:py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 transition shadow-sm cursor-pointer"
                 >
-                  Choose Dispenser
+                  Start Rent-to-Own Plan
                 </Link>
               </motion.div>
             </motion.div>
@@ -484,7 +484,7 @@ export default function HomePage() {
                 </div>
 
                 <p className="text-xs text-gray-500 mb-4 leading-relaxed">
-                  Case of 24 sealed 500ml bottles. Ideal for meetings, travel, workouts, and family gatherings.
+                  Case of 24 sealed 500ml bottles. Ideal for boardrooms, workouts, road trips, and family gatherings.
                 </p>
 
                 <ul className="space-y-1.5 text-xs text-gray-600 mb-5 border-t border-gray-100 pt-3.5">
@@ -514,7 +514,7 @@ export default function HomePage() {
                   href="/customer/order?product=PACK"
                   className="w-full inline-block text-center py-2.5 sm:py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-gray-800 bg-gray-100 hover:bg-gray-200 transition border border-gray-200 cursor-pointer"
                 >
-                  Order Case Pack
+                  Order 24-Pack Case (GH₵ 42)
                 </Link>
               </motion.div>
             </motion.div>
@@ -541,10 +541,10 @@ export default function HomePage() {
               <span>Universal Bottle Exchange</span>
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-              Affiliated with Ghana&apos;s Top Water Producers
+              Swap Any Brand of Empty Bottle. Pay Zero Deposit.
             </h2>
             <p className="mt-2 text-xs sm:text-sm text-gray-600 leading-relaxed">
-              We supply and accept empty 19L bottle exchanges for Ghana&apos;s most trusted certified brands with zero deposit penalties.
+              Have empty 19L bottles from Voltic, Awake, Bel-Aqua, or Ice Cool? Our drivers exchange them at your doorstep with no brand restrictions and no deposit fees.
             </p>
           </motion.div>
 
@@ -587,13 +587,13 @@ export default function HomePage() {
             className="text-center max-w-xl mx-auto mb-10 sm:mb-12"
           >
             <span className="text-xs font-bold uppercase tracking-wider text-brand-600">
-              Effortless Delivery
+              3-Step Doorstep Service
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1 tracking-tight">
               How It Works
             </h2>
             <p className="mt-1.5 text-xs sm:text-sm text-gray-500">
-              Get fresh drinking water in three simple steps.
+              Reliable drinking water delivered in three simple steps.
             </p>
           </motion.div>
 
@@ -612,10 +612,10 @@ export default function HomePage() {
                 01
               </span>
               <h3 className="text-base font-bold text-gray-900 mb-1.5">
-                Order Online
+                Order in 60 Seconds
               </h3>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Pick your refills or cases online and select your preferred delivery time slot.
+                Choose your bottle quantity and pick your preferred morning, afternoon, or evening delivery slot.
               </p>
             </motion.div>
 
@@ -632,10 +632,10 @@ export default function HomePage() {
                 02
               </span>
               <h3 className="text-base font-bold text-gray-900 mb-1.5">
-                Doorstep Bottle Swap
+                Doorstep Bottle Exchange
               </h3>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Our driver delivers sealed bottles and collects your empties with zero deposit charge.
+                Our driver delivers sealed, hygienic bottles to your door and collects your empties with zero deposit fees.
               </p>
             </motion.div>
 
@@ -652,10 +652,10 @@ export default function HomePage() {
                 03
               </span>
               <h3 className="text-base font-bold text-gray-900 mb-1.5">
-                Pay with Ease
+                Pay on Delivery
               </h3>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Pay easily via Mobile Money, Card, or Cash on Delivery with instant SMS receipts.
+                Pay with Mobile Money, debit card, or cash after your bottles arrive, with an instant SMS receipt.
               </p>
             </motion.div>
 
@@ -698,15 +698,15 @@ export default function HomePage() {
               className="lg:col-span-6 space-y-5"
             >
               <span className="text-xs font-bold uppercase tracking-wider text-brand-600">
-                Own Your Smart Hardware
+                Rent-to-Own Hardware
               </span>
 
               <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight leading-tight">
-                Hot & cold water on demand. Pay monthly towards ownership.
+                Instant Hot Tea &amp; Chilled Water. Own Your Dispenser in 12 Months.
               </h2>
 
               <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                Our 12-month Rent-to-Own plan lets you enjoy a modern dispenser for GH₵ 120/month. After 12 payments, the dispenser is 100% yours.
+                Skip boiling kettles or chilling bottles in the fridge. For GH₵ 120 a month, we deliver and install a modern digital dispenser. After 12 monthly payments, you own it completely.
               </p>
 
               <div className="grid grid-cols-2 gap-3 pt-1">
@@ -737,7 +737,7 @@ export default function HomePage() {
                     href="/customer/dispenser"
                     className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 shadow-sm transition active:scale-[0.99] cursor-pointer"
                   >
-                    <span>Apply for Dispenser Plan</span>
+                    <span>Get Dispenser on Rent-to-Own</span>
                     <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
@@ -765,13 +765,13 @@ export default function HomePage() {
             className="text-center max-w-xl mx-auto mb-10"
           >
             <span className="text-xs font-bold uppercase tracking-wider text-brand-600">
-              Interactive Estimator
+              Usage Calculator
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1 tracking-tight">
-              Estimate Your Monthly Usage
+              Calculate Your Home or Office Water Needs
             </h2>
             <p className="mt-1 text-xs text-gray-500">
-              Slide to calculate how much water you need and see your savings.
+              Slide to find the right weekly quantity and see how much you save compared to single-use bottles.
             </p>
           </motion.div>
 
@@ -858,7 +858,7 @@ export default function HomePage() {
                     href={`/customer/order?qty=${weeklyBottles}`}
                     className="w-full inline-flex items-center justify-center py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 transition shadow-sm cursor-pointer mt-1"
                   >
-                    Order This Quantity
+                    Order {weeklyBottles} {weeklyBottles === 1 ? "Bottle" : "Bottles"} Weekly
                   </Link>
                 </motion.div>
               </div>
@@ -912,7 +912,7 @@ export default function HomePage() {
               </h2>
 
               <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                Scheduled morning, afternoon, and evening van routes with real-time SMS arrival alerts sent to your phone.
+                Our delivery vans cover East Legon, Cantonments, Osu, Airport, Ridge, and Spintex daily, with live SMS alerts before arrival.
               </p>
 
               <div className="grid grid-cols-2 gap-3 pt-1">
@@ -943,7 +943,7 @@ export default function HomePage() {
                     href="/customer/order"
                     className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 shadow-sm transition active:scale-[0.99] cursor-pointer"
                   >
-                    <span>Schedule Delivery</span>
+                    <span>Book Your Delivery Slot</span>
                     <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
