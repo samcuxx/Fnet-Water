@@ -34,13 +34,14 @@ RUN npx prisma generate
 # Build Next.js in standalone mode
 RUN npm run build
 
-# 4. Migration runner stage (optional target for database migration service)
+# 4. Migration runner stage (target for database migration service)
 FROM base AS migrate
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY package.json ./
 COPY prisma ./prisma
-CMD ["npx", "prisma", "db", "push", "--skip-generate"]
+COPY src ./src
+CMD ["sh", "-c", "npx prisma db push --skip-generate && npx tsx prisma/create-admin.ts"]
 
 # 5. Production Runner (default target)
 FROM base AS runner
