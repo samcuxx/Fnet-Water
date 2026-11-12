@@ -1,7 +1,7 @@
-# 1. Base image
-FROM node:22-alpine AS base
+# 1. Base image (Debian Bookworm Slim for 100% glibc compatibility with Prisma, SWC, and Tailwind Oxide)
+FROM node:22-bookworm-slim AS base
 WORKDIR /app
-RUN apk add --no-cache libc6-compat openssl
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # 2. Dependencies
 FROM base AS deps
@@ -15,27 +15,22 @@ RUN npm ci --include=dev --production=false
 # 3. Builder
 FROM base AS builder
 WORKDIR /app
-ARG DATABASE_URL
-ARG NEXTAUTH_SECRET
-ARG NEXTAUTH_URL
-ARG NEXT_PUBLIC_APP_URL
-ARG PAYSTACK_SECRET_KEY
-ARG NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY
-ARG MNOTIFY_API_KEY
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Build-time environment variables for Next.js static page optimization
+# Hardcode placeholder DATABASE_URL to prevent network timeouts during build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV IS_BUILD_TIME=true
-ENV DATABASE_URL=${DATABASE_URL:-"postgresql://placeholder:placeholder@localhost:5432/placeholder?schema=public"}
-ENV NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-"fnet-water-hub-super-secret-jwt-key-2026"}
-ENV NEXTAUTH_URL=${NEXTAUTH_URL:-"https://fnetwater.samcux.com"}
-ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-"https://fnetwater.samcux.com"}
-ENV PAYSTACK_SECRET_KEY=${PAYSTACK_SECRET_KEY:-"sk_test_placeholder"}
-ENV NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=${NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY:-"pk_test_placeholder"}
-ENV MNOTIFY_API_KEY=${MNOTIFY_API_KEY:-"placeholder"}
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV DATABASE_URL="postgresql://placeholder:placeholder@127.0.0.1:5432/placeholder?schema=public"
+ENV NEXTAUTH_SECRET="fnet-water-hub-super-secret-jwt-key-2026"
+ENV NEXTAUTH_URL="https://fnetwater.samcux.com"
+ENV NEXT_PUBLIC_APP_URL="https://fnetwater.samcux.com"
+ENV PAYSTACK_SECRET_KEY="sk_test_placeholder"
+ENV NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY="pk_test_placeholder"
+ENV MNOTIFY_API_KEY="placeholder"
 
 # Generate Prisma client for all target platforms
 RUN npx prisma generate
@@ -60,8 +55,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 
@@ -76,6 +70,6 @@ USER nextjs
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:3000/api/health || exit 1
+  CMD node -e "fetch('http://127.0.0.1:3000/api/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
 
 CMD ["node", "server.js"]
