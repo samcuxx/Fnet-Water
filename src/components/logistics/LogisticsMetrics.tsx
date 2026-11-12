@@ -1,90 +1,87 @@
 "use client";
 
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/tailgrids/core/card";
+import { InvoiceIcon, TableIcon, TaskIcon, Widget4Icon } from "@/components/common/sidebar/icon";
+import { ArrowUpIcon } from "@/utils/icon";
 import React from "react";
-import Badge from "@/components/ui/badge/Badge";
 
 export default function LogisticsMetrics() {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
+    <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
       {/* Metric 1 */}
-      <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-            Active Delivery Runs
-          </span>
-          <Badge color="primary" size="sm">
-            Live
-          </Badge>
-        </div>
-        <div className="mt-4 flex items-baseline justify-between">
-          <h4 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
+      <Card beamIndex={0}>
+        <CardHeader className="justify-between">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-blue-light-50 text-primary dark:bg-blue-light-950">
+            <Widget4Icon />
+          </div>
+        </CardHeader>
+        <CardContent className="mt-3.5 sm:mt-5 p-0">
+          <div className="text-lg leading-6 font-bold text-text-primary sm:text-xl md:text-2xl tracking-tight">
             18 Orders
-          </h4>
-          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold">
-            4 Vans Dispatched
-          </span>
-        </div>
-      </div>
+          </div>
+        </CardContent>
+        <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between p-0">
+          <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Active Runs</span>
+          <span className="text-[11px] leading-4 sm:text-xs font-semibold text-primary">4 vans en route</span>
+        </CardFooter>
+      </Card>
 
       {/* Metric 2 */}
-      <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-            On-Time Dispatch Rate
-          </span>
-          <Badge color="success" size="sm">
-            Optimal
-          </Badge>
-        </div>
-        <div className="mt-4 flex items-baseline justify-between">
-          <h4 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
+      <Card beamIndex={1}>
+        <CardHeader className="justify-between">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-success-50 text-green-600 dark:bg-success-950">
+            <TaskIcon />
+          </div>
+        </CardHeader>
+        <CardContent className="mt-3.5 sm:mt-5 p-0">
+          <div className="text-lg leading-6 font-bold text-green-600 sm:text-xl md:text-2xl tracking-tight">
             97.8%
-          </h4>
-          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold">
-            +2.4% vs last week
-          </span>
-        </div>
-      </div>
+          </div>
+        </CardContent>
+        <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between p-0">
+          <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">On-Time Dispatch</span>
+          <div className="flex items-center gap-1 text-[11px] leading-4 sm:text-xs font-semibold text-green-600">
+            <span>+2.4%</span>
+            <ArrowUpIcon />
+          </div>
+        </CardFooter>
+      </Card>
 
       {/* Metric 3 */}
-      <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-            Bottles Exchanged
-          </span>
-          <Badge color="info" size="sm">
-            Returns
-          </Badge>
-        </div>
-        <div className="mt-4 flex items-baseline justify-between">
-          <h4 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
-            348 Bottles
-          </h4>
-          <span className="text-xs text-gray-500 dark:text-gray-400 font-semibold">
-            348 Collected
-          </span>
-        </div>
-      </div>
+      <Card beamIndex={2}>
+        <CardHeader className="justify-between">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-brand-50 text-brand-500 dark:bg-brand-950">
+            <TableIcon />
+          </div>
+        </CardHeader>
+        <CardContent className="mt-3.5 sm:mt-5 p-0">
+          <div className="text-lg leading-6 font-bold text-brand-600 dark:text-brand-400 sm:text-xl md:text-2xl tracking-tight">
+            1,420
+          </div>
+        </CardContent>
+        <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between p-0">
+          <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Bottles Exchanged</span>
+          <span className="text-[11px] leading-4 sm:text-xs font-semibold text-brand-600">Returned empties</span>
+        </CardFooter>
+      </Card>
 
       {/* Metric 4 */}
-      <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-            Damaged Bottle Alerts
-          </span>
-          <Badge color="error" size="sm">
-            Quality Control
-          </Badge>
-        </div>
-        <div className="mt-4 flex items-baseline justify-between">
-          <h4 className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 tracking-tight">
-            2 Bottles
-          </h4>
-          <span className="text-xs text-gray-500 dark:text-gray-400 font-semibold">
-            Quarantined
-          </span>
-        </div>
-      </div>
+      <Card beamIndex={3}>
+        <CardHeader className="justify-between">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-orange-50 text-orange-500 dark:bg-orange-950">
+            <InvoiceIcon />
+          </div>
+        </CardHeader>
+        <CardContent className="mt-3.5 sm:mt-5 p-0">
+          <div className="text-lg leading-6 font-bold text-orange-600 dark:text-orange-400 sm:text-xl md:text-2xl tracking-tight">
+            GH₵ 2,840
+          </div>
+        </CardContent>
+        <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between p-0">
+          <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Cash Collected</span>
+          <span className="text-[11px] leading-4 sm:text-xs font-semibold text-orange-500">Route payments</span>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

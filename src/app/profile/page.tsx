@@ -2,13 +2,20 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Modal from "@/components/ui/Modal";
-import Badge from "@/components/ui/Badge";
+import { Breadcrumbs } from "@/components/tailgrids/core/breadcrumbs";
+import { Card } from "@/components/tailgrids/core/card";
+import { Badge } from "@/components/tailgrids/core/badge";
+import { Button } from "@/components/tailgrids/core/button";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/tailgrids/core/input-group";
 import Skeleton from "@/components/ui/skeleton";
-import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { RoleType } from "@/types/next-auth";
+import { X, Edit2, MapPin, KeyRound, User, Mail, Phone, Calendar, Shield, Check } from "lucide-react";
 
 interface UserProfileData {
   id: string;
@@ -105,7 +112,7 @@ export default function ProfilePage() {
       setIsEditInfoOpen(false);
       setFeedback({ type: "success", text: "Personal information updated successfully." });
     } catch {
-      setFormError("Network error occurred.");
+      setFormError("Network connection error occurred.");
     } finally {
       setIsSubmitting(false);
     }
@@ -136,9 +143,9 @@ export default function ProfilePage() {
 
       setProfile(data.profile);
       setIsEditAddressOpen(false);
-      setFeedback({ type: "success", text: "Address details updated successfully." });
+      setFeedback({ type: "success", text: "Operating address updated successfully." });
     } catch {
-      setFormError("Network error occurred.");
+      setFormError("Network connection error occurred.");
     } finally {
       setIsSubmitting(false);
     }
@@ -183,7 +190,7 @@ export default function ProfilePage() {
       setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
       setFeedback({ type: "success", text: "Password changed successfully." });
     } catch {
-      setFormError("Network error occurred.");
+      setFormError("Network connection error occurred.");
     } finally {
       setIsSubmitting(false);
     }
@@ -191,279 +198,292 @@ export default function ProfilePage() {
 
   const userRole: RoleType = profile?.role || (session?.user as { role?: RoleType })?.role || "ADMIN";
 
-  const getRoleBadgeColor = (role: RoleType): "primary" | "info" | "success" | "warning" | "dark" => {
+  const homeHref =
+    userRole === "ADMIN"
+      ? "/admin"
+      : userRole === "MANAGER"
+      ? "/manager"
+      : userRole === "DRIVER"
+      ? "/driver"
+      : userRole === "AGENT"
+      ? "/agent"
+      : "/customer";
+
+  const getRoleBadgeColor = (role: RoleType): "primary" | "cyan" | "success" | "warning" | "neutral" => {
     switch (role) {
       case "ADMIN":
         return "primary";
       case "MANAGER":
-        return "info";
+        return "cyan";
       case "DRIVER":
         return "success";
       case "AGENT":
         return "warning";
       case "CUSTOMER":
-        return "dark";
       default:
-        return "dark";
+        return "neutral";
     }
   };
 
   return (
     <AppLayout role={userRole}>
       <div className="space-y-6">
-        {/* Toast / Notification Banner */}
+        {/* Breadcrumbs & Page Header */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+              Account Profile
+            </h1>
+            <p className="mt-1 text-xs text-text-tertiary sm:text-sm">
+              Manage your personal information, operating address, and account credentials.
+            </p>
+          </div>
+          <div>
+            <Breadcrumbs
+              dividerType="chevron"
+              items={[
+                { label: "Home", href: homeHref },
+                { label: "Profile" },
+              ]}
+            />
+          </div>
+        </div>
+
+        {/* Feedback Alert */}
         {feedback && (
           <div
-            className={`p-3.5 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-between transition-all ${
+            className={`flex items-center justify-between rounded-xl p-4 text-xs font-semibold sm:text-sm ${
               feedback.type === "success"
-                ? "bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-900/60 text-green-700 dark:text-green-300"
-                : "bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300"
+                ? "border border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-300"
+                : "border border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-800/40 dark:bg-rose-950/30 dark:text-rose-300"
             }`}
           >
-            <span>{feedback.text}</span>
+            <div className="flex items-center gap-2">
+              <Check className="size-4 shrink-0" />
+              <span>{feedback.text}</span>
+            </div>
             <button
               onClick={() => setFeedback(null)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-0.5 rounded-lg"
+              className="text-text-tertiary hover:text-text-primary cursor-pointer p-0.5"
               aria-label="Dismiss feedback"
             >
-              <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+              <X className="size-4" />
             </button>
           </div>
         )}
 
-        {/* Page Container */}
-        <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-6 sm:p-8 shadow-xs">
-          <div className="mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
-              Account Profile
-            </h1>
-            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              Manage your personal information, operating address, and account credentials.
-            </p>
-          </div>
-
-          {loading ? (
-            <div className="space-y-6">
-              <div className="p-6 border border-gray-100 dark:border-gray-800/80 rounded-2xl bg-gray-50/40 dark:bg-gray-800/20 flex flex-col sm:flex-row items-center gap-5">
+        {loading ? (
+          <div className="space-y-6">
+            <Card className="p-6">
+              <div className="flex items-center gap-5">
                 <Skeleton className="size-20 rounded-full shrink-0" />
-                <div className="space-y-2 flex-1 w-full text-center sm:text-left">
-                  <Skeleton className="h-6 w-48 mx-auto sm:mx-0 rounded-lg" />
-                  <Skeleton className="h-4 w-32 mx-auto sm:mx-0 rounded-lg" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-6 w-48 rounded-lg" />
+                  <Skeleton className="h-4 w-32 rounded-lg" />
                 </div>
               </div>
-              <div className="p-6 border border-gray-100 dark:border-gray-800/80 rounded-2xl bg-gray-50/40 dark:bg-gray-800/20 space-y-4">
-                <Skeleton className="h-5 w-40 rounded-lg" />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Skeleton className="h-10 w-full rounded-xl" />
-                  <Skeleton className="h-10 w-full rounded-xl" />
-                </div>
+            </Card>
+            <Card className="p-6 space-y-4">
+              <Skeleton className="h-5 w-40 rounded-lg" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Skeleton className="h-10 w-full rounded-xl" />
+                <Skeleton className="h-10 w-full rounded-xl" />
               </div>
-            </div>
-          ) : (
-            <motion.div
-              variants={staggerContainer}
-              initial="initial"
-              animate="animate"
-              className="space-y-6"
-            >
-              {/* CARD 1: UserMetaCard */}
-              <div className="p-5 sm:p-6 border border-gray-100 dark:border-gray-800/80 rounded-2xl bg-gray-50/40 dark:bg-gray-800/20">
-                <div className="flex flex-col gap-5 mb-6 xl:flex-row xl:items-center xl:justify-between">
-                  <div className="flex flex-col items-center w-full gap-5 sm:flex-row">
-                    <div className="size-16 sm:size-20 flex items-center justify-center rounded-full bg-gradient-to-tr from-brand-500 to-sky-400 text-white font-black text-2xl sm:text-3xl shrink-0 ring-4 ring-brand-100 dark:ring-brand-950 shadow-xs">
-                      {profile?.name?.charAt(0).toUpperCase() || "U"}
+            </Card>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* Header Hero Card */}
+            <Card className="p-6">
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-5">
+                  <div className="flex size-18 sm:size-20 items-center justify-center rounded-2xl bg-primary text-2xl font-bold text-white shadow-xs">
+                    {profile?.name?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2.5">
+                      <h2 className="text-xl font-bold text-text-primary sm:text-2xl">
+                        {profile?.name}
+                      </h2>
+                      <Badge color={getRoleBadgeColor(userRole)} size="sm">
+                        {userRole}
+                      </Badge>
                     </div>
-
-                    <div className="text-center sm:text-left">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                          {profile?.name}
-                        </h2>
-                        <Badge color={getRoleBadgeColor(userRole)} variant="light" size="sm">
-                          {userRole}
-                        </Badge>
-                      </div>
-
-                      <div className="mt-1 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                        <span>{profile?.email}</span>
-                        <span className="hidden sm:inline">•</span>
-                        <span className="font-mono">{profile?.phone}</span>
-                        <span className="hidden sm:inline">•</span>
-                        <span>Ghana</span>
-                      </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-text-tertiary sm:text-sm">
+                      <span>{profile?.email}</span>
+                      <span>•</span>
+                      <span className="font-mono">{profile?.phone}</span>
+                      <span>•</span>
+                      <span>Ghana</span>
                     </div>
                   </div>
+                </div>
 
-                  <button
-                    type="button"
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <Button
+                    appearance="outline"
+                    size="sm"
                     onClick={() => {
                       setFormError(null);
                       setIsEditInfoOpen(true);
                     }}
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-5 py-2.5 text-xs sm:text-sm font-bold text-gray-700 shadow-2xs hover:bg-gray-50 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700/60 lg:inline-flex lg:w-auto shrink-0 cursor-pointer"
+                    className="gap-2"
                   >
-                    <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                      />
-                    </svg>
-                    <span>Edit Info</span>
-                  </button>
-                </div>
-
-                <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-                    Personal Information
-                  </h3>
-
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Full Name</p>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{profile?.name}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Email Address</p>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{profile?.email}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Contact Phone</p>
-                      <p className="text-sm font-medium font-mono text-gray-900 dark:text-white">
-                        {profile?.phone}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assigned Role</p>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{userRole}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Account Identifier</p>
-                      <p className="text-sm font-medium font-mono text-gray-900 dark:text-white">
-                        {profile?.customerCode || profile?.id || "N/A"}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Account Created</p>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString() : "Active"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* CARD 2: UserAddressCard */}
-              <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-                  <div>
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-                      Operating Address &amp; Delivery Zone
-                    </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                      Location for water deliveries and operations dispatch.
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFormError(null);
-                      setIsEditAddressOpen(true);
-                    }}
-                    className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2.5 text-xs sm:text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700/60 sm:w-auto shrink-0 cursor-pointer"
-                  >
-                    <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                      />
-                    </svg>
-                    Edit Location
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-                  <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Country</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">Ghana</p>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Region</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">Ghana</p>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Primary Operating Zone</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {profile?.deliveryArea || "East Legon"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* CARD 3: Security & Credentials Card */}
-              <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div>
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-                      Account Security &amp; Credentials
-                    </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                      Ensure your account remains safe with password updates.
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
+                    <Edit2 className="size-3.5" />
+                    <span>Edit Profile</span>
+                  </Button>
+                  <Button
+                    appearance="outline"
+                    size="sm"
                     onClick={() => {
                       setFormError(null);
                       setIsChangePasswordOpen(true);
                     }}
-                    className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2.5 text-xs sm:text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700/60 sm:w-auto shrink-0 cursor-pointer"
+                    className="gap-2"
                   >
-                    <svg className="size-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                      />
-                    </svg>
-                    Change Password
-                  </button>
+                    <KeyRound className="size-3.5" />
+                    <span>Change Password</span>
+                  </Button>
                 </div>
               </div>
-            </motion.div>
-          )}
-        </div>
+            </Card>
 
-        {/* MODAL 1: Edit Personal Details */}
+            {/* Profile Grid: Personal Details & Operating Location */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {/* Personal Information */}
+              <Card className="p-6">
+                <div className="flex items-center justify-between border-b border-card-border pb-4">
+                  <div className="flex items-center gap-2">
+                    <User className="size-4.5 text-primary" />
+                    <h3 className="text-base font-bold text-text-primary">
+                      Personal Information
+                    </h3>
+                  </div>
+                  <Button
+                    appearance="ghost"
+                    size="sm"
+                    onClick={() => setIsEditInfoOpen(true)}
+                    className="text-xs font-semibold text-primary"
+                  >
+                    Edit
+                  </Button>
+                </div>
+
+                <div className="mt-4 space-y-4">
+                  <div className="flex justify-between items-center text-xs sm:text-sm py-1 border-b border-card-border/60">
+                    <span className="text-text-tertiary font-medium">Full Name</span>
+                    <span className="text-text-primary font-bold">{profile?.name}</span>
+                  </div>
+
+                  <div className="flex justify-between items-center text-xs sm:text-sm py-1 border-b border-card-border/60">
+                    <span className="text-text-tertiary font-medium">Email Address</span>
+                    <span className="text-text-primary font-medium">{profile?.email}</span>
+                  </div>
+
+                  <div className="flex justify-between items-center text-xs sm:text-sm py-1 border-b border-card-border/60">
+                    <span className="text-text-tertiary font-medium">Phone Number</span>
+                    <span className="text-text-primary font-mono font-bold">{profile?.phone}</span>
+                  </div>
+
+                  <div className="flex justify-between items-center text-xs sm:text-sm py-1 border-b border-card-border/60">
+                    <span className="text-text-tertiary font-medium">Account Role</span>
+                    <Badge color={getRoleBadgeColor(userRole)} size="sm">
+                      {userRole}
+                    </Badge>
+                  </div>
+
+                  <div className="flex justify-between items-center text-xs sm:text-sm py-1">
+                    <span className="text-text-tertiary font-medium">Member Since</span>
+                    <span className="text-text-secondary">
+                      {profile?.createdAt
+                        ? new Date(profile.createdAt).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "2024"}
+                    </span>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Operating Address & Operational Metadata */}
+              <Card className="p-6">
+                <div className="flex items-center justify-between border-b border-card-border pb-4">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="size-4.5 text-primary" />
+                    <h3 className="text-base font-bold text-text-primary">
+                      Operating Location
+                    </h3>
+                  </div>
+                  <Button
+                    appearance="ghost"
+                    size="sm"
+                    onClick={() => setIsEditAddressOpen(true)}
+                    className="text-xs font-semibold text-primary"
+                  >
+                    Update
+                  </Button>
+                </div>
+
+                <div className="mt-4 space-y-4">
+                  <div className="flex justify-between items-center text-xs sm:text-sm py-1 border-b border-card-border/60">
+                    <span className="text-text-tertiary font-medium">Operating Territory</span>
+                    <span className="text-text-primary font-bold">
+                      {profile?.deliveryArea || "East Legon, Accra"}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center text-xs sm:text-sm py-1 border-b border-card-border/60">
+                    <span className="text-text-tertiary font-medium">Country / Region</span>
+                    <span className="text-text-secondary font-medium">Greater Accra, Ghana</span>
+                  </div>
+
+                  {userRole === "CUSTOMER" && (
+                    <>
+                      <div className="flex justify-between items-center text-xs sm:text-sm py-1 border-b border-card-border/60">
+                        <span className="text-text-tertiary font-medium">Bottles Held</span>
+                        <span className="text-text-primary font-bold font-mono">
+                          {profile?.bottlesHeld ?? 0} Bottles
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center text-xs sm:text-sm py-1 border-b border-card-border/60">
+                        <span className="text-text-tertiary font-medium">Dispenser Agreement</span>
+                        <span className="text-text-secondary">
+                          {profile?.dispenserPlan || "None active"}
+                        </span>
+                      </div>
+                    </>
+                  )}
+
+                  <div className="flex justify-between items-center text-xs sm:text-sm py-1">
+                    <span className="text-text-tertiary font-medium">Account Status</span>
+                    <Badge color="success" size="sm">
+                      Active
+                    </Badge>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL 1: Edit Info */}
         <Modal
           isOpen={isEditInfoOpen}
           onClose={() => setIsEditInfoOpen(false)}
           title="Edit Personal Information"
         >
           {formError && (
-            <div className="mb-4 p-3 rounded-lg text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400">
+            <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
               {formError}
             </div>
           )}
 
           <form onSubmit={handleSaveInfo} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="mb-1 block text-xs font-semibold text-text-primary">
                 Full Name
               </label>
               <input
@@ -471,13 +491,13 @@ export default function ProfilePage() {
                 required
                 value={infoForm.name}
                 onChange={(e) => setInfoForm({ ...infoForm, name: e.target.value })}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+                className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-sm text-text-primary focus:outline-hidden focus:border-primary transition"
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   Email Address
                 </label>
                 <input
@@ -485,12 +505,12 @@ export default function ProfilePage() {
                   required
                   value={infoForm.email}
                   onChange={(e) => setInfoForm({ ...infoForm, email: e.target.value })}
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+                  className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-sm text-text-primary focus:outline-hidden focus:border-primary transition"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   Phone Number
                 </label>
                 <input
@@ -498,26 +518,27 @@ export default function ProfilePage() {
                   required
                   value={infoForm.phone}
                   onChange={(e) => setInfoForm({ ...infoForm, phone: e.target.value })}
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+                  className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-sm text-text-primary focus:outline-hidden focus:border-primary transition"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
-              <button
+            <div className="flex justify-end gap-2.5 pt-4 border-t border-card-border">
+              <Button
                 type="button"
+                appearance="outline"
+                size="sm"
                 onClick={() => setIsEditInfoOpen(false)}
-                className="px-4 py-2 text-xs font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 text-xs font-medium rounded-lg text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs disabled:opacity-50 cursor-pointer"
+                size="sm"
               >
                 {isSubmitting ? "Saving..." : "Save Changes"}
-              </button>
+              </Button>
             </div>
           </form>
         </Modal>
@@ -529,14 +550,14 @@ export default function ProfilePage() {
           title="Edit Operating Address"
         >
           {formError && (
-            <div className="mb-4 p-3 rounded-lg text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400">
+            <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
               {formError}
             </div>
           )}
 
           <form onSubmit={handleSaveAddress} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="mb-1 block text-xs font-semibold text-text-primary">
                 Primary Operating Area / Delivery Location
               </label>
               <input
@@ -545,25 +566,26 @@ export default function ProfilePage() {
                 placeholder="e.g. East Legon, Accra"
                 value={addressForm.deliveryArea}
                 onChange={(e) => setAddressForm({ ...addressForm, deliveryArea: e.target.value })}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+                className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-sm text-text-primary focus:outline-hidden focus:border-primary transition"
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
-              <button
+            <div className="flex justify-end gap-2.5 pt-4 border-t border-card-border">
+              <Button
                 type="button"
+                appearance="outline"
+                size="sm"
                 onClick={() => setIsEditAddressOpen(false)}
-                className="px-4 py-2 text-xs font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 text-xs font-medium rounded-lg text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs disabled:opacity-50 cursor-pointer"
+                size="sm"
               >
                 {isSubmitting ? "Saving..." : "Save Location"}
-              </button>
+              </Button>
             </div>
           </form>
         </Modal>
@@ -575,14 +597,14 @@ export default function ProfilePage() {
           title="Change Account Password"
         >
           {formError && (
-            <div className="mb-4 p-3 rounded-lg text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400">
+            <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
               {formError}
             </div>
           )}
 
           <form onSubmit={handleSavePassword} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="mb-1 block text-xs font-semibold text-text-primary">
                 Current Password
               </label>
               <input
@@ -591,13 +613,13 @@ export default function ProfilePage() {
                 placeholder="Enter current password"
                 value={passwordForm.currentPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+                className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-sm text-text-primary focus:outline-hidden focus:border-primary transition"
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   New Password
                 </label>
                 <input
@@ -606,12 +628,12 @@ export default function ProfilePage() {
                   placeholder="Min 6 characters"
                   value={passwordForm.newPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+                  className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-sm text-text-primary focus:outline-hidden focus:border-primary transition"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   Confirm New Password
                 </label>
                 <input
@@ -620,26 +642,27 @@ export default function ProfilePage() {
                   placeholder="Re-enter new password"
                   value={passwordForm.confirmPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+                  className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-sm text-text-primary focus:outline-hidden focus:border-primary transition"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
-              <button
+            <div className="flex justify-end gap-2.5 pt-4 border-t border-card-border">
+              <Button
                 type="button"
+                appearance="outline"
+                size="sm"
                 onClick={() => setIsChangePasswordOpen(false)}
-                className="px-4 py-2 text-xs font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 text-xs font-medium rounded-lg text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs disabled:opacity-50 cursor-pointer"
+                size="sm"
               >
                 {isSubmitting ? "Updating..." : "Update Password"}
-              </button>
+              </Button>
             </div>
           </form>
         </Modal>

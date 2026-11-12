@@ -101,18 +101,18 @@ export default function DeliveryStatisticsChart() {
   ];
 
   return (
-    <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs">
+    <div className="rounded-xl border border-border bg-card text-card-foreground p-5 sm:p-6 shadow-xs">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
-          <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+          <h3 className="text-base sm:text-lg font-bold text-card-foreground">
             Daily Delivery Run Statistics
           </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-muted-foreground">
             Total completed vs scheduled routes across Ghana hubs
           </p>
         </div>
 
-        <span className="text-xs font-bold px-3 py-1 rounded-full bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-sky-400 self-start sm:self-auto border border-brand-200/50 dark:border-brand-500/20">
+        <span className="text-xs font-bold px-3 py-1 rounded-full bg-primary/10 text-primary self-start sm:self-auto border border-primary/20">
           Weekly Fulfillment: 98.4%
         </span>
       </div>

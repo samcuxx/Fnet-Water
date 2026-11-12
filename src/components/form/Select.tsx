@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 export interface Option {
   value: string;
@@ -49,10 +50,10 @@ const Select: React.FC<SelectProps> = ({
         disabled={disabled}
         value={selectedValue}
         onChange={handleChange}
-        className={`h-10.5 w-full appearance-none rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 pr-10 text-xs sm:text-sm shadow-2xs placeholder:text-gray-400 focus:border-brand-500 focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:opacity-60 transition-all cursor-pointer ${
+        className={`h-10.5 w-full appearance-none rounded-md border border-input bg-background px-3.5 pr-10 text-xs sm:text-sm shadow-2xs placeholder:text-muted-foreground focus:border-ring focus:outline-hidden focus:ring-2 focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-60 transition-all cursor-pointer ${
           selectedValue
-            ? "text-gray-800 dark:text-white"
-            : "text-gray-400 dark:text-gray-500"
+            ? "text-foreground"
+            : "text-muted-foreground"
         } ${className}`}
       >
         <option value="" disabled className="text-gray-500 dark:bg-gray-900 dark:text-gray-400">
@@ -69,20 +70,7 @@ const Select: React.FC<SelectProps> = ({
         ))}
       </select>
 
-      <svg
-        className="absolute text-gray-500 dark:text-gray-400 right-3 top-1/2 -translate-y-1/2 pointer-events-none size-4"
-        viewBox="0 0 20 20"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M5 7.5L10 12.5L15 7.5"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <ChevronDown className="absolute text-gray-500 dark:text-gray-400 right-3.5 top-1/2 -translate-y-1/2 pointer-events-none size-4" />
     </div>
   );
 };

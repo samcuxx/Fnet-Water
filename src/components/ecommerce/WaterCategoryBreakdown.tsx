@@ -1,54 +1,58 @@
 "use client";
 
-import React from "react";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/tailgrids/core/card";
 import Link from "next/link";
+import React from "react";
 
 export default function WaterCategoryBreakdown() {
   const categories = [
-    { name: "19L Refill Bottles", percent: "52%", color: "#10B981" },
-    { name: "Smart Dispensers", percent: "22%", color: "#0284C7" },
-    { name: "24-Pack Cases", percent: "12%", color: "#06B6D4" },
+    { name: "19L Refill Bottles", percent: "52%", color: "#12b76a" },
+    { name: "Smart Dispensers", percent: "22%", color: "#0057b8" },
+    { name: "24-Pack Bottles", percent: "12%", color: "#00aeef" },
   ];
 
   return (
-    <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs flex flex-col justify-between h-full">
-      <div>
-        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-          Water Category Share
-        </span>
-        <div className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight mt-3">
+    <Card className="flex flex-col justify-between h-full">
+      <CardHeader>
+        <div>
+          <CardTitle className="text-sm font-semibold">Water Category Share</CardTitle>
+          <p className="text-xs text-text-tertiary mt-0.5">Primary sales distribution</p>
+        </div>
+      </CardHeader>
+
+      <CardContent className="my-2">
+        <div className="text-3xl font-black text-text-primary tracking-tight">
           86%
         </div>
-      </div>
 
-      <div className="my-4 space-y-2.5">
-        {categories.map((c) => (
-          <div key={c.name} className="flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2">
-              <span
-                style={{ backgroundColor: c.color }}
-                className="size-2 rounded-full shrink-0"
-              />
-              <span className="font-medium text-gray-600 dark:text-gray-300">
-                {c.name}
+        <div className="mt-4 space-y-2.5">
+          {categories.map((c) => (
+            <div key={c.name} className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <span
+                  style={{ backgroundColor: c.color }}
+                  className="size-2 rounded-full shrink-0"
+                />
+                <span className="font-medium text-text-secondary">
+                  {c.name}
+                </span>
+              </div>
+              <span className="font-bold text-text-primary">
+                {c.percent}
               </span>
             </div>
-            <span className="font-bold text-gray-900 dark:text-white">
-              {c.percent}
-            </span>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </CardContent>
 
-      <div>
+      <CardFooter className="pt-2 border-t border-border-primary">
         <Link
-          href="/admin/inventory"
-          className="w-full inline-flex items-center justify-center py-2.5 px-4 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-200 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700/80 border border-gray-200/80 dark:border-gray-700 transition"
+          href="/admin/bottles"
+          className="w-full inline-flex items-center justify-center py-2 px-3 rounded-lg text-xs font-semibold text-text-primary bg-background-gray-primary hover:bg-background-gray-secondary border border-card-border transition-colors"
         >
-          View Details
+          View Bottle Inventory
         </Link>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }
-

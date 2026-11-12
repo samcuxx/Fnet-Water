@@ -10,7 +10,7 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 export function Skeleton({ className = "", ...props }: SkeletonProps) {
   return (
     <div
-      className={`animate-shimmer bg-gray-100 dark:bg-gray-800/80 rounded-2xl ${className}`}
+      className={`animate-shimmer bg-muted rounded-md ${className}`}
       {...props}
     />
   );
@@ -25,7 +25,7 @@ export function SkeletonMetrics({ count = 4 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs space-y-3"
+          className="p-5 sm:p-6 rounded-xl border border-border bg-card shadow-xs space-y-3"
         >
           <div className="flex items-center justify-between">
             <Skeleton className="h-3.5 w-24 rounded-lg" />
@@ -50,15 +50,15 @@ export function SkeletonTable({
   columns?: number;
 }) {
   return (
-    <div className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs">
-      <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+      <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between">
         <Skeleton className="h-4 w-36 rounded-lg" />
-        <Skeleton className="h-7 w-24 rounded-2xl" />
+        <Skeleton className="h-7 w-24 rounded-md" />
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40">
+            <tr className="border-b border-border bg-muted/40">
               {Array.from({ length: columns }).map((_, i) => (
                 <th key={i} className="py-3 px-4">
                   <Skeleton className="h-3 w-20 rounded-md" />
@@ -66,7 +66,7 @@ export function SkeletonTable({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
+          <tbody className="divide-y divide-border">
             {Array.from({ length: rows }).map((_, r) => (
               <tr key={r}>
                 {Array.from({ length: columns }).map((_, c) => (
@@ -80,7 +80,7 @@ export function SkeletonTable({
                       </div>
                     ) : c === columns - 1 ? (
                       <div className="flex justify-end">
-                        <Skeleton className="h-6 w-14 rounded-2xl" />
+                        <Skeleton className="h-6 w-14 rounded-md" />
                       </div>
                     ) : (
                       <Skeleton className="h-3.5 w-16 rounded-lg" />
@@ -108,14 +108,14 @@ export function SkeletonCard({
 }) {
   return (
     <div
-      className={`p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs space-y-4 ${className}`}
+      className={`p-5 sm:p-6 rounded-xl border border-border bg-card text-card-foreground shadow-xs space-y-4 ${className}`}
     >
-      <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
+      <div className="flex items-center justify-between pb-3 border-b border-border">
         <div className="space-y-1.5">
           <Skeleton className="h-4 w-32 rounded-lg" />
           <Skeleton className="h-3 w-48 rounded-md" />
         </div>
-        <Skeleton className="size-8 rounded-2xl" />
+        <Skeleton className="size-8 rounded-md" />
       </div>
       <div className="space-y-2.5">
         {Array.from({ length: lines }).map((_, i) => (
@@ -140,10 +140,10 @@ export function SkeletonFeed({ count = 3 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="p-4 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs flex items-center justify-between gap-4"
+          className="p-4 rounded-xl border border-border bg-card text-card-foreground shadow-xs flex items-center justify-between gap-4"
         >
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <Skeleton className="size-10 rounded-2xl shrink-0" />
+            <Skeleton className="size-10 rounded-md shrink-0" />
             <div className="space-y-1.5 flex-1 min-w-0">
               <Skeleton className="h-3.5 w-36 rounded-lg" />
               <Skeleton className="h-2.5 w-48 rounded-md" />
@@ -164,10 +164,10 @@ export function SkeletonFeed({ count = 3 }: { count?: number }) {
  */
 export function SkeletonReceipt() {
   return (
-    <div className="p-6 sm:p-8 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs space-y-6">
-      <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+    <div className="p-6 sm:p-8 rounded-xl border border-border bg-card text-card-foreground shadow-xs space-y-6">
+      <div className="flex items-center justify-between pb-4 border-b border-border">
         <div className="flex items-center gap-3">
-          <Skeleton className="size-10 rounded-2xl" />
+          <Skeleton className="size-10 rounded-md" />
           <div className="space-y-1.5">
             <Skeleton className="h-4 w-36 rounded-lg" />
             <Skeleton className="h-3 w-48 rounded-md" />
@@ -179,7 +179,7 @@ export function SkeletonReceipt() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-gray-100 dark:border-gray-800">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-border">
         <div className="space-y-2">
           <Skeleton className="h-3 w-20 rounded-md" />
           <Skeleton className="h-4 w-44 rounded-lg" />
@@ -193,11 +193,11 @@ export function SkeletonReceipt() {
       </div>
 
       <div className="space-y-3">
-        <Skeleton className="h-10 w-full rounded-2xl" />
-        <Skeleton className="h-10 w-full rounded-2xl" />
+        <Skeleton className="h-10 w-full rounded-md" />
+        <Skeleton className="h-10 w-full rounded-md" />
       </div>
 
-      <div className="flex justify-end pt-4 border-t border-gray-100 dark:border-gray-800">
+      <div className="flex justify-end pt-4 border-t border-border">
         <div className="w-56 space-y-2">
           <div className="flex justify-between">
             <Skeleton className="h-3 w-16 rounded-md" />
@@ -221,16 +221,16 @@ export function SkeletonTelemetry() {
     <div className="space-y-6">
       <SkeletonMetrics count={4} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <div className="lg:col-span-7 p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs space-y-4">
+        <div className="lg:col-span-7 p-6 rounded-xl border border-border bg-card text-card-foreground shadow-xs space-y-4">
           <Skeleton className="h-4 w-40 rounded-lg" />
           <div className="grid grid-cols-2 gap-4 pt-2">
-            <Skeleton className="h-28 rounded-2xl" />
-            <Skeleton className="h-28 rounded-2xl" />
-            <Skeleton className="h-28 rounded-2xl" />
-            <Skeleton className="h-28 rounded-2xl" />
+            <Skeleton className="h-28 rounded-md" />
+            <Skeleton className="h-28 rounded-md" />
+            <Skeleton className="h-28 rounded-md" />
+            <Skeleton className="h-28 rounded-md" />
           </div>
         </div>
-        <div className="lg:col-span-5 p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs flex flex-col items-center justify-center space-y-4">
+        <div className="lg:col-span-5 p-6 rounded-xl border border-border bg-card text-card-foreground shadow-xs flex flex-col items-center justify-center space-y-4">
           <Skeleton className="h-4 w-32 rounded-lg" />
           <Skeleton className="size-44 rounded-full" />
           <Skeleton className="h-4 w-48 rounded-lg" />
@@ -245,16 +245,16 @@ export function SkeletonTelemetry() {
  */
 export function SkeletonAppShell() {
   return (
-    <div className="min-h-screen bg-[#071E3D] text-gray-900 flex p-0 sm:p-2.5 lg:p-3 xl:p-3.5">
+    <div className="min-h-screen bg-sidebar text-foreground flex p-0 sm:p-2.5 lg:p-3 xl:p-3.5">
       {/* Sidebar placeholder */}
-      <aside className="hidden xl:flex flex-col w-[270px] h-screen bg-[#071E3D] p-5 space-y-6">
+      <aside className="hidden xl:flex flex-col w-[270px] h-screen bg-sidebar p-5 space-y-6">
         <div className="flex items-center gap-3">
-          <Skeleton className="size-9 rounded-2xl bg-white/20" />
+          <Skeleton className="size-9 rounded-md bg-white/20" />
           <Skeleton className="h-4 w-32 rounded-lg bg-white/20" />
         </div>
         <div className="space-y-2 pt-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-10 w-full rounded-2xl bg-white/10" />
+            <Skeleton key={i} className="h-10 w-full rounded-md bg-white/10" />
           ))}
         </div>
         <div className="mt-auto pt-6 border-t border-white/10 flex items-center gap-3">
@@ -267,13 +267,13 @@ export function SkeletonAppShell() {
       </aside>
 
       {/* Floating Island canvas placeholder */}
-      <div className="flex-1 flex flex-col min-h-[calc(100vh-1.5rem)] bg-white dark:bg-gray-950 rounded-none sm:rounded-[28px] lg:rounded-[36px] p-5 sm:p-8 space-y-6 overflow-hidden">
-        <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+      <div className="flex-1 flex flex-col min-h-[calc(100vh-1.5rem)] bg-background text-foreground rounded-none sm:rounded-xl lg:rounded-md p-5 sm:p-8 space-y-6 overflow-hidden">
+        <div className="flex items-center justify-between pb-4 border-b border-border">
           <div className="space-y-2">
             <Skeleton className="h-6 w-48 rounded-xl" />
             <Skeleton className="h-3.5 w-64 rounded-lg" />
           </div>
-          <Skeleton className="h-9 w-28 rounded-2xl" />
+          <Skeleton className="h-9 w-28 rounded-md" />
         </div>
         <SkeletonMetrics count={4} />
         <div className="grid grid-cols-12 gap-5">

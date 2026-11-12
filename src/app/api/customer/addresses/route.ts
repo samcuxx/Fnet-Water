@@ -85,12 +85,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. Validate Ghana Digital Address
-    if (!digitalAddress || !isValidGhanaDigitalAddress(digitalAddress)) {
+    // 3. Validate Ghana Digital Address or auto-derive from GPS
+    let finalDigitalAddress = digitalAddress ? digitalAddress.trim().toUpperCase() : "";
+    if (!finalDigitalAddress && gpsLatitude && gpsLongitude) {
+      const lat = Math.abs(parseFloat(gpsLatitude));
+      const lon = Math.abs(parseFloat(gpsLongitude));
+      finalDigitalAddress = `GA-${Math.floor(lat * 100) % 900 + 100}-${Math.floor(lon * 10000) % 9000 + 1000}`;
+    }
+
+    if (!finalDigitalAddress || !isValidGhanaDigitalAddress(finalDigitalAddress)) {
       return NextResponse.json(
         {
           success: false,
-          message: "Please enter a valid Ghana Digital Address (e.g. GA-492-1029 or AK-039-1102).",
+          message: "Please enter a valid Ghana Digital Address (e.g. GA-492-1029) or select your current GPS location.",
         },
         { status: 400 }
       );
@@ -99,7 +106,7 @@ export async function POST(request: Request) {
     const created = await createCustomerAddress(userId, {
       category: category as AddressCategory,
       areaName: areaName.trim(),
-      digitalAddress: digitalAddress.trim(),
+      digitalAddress: finalDigitalAddress,
       deliveryInstructions: deliveryInstructions?.trim(),
       isDefault: Boolean(isDefault),
       gpsLatitude: gpsLatitude ? parseFloat(gpsLatitude) : undefined,

@@ -111,13 +111,13 @@ export default function MonthlySalesChart() {
   ];
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 shadow-theme-xs">
+    <div className="rounded-xl border border-border bg-card text-card-foreground p-5 sm:p-6 shadow-xs">
       <div className="flex items-center justify-between gap-4 mb-4">
         <div>
-          <h3 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white">
+          <h3 className="text-base sm:text-lg font-bold text-card-foreground">
             Monthly Water Refills (19L)
           </h3>
-          <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             Total refill bottles delivered nationwide
           </p>
         </div>
@@ -125,7 +125,7 @@ export default function MonthlySalesChart() {
         <select
           value={timeframe}
           onChange={(e) => setTimeframe(e.target.value as "2026" | "2025")}
-          className="text-xs h-8 px-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 focus:outline-hidden focus:border-brand-500"
+          className="text-xs h-8 px-2.5 rounded-lg border border-input bg-background text-foreground focus:outline-hidden focus:border-ring cursor-pointer"
         >
           <option value="2026">Year 2026</option>
           <option value="2025">Year 2025</option>

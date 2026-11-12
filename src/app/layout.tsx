@@ -5,10 +5,10 @@ import { ThemeProvider } from "@/components/common/ThemeProviders";
 import AuthProvider from "@/components/common/AuthProvider";
 import { ToastProvider } from "@/context/ToastContext";
 
-const inter = Inter({
+const fontSans = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
@@ -34,8 +34,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={inter.variable}>
-      <body className={`${inter.className} font-sans antialiased min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100`}>
+    <html lang="en" suppressHydrationWarning className={fontSans.variable}>
+      <body className={`${fontSans.className} font-sans antialiased min-h-screen bg-background text-foreground`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

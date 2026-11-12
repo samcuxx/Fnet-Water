@@ -1,16 +1,31 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
-import AppLayout from "@/components/layout/AppLayout";
-import Badge from "@/components/ui/badge/Badge";
-import Input from "@/components/form/input/InputField";
-import Select from "@/components/form/Select";
-import { Modal } from "@/components/ui/Modal";
 import OrderReceipt from "@/components/invoice/OrderReceipt";
+import AppLayout from "@/components/layout/AppLayout";
+import { Badge } from "@/components/tailgrids/core/badge";
+import Breadcrumbs from "@/components/tailgrids/core/breadcrumbs";
+import { Button } from "@/components/tailgrids/core/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/tailgrids/core/card";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/tailgrids/core/input-group";
+import {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRoot,
+  TableRow,
+} from "@/components/tailgrids/core/table";
+import { Modal } from "@/components/ui/Modal";
 import { SkeletonMetrics, SkeletonTable } from "@/components/ui/skeleton";
-import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
-import type { StoredOrder, OrderStatus } from "@/lib/order-store";
+import { cardHoverMotion, fadeInUp, staggerContainer } from "@/lib/animations";
+import type { OrderStatus, StoredOrder } from "@/lib/order-store";
+import { cn } from "@/utils/cn";
+import { SearchIcon } from "@/components/common/header/icons";
+import { TaskIcon, TableIcon, Widget4Icon, InvoiceIcon } from "@/components/common/sidebar/icon";
+import { ArrowDownIcon, ArrowUpIcon, DownloadIcon, FilterIcon, MenuDotsIcon } from "@/utils/icon";
+import { motion } from "framer-motion";
+import { FileText } from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<StoredOrder[]>([]);
@@ -56,192 +71,251 @@ export default function AdminOrdersPage() {
       case "OUT_FOR_DELIVERY":
         return <Badge color="warning" size="sm">Out for Delivery</Badge>;
       case "ASSIGNED":
-        return <Badge color="info" size="sm">Driver Assigned</Badge>;
+        return <Badge color="primary" size="sm">Driver Assigned</Badge>;
       case "PENDING":
         return <Badge color="warning" size="sm">Pending</Badge>;
       case "CANCELLED":
         return <Badge color="error" size="sm">Cancelled</Badge>;
       default:
-        return <Badge color="light" size="sm">{status}</Badge>;
+        return <Badge color="neutral" size="sm">{status}</Badge>;
     }
   };
 
   const pendingCount = orders.filter((o) => o.status === "PENDING").length;
-  const inTransitCount = orders.filter((o) => o.status === "OUT_FOR_DELIVERY" || o.status === "ASSIGNED").length;
+  const inTransitCount = orders.filter(
+    (o) => o.status === "OUT_FOR_DELIVERY" || o.status === "ASSIGNED"
+  ).length;
   const deliveredCount = orders.filter((o) => o.status === "DELIVERED").length;
 
   return (
     <AppLayout role="ADMIN">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
-                Customer Water Orders
-              </h1>
-              <Badge color="primary" size="sm">
-                Executive
-              </Badge>
-            </div>
-            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              Overview of all customer refill and dispenser orders across Ghana.
-            </p>
+      <div className="mt-4 space-y-6 px-2 lg:px-4">
+        {/* NextAdmin Page Header */}
+        <div>
+          <div className="mb-2">
+            <Breadcrumbs
+              dividerType="chevron"
+              items={[
+                { label: "Home", href: "/admin" },
+                { label: "Operations", href: "/admin/orders" },
+                { label: "Orders" },
+              ]}
+            />
           </div>
+          <h1 className="mb-1 text-[28px] leading-8 font-semibold text-text-primary tracking-tight">
+            Customer Water Orders
+          </h1>
+          <p className="text-sm leading-5 text-text-tertiary">
+            Real-time fulfillment tracking, bottle returns, and dispatch status across Greater Accra.
+          </p>
         </div>
 
-        {/* 4 KPI Metric Cards */}
+        {/* 4-Card NextAdmin Pro Overview Stats */}
         {isLoading ? (
           <SkeletonMetrics count={4} />
         ) : (
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
-          >
-            <motion.div
-              variants={fadeInUp}
-              {...cardHoverMotion}
-              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
-            >
-              <span className="text-xs text-gray-500 font-medium block">Total Orders</span>
-              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
-                {orders.length}
-              </div>
-              <span className="text-[11px] text-gray-400 mt-1 block">All customer submissions</span>
-            </motion.div>
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+            <Card beamIndex={0}>
+              <CardHeader className="justify-between">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-blue-light-50 text-primary dark:bg-blue-light-950">
+                  <TaskIcon />
+                </div>
+              </CardHeader>
+              <CardContent className="mt-3.5 sm:mt-5 p-0">
+                <div className="text-lg leading-6 font-bold text-text-primary sm:text-xl md:text-2xl">
+                  {orders.length}
+                </div>
+              </CardContent>
+              <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
+                <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Total Orders</span>
+                <span className="text-[11px] leading-4 sm:text-xs font-semibold text-primary">All submissions</span>
+              </CardFooter>
+            </Card>
 
-            <motion.div
-              variants={fadeInUp}
-              {...cardHoverMotion}
-              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
-            >
-              <span className="text-xs text-amber-600 font-medium block">Awaiting Dispatch</span>
-              <div className="mt-1 text-2xl sm:text-3xl font-black text-amber-600">
-                {pendingCount}
-              </div>
-              <span className="text-[11px] text-gray-400 mt-1 block">Ready for driver assignment</span>
-            </motion.div>
+            <Card beamIndex={3}>
+              <CardHeader className="justify-between">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-orange-50 text-orange-500 dark:bg-orange-950">
+                  <TableIcon />
+                </div>
+              </CardHeader>
+              <CardContent className="mt-3.5 sm:mt-5 p-0">
+                <div className="text-lg leading-6 font-bold text-orange-600 dark:text-orange-400 sm:text-xl md:text-2xl">
+                  {pendingCount}
+                </div>
+              </CardContent>
+              <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
+                <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Awaiting Driver</span>
+                <span className="text-[11px] leading-4 sm:text-xs font-semibold text-orange-500">Unassigned</span>
+              </CardFooter>
+            </Card>
 
-            <motion.div
-              variants={fadeInUp}
-              {...cardHoverMotion}
-              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
-            >
-              <span className="text-xs text-brand-600 font-medium block">In Transit</span>
-              <div className="mt-1 text-2xl sm:text-3xl font-black text-brand-600 dark:text-sky-400">
-                {inTransitCount}
-              </div>
-              <span className="text-[11px] text-gray-400 mt-1 block">En route to customers</span>
-            </motion.div>
+            <Card beamIndex={5}>
+              <CardHeader className="justify-between">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-brand-50 text-primary dark:bg-brand-950">
+                  <Widget4Icon />
+                </div>
+              </CardHeader>
+              <CardContent className="mt-3.5 sm:mt-5 p-0">
+                <div className="text-lg leading-6 font-bold text-primary sm:text-xl md:text-2xl">
+                  {inTransitCount}
+                </div>
+              </CardContent>
+              <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
+                <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">In Transit</span>
+                <span className="text-[11px] leading-4 sm:text-xs font-semibold text-primary">On delivery van</span>
+              </CardFooter>
+            </Card>
 
-            <motion.div
-              variants={fadeInUp}
-              {...cardHoverMotion}
-              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
-            >
-              <span className="text-xs text-emerald-600 font-medium block">Completed</span>
-              <div className="mt-1 text-2xl sm:text-3xl font-black text-emerald-600">
-                {deliveredCount}
-              </div>
-              <span className="text-[11px] text-gray-400 mt-1 block">Delivered and fulfilled</span>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* Search & Filter Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Input
-              type="text"
-              placeholder="Search order number, customer, address..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-72 text-xs"
-            />
-            <Select
-              options={[
-                { value: "ALL", label: "All Statuses" },
-                { value: "PENDING", label: "Pending" },
-                { value: "ASSIGNED", label: "Driver Assigned" },
-                { value: "OUT_FOR_DELIVERY", label: "Out for Delivery" },
-                { value: "DELIVERED", label: "Delivered" },
-              ]}
-              value={statusFilter}
-              onChange={(val) => setStatusFilter(val)}
-              className="w-44 text-xs"
-            />
+            <Card beamIndex={1}>
+              <CardHeader className="justify-between">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-success-50 text-green-600 dark:bg-success-950">
+                  <InvoiceIcon />
+                </div>
+              </CardHeader>
+              <CardContent className="mt-3.5 sm:mt-5 p-0">
+                <div className="text-lg leading-6 font-bold text-green-600 sm:text-xl md:text-2xl">
+                  {deliveredCount}
+                </div>
+              </CardContent>
+              <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
+                <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Delivered</span>
+                <span className="text-[11px] leading-4 sm:text-xs font-semibold text-green-600">Empties collected</span>
+              </CardFooter>
+            </Card>
           </div>
-          <span className="text-xs text-gray-500">
-            Showing {filteredOrders.length} of {orders.length} orders
-          </span>
-        </div>
-
-        {/* Orders Table */}
-        {isLoading ? (
-          <SkeletonTable rows={6} columns={7} />
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
-          >
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
-                  <th className="py-3 px-4">Order ID</th>
-                  <th className="py-3 px-4">Customer</th>
-                  <th className="py-3 px-4">Delivery Location</th>
-                  <th className="py-3 px-4">Items</th>
-                  <th className="py-3 px-4">Total</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {filteredOrders.map((ord) => (
-                  <tr key={ord.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
-                    <td className="py-3 px-4 font-mono font-bold text-gray-900 dark:text-white">
-                      {ord.orderNumber}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="font-semibold text-gray-800 dark:text-gray-200 block">
-                        {ord.customerName}
-                      </span>
-                      <span className="text-[11px] text-gray-400">{ord.customerPhone}</span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="block text-gray-800 dark:text-gray-200 truncate max-w-xs">
-                        {ord.deliveryAddressText}
-                      </span>
-                      <span className="text-[10px] font-mono text-gray-400">
-                        {ord.deliveryDigitalAddress}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-gray-600 dark:text-gray-400">
-                      {ord.items.map((it) => `${it.productName} (${it.quantity})`).join(", ")}
-                    </td>
-                    <td className="py-3 px-4 font-bold text-gray-900 dark:text-white">
-                      GH₵ {ord.totalAmount.toFixed(2)}
-                    </td>
-                    <td className="py-3 px-4">{getStatusBadge(ord.status)}</td>
-                    <td className="py-3 px-4 text-right">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedOrder(ord)}
-                        className="px-3 py-1.5 text-xs font-semibold rounded-2xl text-brand-600 dark:text-sky-400 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition cursor-pointer"
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </motion.div>
         )}
+
+        {/* Main Orders Table Card */}
+        <Card className="p-0 overflow-hidden">
+          <CardHeader className="p-5 pb-4">
+            <div>
+              <CardTitle>Fulfillment Register</CardTitle>
+              <p className="mt-0.5 text-xs text-text-tertiary">
+                Showing {filteredOrders.length} of {orders.length} orders
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <InputGroup className="h-9 w-52 sm:w-64">
+                <InputGroupAddon align="inline-start" className="pr-0 text-icon-tertiary">
+                  <SearchIcon />
+                </InputGroupAddon>
+                <InputGroupInput
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search orders, customers..."
+                  className="pl-2 text-xs"
+                />
+              </InputGroup>
+
+              {/* Status Filter buttons */}
+              <div className="flex items-center gap-1 rounded-lg border border-card-border bg-background-gray-primary p-0.5">
+                {(["ALL", "PENDING", "ASSIGNED", "DELIVERED"] as const).map((st) => (
+                  <button
+                    key={st}
+                    onClick={() => setStatusFilter(st)}
+                    className={cn(
+                      "px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer",
+                      statusFilter === st
+                        ? "bg-card-background text-text-primary font-semibold shadow-xs"
+                        : "text-text-tertiary hover:text-text-primary"
+                    )}
+                  >
+                    {st === "ALL" ? "All" : st.charAt(0) + st.slice(1).toLowerCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </CardHeader>
+
+          {/* Table */}
+          {isLoading ? (
+            <div className="p-5">
+              <SkeletonTable rows={6} columns={7} />
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <TableRoot className="w-full rounded-none border-none">
+                <TableHeader>
+                  <TableRow className="border-t border-b border-border-primary bg-background-gray-primary/40">
+                    <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
+                      Order ID
+                    </TableHead>
+                    <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
+                      Customer
+                    </TableHead>
+                    <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
+                      Delivery Location
+                    </TableHead>
+                    <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
+                      Items
+                    </TableHead>
+                    <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
+                      Total
+                    </TableHead>
+                    <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
+                      Status
+                    </TableHead>
+                    <TableHead className="px-4 py-3 text-right text-xs font-semibold text-text-secondary">
+                      Actions
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody>
+                  {filteredOrders.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="py-10 text-center text-xs text-text-tertiary">
+                        No orders match the selected filters.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredOrders.map((ord) => (
+                      <TableRow key={ord.id} className="hover:bg-background-gray-primary/50 transition-colors">
+                        <TableCell className="px-5 py-3 font-mono text-xs font-bold text-text-primary whitespace-nowrap">
+                          {ord.orderNumber}
+                        </TableCell>
+                        <TableCell className="px-5 py-3">
+                          <span className="font-medium text-xs text-text-primary block">
+                            {ord.customerName}
+                          </span>
+                          <span className="text-[11px] text-text-tertiary">{ord.customerPhone}</span>
+                        </TableCell>
+                        <TableCell className="px-5 py-3">
+                          <span className="block text-xs text-text-secondary truncate max-w-xs">
+                            {ord.deliveryAddressText}
+                          </span>
+                          <span className="text-[10px] font-mono text-text-tertiary">
+                            {ord.deliveryDigitalAddress}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-5 py-3 text-xs text-text-secondary">
+                          {ord.items.map((it) => `${it.productName} (${it.quantity})`).join(", ")}
+                        </TableCell>
+                        <TableCell className="px-5 py-3 text-xs font-bold text-text-primary whitespace-nowrap">
+                          GH₵ {ord.totalAmount.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="px-5 py-3">
+                          {getStatusBadge(ord.status)}
+                        </TableCell>
+                        <TableCell className="px-4 py-3 text-right">
+                          <Button
+                            variant="ghost"
+                            size="xs"
+                            onClick={() => setSelectedOrder(ord)}
+                            className="text-primary hover:text-brand-600 hover:bg-brand-50 font-semibold cursor-pointer"
+                          >
+                            View Details
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </TableRoot>
+            </div>
+          )}
+        </Card>
 
         {/* Order Details Modal */}
         <Modal
@@ -251,29 +325,29 @@ export default function AdminOrdersPage() {
         >
           {selectedOrder && (
             <div className="space-y-4 text-xs">
-              <div className="p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 space-y-1.5">
+              <div className="p-3.5 rounded-xl bg-background-gray-primary border border-card-border space-y-1.5">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Customer:</span>
-                  <span className="font-bold text-gray-900 dark:text-white">
+                  <span className="text-text-tertiary">Customer:</span>
+                  <span className="font-bold text-text-primary">
                     {selectedOrder.customerName} ({selectedOrder.customerPhone})
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Delivery Address:</span>
-                  <span className="font-medium text-gray-800 dark:text-gray-200">
+                  <span className="text-text-tertiary">Delivery Address:</span>
+                  <span className="font-medium text-text-secondary">
                     {selectedOrder.deliveryAddressText} ({selectedOrder.deliveryDigitalAddress})
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Delivery Slot:</span>
-                  <span className="font-medium text-gray-800 dark:text-gray-200">
+                  <span className="text-text-tertiary">Delivery Slot:</span>
+                  <span className="font-medium text-text-secondary">
                     {selectedOrder.deliverySlot}
                   </span>
                 </div>
                 {selectedOrder.assignedDriverName && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Assigned Driver:</span>
-                    <span className="font-bold text-brand-600 dark:text-blue-light-400">
+                    <span className="text-text-tertiary">Assigned Driver:</span>
+                    <span className="font-bold text-primary">
                       {selectedOrder.assignedDriverName}
                     </span>
                   </div>
@@ -282,21 +356,21 @@ export default function AdminOrdersPage() {
 
               {/* Items List */}
               <div className="space-y-2">
-                <span className="font-bold text-gray-900 dark:text-white uppercase tracking-wider text-[11px]">
+                <span className="font-bold text-text-primary uppercase tracking-wider text-[11px]">
                   Ordered Products
                 </span>
-                <div className="border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden divide-y divide-gray-100 dark:divide-gray-800">
+                <div className="border border-card-border rounded-xl overflow-hidden divide-y divide-card-border">
                   {selectedOrder.items.map((it, idx) => (
-                    <div key={idx} className="p-2.5 flex justify-between items-center">
+                    <div key={idx} className="p-2.5 flex justify-between items-center bg-card-background">
                       <div>
-                        <span className="font-semibold text-gray-900 dark:text-white block">
+                        <span className="font-semibold text-text-primary block">
                           {it.productName}
                         </span>
-                        <span className="text-[11px] text-gray-400">
+                        <span className="text-[11px] text-text-tertiary">
                           Qty: {it.quantity} × GH₵ {it.unitPrice.toFixed(2)}
                         </span>
                       </div>
-                      <span className="font-bold text-gray-900 dark:text-white">
+                      <span className="font-bold text-text-primary">
                         GH₵ {it.totalPrice.toFixed(2)}
                       </span>
                     </div>
@@ -305,54 +379,52 @@ export default function AdminOrdersPage() {
               </div>
 
               {/* Financial Breakdown */}
-              <div className="p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 space-y-1">
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+              <div className="p-3.5 rounded-xl bg-background-gray-primary border border-card-border space-y-1">
+                <div className="flex justify-between text-text-secondary">
                   <span>Subtotal:</span>
                   <span>GH₵ {selectedOrder.subtotal.toFixed(2)}</span>
                 </div>
                 {selectedOrder.depositFee > 0 && (
-                  <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                  <div className="flex justify-between text-text-secondary">
                     <span>Bottle Deposit:</span>
                     <span>GH₵ {selectedOrder.depositFee.toFixed(2)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                <div className="flex justify-between text-text-secondary">
                   <span>Delivery Fee:</span>
                   <span>{selectedOrder.deliveryFee === 0 ? "FREE" : `GH₵ ${selectedOrder.deliveryFee.toFixed(2)}`}</span>
                 </div>
                 {selectedOrder.discountAmount > 0 && (
-                  <div className="flex justify-between text-emerald-600 font-medium">
+                  <div className="flex justify-between text-green-600 font-medium">
                     <span>Reward Discount:</span>
                     <span>-GH₵ {selectedOrder.discountAmount.toFixed(2)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-sm font-bold text-gray-900 dark:text-white pt-1.5 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between text-sm font-bold text-text-primary pt-1.5 border-t border-card-border">
                   <span>Total Amount:</span>
                   <span>GH₵ {selectedOrder.totalAmount.toFixed(2)}</span>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-                <button
-                  type="button"
+              <div className="flex justify-end gap-2 pt-2 border-t border-card-border">
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     setInvoiceOrder(selectedOrder);
                     setIsInvoiceModalOpen(true);
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer"
+                  className="gap-1.5"
                 >
-                  <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                  </svg>
+                  <FileText className="size-3.5" />
                   <span>Tax Invoice</span>
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  size="sm"
                   onClick={() => setSelectedOrder(null)}
-                  className="px-4 py-1.5 text-xs font-semibold rounded-lg text-white bg-brand-500 hover:bg-brand-600 transition shadow-theme-xs cursor-pointer"
                 >
                   Close
-                </button>
+                </Button>
               </div>
             </div>
           )}

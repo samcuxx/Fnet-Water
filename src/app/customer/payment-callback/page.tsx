@@ -3,11 +3,13 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
-import Badge from "@/components/ui/badge/Badge";
+import { Breadcrumbs } from "@/components/tailgrids/core/breadcrumbs";
+import { Card } from "@/components/tailgrids/core/card";
+import { Badge } from "@/components/tailgrids/core/badge";
+import { Button } from "@/components/tailgrids/core/button";
 import Skeleton from "@/components/ui/skeleton";
-import { scaleIn, fadeInUp } from "@/lib/animations";
+import { Check, FileText, X } from "lucide-react";
 
 function CallbackContent() {
   const searchParams = useSearchParams();
@@ -42,7 +44,7 @@ function CallbackContent() {
           setSuccess(false);
           setErrorDetails(data.error || "Payment was not verified. Please try again.");
         }
-      } catch (err) {
+      } catch {
         setSuccess(false);
         setErrorDetails("Network connection failed during verification.");
       } finally {
@@ -54,69 +56,49 @@ function CallbackContent() {
   }, [reference]);
 
   return (
-    <div className="max-w-lg mx-auto py-10 px-4">
+    <div className="max-w-lg mx-auto py-8">
       {loading ? (
-        <div className="p-8 text-center bg-white dark:bg-gray-900/70 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs space-y-4">
+        <Card className="p-8 text-center space-y-4">
           <div className="size-16 rounded-full mx-auto relative flex items-center justify-center">
-            <Skeleton className="size-16 rounded-full" />
-            <div className="absolute inset-0 size-16 rounded-full border-2 border-brand-500 border-t-transparent animate-spin" />
+            <div className="size-16 rounded-full border-2 border-primary border-t-transparent animate-spin" />
           </div>
-          <div className="space-y-2">
-            <h2 className="text-xl font-black text-gray-900 dark:text-white">
+          <div className="space-y-1.5">
+            <h2 className="text-xl font-bold text-text-primary">
               Verifying Payment
             </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-text-tertiary">
               Please wait while we confirm your payment and settle your transaction.
             </p>
           </div>
-          <div className="pt-2">
-            <Skeleton className="h-4 w-48 mx-auto rounded-lg" />
-          </div>
-        </div>
+        </Card>
       ) : success ? (
-        <motion.div
-          variants={scaleIn}
-          initial="initial"
-          animate="animate"
-          className="p-6 sm:p-8 text-center bg-white dark:bg-gray-900/70 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs space-y-5"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            className="size-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto ring-8 ring-emerald-50 dark:ring-emerald-950/30"
-          >
-            <svg className="size-8" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </motion.div>
+        <Card className="p-6 sm:p-8 text-center space-y-5">
+          <div className="size-16 rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-xs">
+            <Check className="size-8" />
+          </div>
 
           <div>
             <Badge color="success" size="sm">
               Settled &amp; Verified
             </Badge>
-            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 dark:text-white mt-2">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary mt-2">
               Payment Confirmed!
             </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-text-tertiary mt-1">
               {message}
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/60 text-xs space-y-2 text-left">
+          <div className="rounded-xl bg-background-gray-secondary p-4 text-xs space-y-2 text-left border border-card-border">
             <div className="flex justify-between items-center">
-              <span className="text-gray-500">Payment Reference:</span>
-              <span className="font-mono font-bold text-gray-900 dark:text-white">
+              <span className="text-text-tertiary">Payment Reference:</span>
+              <span className="font-mono font-bold text-text-primary">
                 {reference}
               </span>
             </div>
             {transactionData && (
               <div className="flex justify-between items-center">
-                <span className="text-gray-500">Amount Paid:</span>
+                <span className="text-text-tertiary">Amount Paid:</span>
                 <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">
                   GH₵ {transactionData.amount.toFixed(2)}
                 </span>
@@ -124,82 +106,66 @@ function CallbackContent() {
             )}
             {orderData && (
               <div className="flex justify-between items-center">
-                <span className="text-gray-500">Order ID:</span>
-                <span className="font-mono font-bold text-brand-600 dark:text-sky-400">
+                <span className="text-text-tertiary">Order Number:</span>
+                <span className="font-mono font-bold text-primary">
                   {orderData.orderNumber}
                 </span>
               </div>
             )}
             {transactionData?.type === "DISPENSER_INSTALLMENT" && (
               <div className="flex justify-between items-center">
-                <span className="text-gray-500">Payment Category:</span>
-                <span className="font-bold text-brand-600 dark:text-sky-400">
+                <span className="text-text-tertiary">Payment Category:</span>
+                <span className="font-bold text-primary">
                   Smart Dispenser Installment
                 </span>
               </div>
             )}
           </div>
 
-          <div className="space-y-2 pt-2">
+          <div className="space-y-2.5 pt-2">
             {orderData && (
-              <Link
-                href={`/customer/orders/${orderData.id}/receipt`}
-                className="w-full py-3 rounded-2xl text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-              >
-                <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fillRule="evenodd"
-                    d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span>View Official Tax Receipt</span>
-              </Link>
+              <Button asChild className="w-full justify-center gap-1.5">
+                <Link href={`/customer/orders/${orderData.id}/receipt`}>
+                  <FileText className="size-4" />
+                  <span>View Official Receipt</span>
+                </Link>
+              </Button>
             )}
 
             {transactionData?.type === "DISPENSER_INSTALLMENT" && (
-              <Link
-                href="/customer/dispenser"
-                className="w-full py-3 rounded-2xl text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-              >
-                <span>Return to Smart Dispenser</span>
-              </Link>
+              <Button asChild className="w-full justify-center">
+                <Link href="/customer/dispenser">
+                  <span>Return to Smart Dispenser</span>
+                </Link>
+              </Button>
             )}
 
             {orderData && (
-              <Link
-                href="/customer/orders"
-                className="w-full py-2.5 rounded-2xl text-xs font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-750 hover:bg-gray-50 dark:hover:bg-gray-800 transition block"
-              >
-                Go to My Deliveries
-              </Link>
+              <Button asChild appearance="outline" className="w-full justify-center">
+                <Link href="/customer/orders">
+                  Go to My Orders
+                </Link>
+              </Button>
             )}
 
-            <Link
-              href="/customer"
-              className="w-full py-2 text-xs font-medium text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 block"
-            >
-              Return to Dashboard
-            </Link>
+            <Button asChild appearance="ghost" className="w-full justify-center text-xs text-text-tertiary">
+              <Link href="/customer">
+                Return to Dashboard
+              </Link>
+            </Button>
           </div>
-        </motion.div>
+        </Card>
       ) : (
-        <div className="p-6 sm:p-8 text-center bg-white dark:bg-gray-900/70 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs space-y-5">
-          <div className="size-16 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto ring-8 ring-rose-50 dark:ring-rose-950/30">
-            <svg className="size-8" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
+        <Card className="p-6 sm:p-8 text-center space-y-5">
+          <div className="size-16 rounded-2xl bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 flex items-center justify-center mx-auto shadow-xs">
+            <X className="size-8" />
           </div>
 
           <div>
             <Badge color="error" size="sm">
               Payment Incomplete
             </Badge>
-            <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white mt-2">
+            <h2 className="text-xl font-bold tracking-tight text-text-primary mt-2">
               Payment Not Completed
             </h2>
             <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 max-w-sm mx-auto">
@@ -207,23 +173,22 @@ function CallbackContent() {
             </p>
           </div>
 
-          <div className="space-y-2 pt-2">
-            <button
+          <div className="space-y-2.5 pt-2">
+            <Button
               type="button"
               onClick={() => router.back()}
-              className="w-full py-3 rounded-2xl text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 transition shadow-xs cursor-pointer"
+              className="w-full justify-center"
             >
               Try Again
-            </button>
+            </Button>
 
-            <Link
-              href="/customer/order"
-              className="w-full py-2.5 rounded-2xl text-xs font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-750 hover:bg-gray-50 dark:hover:bg-gray-800 transition block"
-            >
-              Return to Refill Checkout
-            </Link>
+            <Button asChild appearance="outline" className="w-full justify-center">
+              <Link href="/customer/order">
+                Return to Checkout
+              </Link>
+            </Button>
           </div>
-        </div>
+        </Card>
       )}
     </div>
   );
@@ -232,15 +197,27 @@ function CallbackContent() {
 export default function PaymentCallbackPage() {
   return (
     <AppLayout role="CUSTOMER">
-      <Suspense
-        fallback={
-          <div className="max-w-lg mx-auto py-16 text-center text-xs text-gray-400">
-            Loading payment verification...
-          </div>
-        }
-      >
-        <CallbackContent />
-      </Suspense>
+      <div className="space-y-4">
+        <div className="flex justify-end">
+          <Breadcrumbs
+            dividerType="chevron"
+            items={[
+              { label: "Home", href: "/customer" },
+              { label: "Payment Verification" },
+            ]}
+          />
+        </div>
+
+        <Suspense
+          fallback={
+            <div className="max-w-lg mx-auto py-16 text-center text-xs text-text-tertiary">
+              Loading payment verification...
+            </div>
+          }
+        >
+          <CallbackContent />
+        </Suspense>
+      </div>
     </AppLayout>
   );
 }

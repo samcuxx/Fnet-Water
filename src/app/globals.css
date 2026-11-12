@@ -7,9 +7,9 @@ layer(base);
 
 @theme {
   --font-*: initial;
-  --font-inter: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-sans: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-outfit: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-sans, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-inter: var(--font-sans, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-outfit: var(--font-sans, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
   --breakpoint-*: initial;
   --breakpoint-2xsm: 375px;
@@ -132,9 +132,9 @@ layer(base);
 }
 
 body {
-  font-family: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: var(--color-gray-800);
-  background-color: var(--color-gray-50);
+  font-family: var(--font-sans, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--foreground);
+  background-color: var(--background);
   letter-spacing: -0.011em;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
@@ -142,8 +142,8 @@ body {
 }
 
 .dark body {
-  color: var(--color-gray-100);
-  background-color: var(--color-gray-950);
+  color: var(--foreground);
+  background-color: var(--background);
 }
 
 @utility menu-item {
@@ -328,4 +328,370 @@ body {
   );
 }
 
+@theme inline {
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
+  --font-serif: Georgia, serif;
+  --radius: 0.5rem;
+  --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
+  --tracking-tight: calc(var(--tracking-normal) - 0.025em);
+  --tracking-wide: calc(var(--tracking-normal) + 0.025em);
+  --tracking-wider: calc(var(--tracking-normal) + 0.05em);
+  --tracking-widest: calc(var(--tracking-normal) + 0.1em);
+  --tracking-normal: var(--tracking-normal);
+  --shadow-2xl: var(--shadow-2xl);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-md: var(--shadow-md);
+  --shadow: var(--shadow);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-2xs: var(--shadow-2xs);
+  --spacing: var(--spacing);
+  --letter-spacing: var(--letter-spacing);
+  --shadow-offset-y: var(--shadow-offset-y);
+  --shadow-offset-x: var(--shadow-offset-x);
+  --shadow-spread: var(--shadow-spread);
+  --shadow-blur: var(--shadow-blur);
+  --shadow-opacity: var(--shadow-opacity);
+  --color-shadow-color: var(--shadow-color);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
 
+  /* NextAdmin Semantic Theme Tokens */
+  --color-card-surface-area: var(--card-surface-area);
+  --color-card-background: var(--card-background);
+  --color-card-border: var(--card-border);
+  --color-card-surface-border: var(--card-surface-border);
+  --color-background-gray-primary: var(--background-gray-primary);
+  --color-background-gray-secondary: var(--background-gray-secondary);
+  --color-background-gray-tertiary: var(--background-gray-tertiary);
+  --color-background-gray-quaternary: var(--background-gray-quaternary);
+  --color-background-gray-secondary_alt: var(--background-gray-secondary_alt);
+  --color-background-white-secondary: var(--background-white-secondary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-disable: var(--text-disable);
+  --color-icon-primary: var(--icon-primary);
+  --color-icon-secondary: var(--icon-secondary);
+  --color-icon-tertiary: var(--icon-tertiary);
+  --color-input-background: var(--input-background);
+  --color-input-border: var(--input-border);
+  --color-input-placeholder-text-color: var(--input-placeholder-text-color);
+  --color-input-primary-focus-border: var(--input-primary-focus-border);
+  --color-input-error-focus-border: var(--input-error-focus-border);
+  --color-sidebar-navigation-nav-item-nav-hover-background: var(--sidebar-navigation-nav-item-nav-hover-background);
+  --color-border-primary: var(--border-primary);
+  --color-border-secondary: var(--border-secondary);
+  --color-border-secondary-alt: var(--border-secondary-alt);
+  --color-badge-neutral-background: var(--badge-neutral-background);
+  --color-badge-neutral-text: var(--badge-neutral-text);
+  --color-badge-neutral-icon-color: var(--badge-neutral-icon-color);
+  --color-badge-primary-background: var(--badge-primary-background);
+  --color-badge-primary-text: var(--badge-primary-text);
+  --color-badge-primary-icon-color: var(--badge-primary-icon-color);
+  --color-badge-error-background: var(--badge-error-background);
+  --color-badge-error-text: var(--badge-error-text);
+  --color-badge-error-icon-color: var(--badge-error-icon-color);
+  --color-badge-warning-background: var(--badge-warning-background);
+  --color-badge-warning-text: var(--badge-warning-text);
+  --color-badge-warning-icon-color: var(--badge-warning-icon-color);
+  --color-badge-success-background: var(--badge-success-background);
+  --color-badge-success-text: var(--badge-success-text);
+  --color-badge-success-icon-color: var(--badge-success-icon-color);
+  --color-badge-cyan-background: var(--badge-cyan-background);
+  --color-badge-cyan-text: var(--badge-cyan-text);
+  --color-badge-cyan-icon-color: var(--badge-cyan-icon-color);
+  --color-badge-violet-background: var(--badge-violet-background);
+  --color-badge-violet-text: var(--badge-violet-text);
+  --color-badge-violet-icon-color: var(--badge-violet-icon-color);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+:root {
+  --background: #fcfcfd;
+  --foreground: #101828;
+  --card: #ffffff;
+  --card-foreground: #101828;
+  --popover: #ffffff;
+  --popover-foreground: #101828;
+  --primary: #0057b8;
+  --primary-foreground: #ffffff;
+  --secondary: #f2f4f7;
+  --secondary-foreground: #344054;
+  --muted: #f2f4f7;
+  --muted-foreground: #667085;
+  --accent: #e8f1ff;
+  --accent-foreground: #0057b8;
+  --destructive: #d92d20;
+  --destructive-foreground: #ffffff;
+  --border: #e4e7ec;
+  --input: #e4e7ec;
+  --ring: #0057b8;
+  --chart-1: #0057b8;
+  --chart-2: #00aeef;
+  --chart-3: #12b76a;
+  --chart-4: #fb6514;
+  --chart-5: #6fd5fc;
+  --radius: 0.5rem;
+  --sidebar: #071e3d;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #0057b8;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(255, 255, 255, 0.12);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(0, 87, 184, 0.25);
+  --sidebar-ring: #00aeef;
+  --font-sans: var(--font-sans, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
+  --shadow-color: #0052ff;
+  --shadow-opacity: 0.04;
+  --shadow-blur: 20px;
+  --shadow-spread: -5px;
+  --shadow-offset-x: 0px;
+  --shadow-offset-y: 10px;
+  --letter-spacing: -0.02em;
+  --spacing: 0.25rem;
+  --shadow-2xs: 0px 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-xs: 0px 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-sm: 0px 1px 3px rgba(16, 24, 40, 0.1), 0px 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow: 0px 4px 8px -2px rgba(16, 24, 40, 0.1), 0px 2px 4px -2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0px 4px 8px -2px rgba(16, 24, 40, 0.1), 0px 2px 4px -2px rgba(16, 24, 40, 0.06);
+  --shadow-lg: 0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03);
+  --shadow-xl: 0px 20px 24px -4px rgba(16, 24, 40, 0.08), 0px 8px 8px -4px rgba(16, 24, 40, 0.03);
+  --shadow-2xl: 0px 24px 48px -12px rgba(16, 24, 40, 0.18);
+  --tracking-normal: -0.02em;
+
+  /* NextAdmin Semantic Tokens - Light Mode */
+  --card-surface-area: #fcfcfd;
+  --card-background: #ffffff;
+  --card-border: #e4e7ec;
+  --card-surface-border: #e4e7ec;
+  --background-gray-primary: #f9fafb;
+  --background-gray-secondary: #f2f4f7;
+  --background-gray-tertiary: #e4e7ec;
+  --background-gray-quaternary: #d0d5dd;
+  --background-gray-secondary_alt: #f2f4f7;
+  --background-white-secondary: #ffffff;
+  --text-primary: #101828;
+  --text-secondary: #344054;
+  --text-tertiary: #667085;
+  --text-disable: #98a2b3;
+  --icon-primary: #101828;
+  --icon-secondary: #344054;
+  --icon-tertiary: #667085;
+  --input-background: #ffffff;
+  --input-border: #d0d5dd;
+  --input-placeholder-text-color: #98a2b3;
+  --input-primary-focus-border: #0057b8;
+  --input-error-focus-border: #f04438;
+  --sidebar-navigation-nav-item-nav-hover-background: rgba(0, 87, 184, 0.06);
+  --border-primary: #f2f4f7;
+  --border-secondary: #e4e7ec;
+  --border-secondary-alt: #e4e7ec;
+
+  --badge-neutral-background: #f2f4f7;
+  --badge-neutral-text: #344054;
+  --badge-neutral-icon-color: #667085;
+  --badge-primary-background: #e8f1ff;
+  --badge-primary-text: #0057b8;
+  --badge-primary-icon-color: #0057b8;
+  --badge-error-background: #fee4e2;
+  --badge-error-text: #d92d20;
+  --badge-error-icon-color: #d92d20;
+  --badge-warning-background: #ffead5;
+  --badge-warning-text: #ec4a0a;
+  --badge-warning-icon-color: #ec4a0a;
+  --badge-success-background: #d1fadf;
+  --badge-success-text: #027a48;
+  --badge-success-icon-color: #027a48;
+  --badge-cyan-background: #d6f2fe;
+  --badge-cyan-text: #0079ab;
+  --badge-cyan-icon-color: #0079ab;
+  --badge-violet-background: #f4ebff;
+  --badge-violet-text: #6941c6;
+  --badge-violet-icon-color: #6941c6;
+}
+
+.dark {
+  --background: #0c111d;
+  --foreground: #f9fafb;
+  --card: #101828;
+  --card-foreground: #f9fafb;
+  --popover: #101828;
+  --popover-foreground: #f9fafb;
+  --primary: #3c7eff;
+  --primary-foreground: #ffffff;
+  --secondary: #1d2939;
+  --secondary-foreground: #d0d5dd;
+  --muted: #1d2939;
+  --muted-foreground: #98a2b3;
+  --accent: rgba(60, 126, 255, 0.15);
+  --accent-foreground: #74a7ff;
+  --destructive: #f04438;
+  --destructive-foreground: #ffffff;
+  --border: #1d2939;
+  --input: #1d2939;
+  --ring: #3c7eff;
+  --radius: 0.5rem;
+  --sidebar: #05162e;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #3c7eff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(255, 255, 255, 0.08);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #3c7eff;
+  --chart-1: #3c7eff;
+  --chart-2: #00aeef;
+  --chart-3: #32d583;
+  --chart-4: #fd853a;
+  --chart-5: #6fd5fc;
+  --font-sans: var(--font-sans, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
+  --shadow-color: #000000;
+  --shadow-opacity: 0.4;
+  --shadow-blur: 25px;
+  --shadow-spread: -8px;
+  --shadow-offset-x: 0px;
+  --shadow-offset-y: 12px;
+  --letter-spacing: -0.02em;
+  --spacing: 0.25rem;
+  --shadow-2xs: 0px 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-xs: 0px 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0px 1px 3px rgba(0, 0, 0, 0.4), 0px 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow: 0px 4px 8px -2px rgba(0, 0, 0, 0.4), 0px 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0px 4px 8px -2px rgba(0, 0, 0, 0.4), 0px 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0px 12px 16px -4px rgba(0, 0, 0, 0.5), 0px 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0px 20px 24px -4px rgba(0, 0, 0, 0.5), 0px 8px 8px -4px rgba(0, 0, 0, 0.3);
+  --shadow-2xl: 0px 24px 48px -12px rgba(0, 0, 0, 0.6);
+  --tracking-normal: -0.02em;
+
+  /* NextAdmin Semantic Tokens - Dark Mode */
+  --card-surface-area: #0c111d;
+  --card-background: #101828;
+  --card-border: #1d2939;
+  --card-surface-border: #1d2939;
+  --background-gray-primary: #101828;
+  --background-gray-secondary: #1d2939;
+  --background-gray-tertiary: #344054;
+  --background-gray-quaternary: #475467;
+  --background-gray-secondary_alt: #1d2939;
+  --background-white-secondary: #101828;
+  --text-primary: #f9fafb;
+  --text-secondary: #d0d5dd;
+  --text-tertiary: #98a2b3;
+  --text-disable: #667085;
+  --icon-primary: #f9fafb;
+  --icon-secondary: #d0d5dd;
+  --icon-tertiary: #98a2b3;
+  --input-background: rgba(255, 255, 255, 0.05);
+  --input-border: #1d2939;
+  --input-placeholder-text-color: #667085;
+  --input-primary-focus-border: #3c7eff;
+  --input-error-focus-border: #f04438;
+  --sidebar-navigation-nav-item-nav-hover-background: rgba(255, 255, 255, 0.06);
+  --border-primary: #1d2939;
+  --border-secondary: #1d2939;
+  --border-secondary-alt: #344054;
+
+  --badge-neutral-background: #1d2939;
+  --badge-neutral-text: #d0d5dd;
+  --badge-neutral-icon-color: #98a2b3;
+  --badge-primary-background: rgba(60, 126, 255, 0.15);
+  --badge-primary-text: #74a7ff;
+  --badge-primary-icon-color: #74a7ff;
+  --badge-error-background: rgba(240, 68, 56, 0.15);
+  --badge-error-text: #fda29b;
+  --badge-error-icon-color: #fda29b;
+  --badge-warning-background: rgba(251, 101, 20, 0.15);
+  --badge-warning-text: #feb273;
+  --badge-warning-icon-color: #feb273;
+  --badge-success-background: rgba(18, 183, 106, 0.15);
+  --badge-success-text: #6ce9a6;
+  --badge-success-icon-color: #6ce9a6;
+  --badge-cyan-background: rgba(0, 174, 239, 0.15);
+  --badge-cyan-text: #6fd5fc;
+  --badge-cyan-icon-color: #6fd5fc;
+  --badge-violet-background: rgba(105, 65, 198, 0.15);
+  --badge-violet-text: #c4b5fd;
+  --badge-violet-icon-color: #c4b5fd;
+}
+
+@layer base {
+  body {
+    letter-spacing: var(--tracking-normal);
+  }
+}
+
+/* Magic UI View Transitions for Animated Theme Toggler */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html[data-magicui-theme-vt="active"]::view-transition-group(root) {
+  animation-duration: var(--magicui-theme-toggle-vt-duration, 450ms);
+}
+
+html[data-magicui-theme-vt="active"]::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  z-index: 1;
+}
+
+html[data-magicui-theme-vt="active"]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  clip-path: var(--magicui-theme-vt-clip-from);
+  z-index: 9999;
+}
+
+@utility border-beam-mask {
+  border-style: solid;
+  border-color: transparent;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}

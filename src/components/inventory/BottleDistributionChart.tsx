@@ -111,19 +111,19 @@ export default function BottleDistributionChart({
   };
 
   return (
-    <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs">
+    <div className="rounded-xl border border-border bg-card text-card-foreground p-5 sm:p-6 shadow-xs">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
         <div>
-          <h3 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white">
+          <h3 className="text-base sm:text-lg font-bold text-card-foreground">
             Bottle Fleet Distribution
           </h3>
-          <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             Real-time balance across warehouse and customer locations
           </p>
         </div>
-        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <span className="size-2.5 rounded-full bg-brand-500 inline-block" />
+            <span className="size-2.5 rounded-full bg-primary inline-block" />
             Filled
           </span>
           <span className="flex items-center gap-1.5">

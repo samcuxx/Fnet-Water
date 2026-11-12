@@ -2,10 +2,11 @@
 
 import React from "react";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 export default function NetworkCommunityCard() {
   return (
-    <div className="relative rounded-[28px] overflow-hidden p-6 text-white shadow-md bg-gradient-to-br from-[#004C99] via-[#0057B8] to-[#0284C7] flex flex-col justify-between h-full group">
+    <div className="relative rounded-xl overflow-hidden p-6 text-white shadow-md bg-gradient-to-br from-[#004C99] via-[#0057B8] to-[#0284C7] flex flex-col justify-between h-full group">
       {/* Subtle background glow/water drops pattern */}
       <div className="absolute -right-8 -bottom-8 size-48 rounded-full bg-sky-400/20 blur-2xl pointer-events-none" />
       <div className="absolute top-0 right-0 p-5 z-10">
@@ -14,13 +15,7 @@ export default function NetworkCommunityCard() {
           aria-label="View network orders"
           className="size-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition-all group-hover:scale-105"
         >
-          <svg className="size-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fillRule="evenodd"
-              d="M5.22 14.78a.75.75 0 001.06 0l7.22-7.22v5.69a.75.75 0 001.5 0v-7.5a.75.75 0 00-.75-.75h-7.5a.75.75 0 000 1.5h5.69l-7.22 7.22a.75.75 0 000 1.06z"
-              clipRule="evenodd"
-            />
-          </svg>
+          <ArrowUpRight className="size-4 text-white" />
         </Link>
       </div>
 
@@ -48,25 +43,20 @@ export default function NetworkCommunityCard() {
               KA
             </div>
             <div className="inline-block size-7 rounded-full ring-2 ring-brand-700 bg-emerald-200 text-[10px] font-bold text-emerald-900 flex items-center justify-center">
-              NK
+              EM
             </div>
           </div>
-          <span className="text-xs font-bold text-white">
-            15,000+ homes &amp; offices
+          <span className="text-[11px] font-bold text-sky-100">
+            +18 Drivers Active
           </span>
         </div>
 
-        {/* Small Tags */}
-        <div className="flex items-center gap-1.5 self-start sm:self-auto">
-          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/20 text-white backdrop-blur-xs">
-            Zero Deposit
-          </span>
-          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-400/25 text-emerald-100 backdrop-blur-xs">
-            FDA Certified
+        <div className="text-right">
+          <span className="text-xs font-semibold text-white/90">
+            Greater Accra Fleet
           </span>
         </div>
       </div>
     </div>
   );
 }
-

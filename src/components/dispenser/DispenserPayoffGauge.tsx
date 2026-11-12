@@ -78,25 +78,25 @@ export default function DispenserPayoffGauge({
   };
 
   return (
-    <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs flex flex-col justify-between h-full">
+    <div className="rounded-xl border border-border bg-card text-card-foreground p-5 sm:p-6 shadow-xs flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+            <h3 className="text-base sm:text-lg font-bold text-card-foreground">
               Rent-to-Own Progress
             </h3>
-            <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+            <p className="mt-0.5 text-xs text-muted-foreground">
               {isFullyPaid
                 ? "Congratulations! You own this dispenser 100%"
                 : "Monthly payments build toward permanent ownership"}
             </p>
           </div>
           {isFullyPaid ? (
-            <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+            <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
               Customer Owned
             </span>
           ) : (
-            <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-sky-50 text-brand-700 dark:bg-brand-950/40 dark:text-sky-400 border border-sky-200 dark:border-brand-800">
+            <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-primary/10 text-primary border border-primary/20">
               Active Plan
             </span>
           )}
@@ -107,7 +107,7 @@ export default function DispenserPayoffGauge({
         </div>
       </div>
 
-      <div className="pt-3 border-t border-gray-100 dark:border-gray-800 grid grid-cols-2 gap-3 text-center text-xs">
+      <div className="pt-3 border-t border-border grid grid-cols-2 gap-3 text-center text-xs">
         <div>
           <span className="text-gray-400 block text-[11px]">Paid so far</span>
           <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">

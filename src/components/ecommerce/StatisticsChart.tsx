@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
-import { useTheme } from "next-themes";
+import { Card, CardHeader, CardTitle } from "@/components/tailgrids/core/card";
 import type { ApexOptions } from "apexcharts";
+import { useTheme } from "next-themes";
+import dynamic from "next/dynamic";
+import React, { useEffect, useState } from "react";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -25,10 +26,10 @@ export default function StatisticsChart() {
       horizontalAlign: "left",
       fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       labels: {
-        colors: isDark ? "#9CA3AF" : "#667085",
+        colors: isDark ? "#98a2b3" : "#667085",
       },
     },
-    colors: ["#0057B8", "#00AEEF"],
+    colors: ["#0057b8", "#00aeef"],
     chart: {
       fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       height: 310,
@@ -55,7 +56,7 @@ export default function StatisticsChart() {
       },
     },
     grid: {
-      borderColor: isDark ? "#1F2937" : "#F2F4F7",
+      borderColor: isDark ? "#1d2939" : "#f2f4f7",
       strokeDashArray: 3,
       yaxis: {
         lines: {
@@ -73,15 +74,7 @@ export default function StatisticsChart() {
     },
     xaxis: {
       type: "category",
-      categories: [
-        "Mon",
-        "Tue",
-        "Wed",
-        "Thu",
-        "Fri",
-        "Sat",
-        "Sun",
-      ],
+      categories: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
       axisBorder: {
         show: false,
       },
@@ -90,7 +83,7 @@ export default function StatisticsChart() {
       },
       labels: {
         style: {
-          colors: isDark ? "#9CA3AF" : "#667085",
+          colors: isDark ? "#98a2b3" : "#667085",
           fontSize: "12px",
         },
       },
@@ -98,7 +91,7 @@ export default function StatisticsChart() {
     yaxis: {
       labels: {
         style: {
-          colors: isDark ? "#9CA3AF" : "#667085",
+          colors: isDark ? "#98a2b3" : "#667085",
           fontSize: "12px",
         },
         formatter: (val: number) => `GH₵ ${val}`,
@@ -114,35 +107,41 @@ export default function StatisticsChart() {
   const series = [
     {
       name: "19L Refill Revenue",
-      data: activeTab === "dispensers" ? [400, 600, 800, 600, 900, 1100, 1200] : [2400, 3100, 2800, 4200, 3900, 4800, 5200],
+      data:
+        activeTab === "dispensers"
+          ? [400, 600, 800, 600, 900, 1100, 1200]
+          : [2400, 3100, 2800, 4200, 3900, 4800, 5200],
     },
     {
       name: "Dispenser Financing",
-      data: activeTab === "refills" ? [0, 0, 0, 0, 0, 0, 0] : [1200, 1800, 1500, 2200, 1900, 2400, 2800],
+      data:
+        activeTab === "refills"
+          ? [0, 0, 0, 0, 0, 0, 0]
+          : [1200, 1800, 1500, 2200, 1900, 2400, 2800],
     },
   ];
 
   return (
-    <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-7 shadow-xs">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+    <Card className="p-5 sm:p-6">
+      <CardHeader className="mb-4">
         <div>
-          <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+          <CardTitle className="text-base sm:text-lg font-bold">
             Daily Revenue Statistics
-          </h3>
-          <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-            Real-time revenue trends across mobile money and card payments
+          </CardTitle>
+          <p className="mt-0.5 text-xs text-text-tertiary">
+            Real-time revenue trends across mobile money and bank settlements
           </p>
         </div>
 
         {/* Tab Filter */}
-        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-2xl self-start sm:self-auto">
+        <div className="flex items-center gap-1 bg-background-gray-primary border border-card-border p-1 rounded-lg self-start sm:self-auto">
           <button
             type="button"
             onClick={() => setActiveTab("all")}
-            className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition ${
+            className={`px-3 py-1 text-xs font-semibold rounded-md transition cursor-pointer ${
               activeTab === "all"
-                ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-theme-xs font-bold"
-                : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                ? "bg-card-background text-text-primary shadow-xs font-bold"
+                : "text-text-tertiary hover:text-text-primary"
             }`}
           >
             All Sales
@@ -150,10 +149,10 @@ export default function StatisticsChart() {
           <button
             type="button"
             onClick={() => setActiveTab("refills")}
-            className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition ${
+            className={`px-3 py-1 text-xs font-semibold rounded-md transition cursor-pointer ${
               activeTab === "refills"
-                ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-theme-xs font-bold"
-                : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                ? "bg-card-background text-text-primary shadow-xs font-bold"
+                : "text-text-tertiary hover:text-text-primary"
             }`}
           >
             Refills
@@ -161,20 +160,20 @@ export default function StatisticsChart() {
           <button
             type="button"
             onClick={() => setActiveTab("dispensers")}
-            className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition ${
+            className={`px-3 py-1 text-xs font-semibold rounded-md transition cursor-pointer ${
               activeTab === "dispensers"
-                ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-theme-xs font-bold"
-                : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                ? "bg-card-background text-text-primary shadow-xs font-bold"
+                : "text-text-tertiary hover:text-text-primary"
             }`}
           >
             Dispensers
           </button>
         </div>
-      </div>
+      </CardHeader>
 
       <div className="w-full">
         <Chart options={options} series={series} type="area" height={290} />
       </div>
-    </div>
+    </Card>
   );
 }

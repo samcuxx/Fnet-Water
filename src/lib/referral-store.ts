@@ -13,6 +13,7 @@ export interface StoredReferral {
   refereeId: string;        // User ID of newly registered referee
   refereeName: string;
   refereePhone: string;
+  deliveryArea?: string;
   isQualified: boolean;     // Qualified once referee completes first paid order
   qualifiedAt: string | null;
   rewardCredited: boolean;  // True when consumed in a 5:1 free bottle award
@@ -58,6 +59,13 @@ export interface AgentStats {
     refillsCount: number;
     commissionGHS: number;
     lastOrderDate: string;
+    zone?: string;
+    status?: "ACTIVE" | "PENDING";
+  }>;
+  zonesSummary?: Array<{
+    name: string;
+    customersCount: number;
+    refillsCount: number;
   }>;
 }
 
@@ -546,6 +554,14 @@ export async function getAgentStats(
 
   // Agent receives GH₵ 5.00 commission per refill order, plus 5:1 free bottles
   const mockRefillsPerReferee = [12, 20, 5, 8, 14, 6];
+  const mockZones = [
+    "East Legon & Adjiringanor",
+    "Airport, Cantonments & Osu",
+    "Spintex Road & Sakumono",
+    "Tema Central & Communities",
+    "Madina, Adenta & Abokobi",
+    "Dansoman & Korle Bu",
+  ];
   let totalRefillsOrdered = 0;
   let totalCommissionGHS = 0;
 
@@ -554,6 +570,7 @@ export async function getAgentStats(
     const commission = refills * 5.0; // GH₵ 5.00 commission per refill
     totalRefillsOrdered += refills;
     totalCommissionGHS += commission;
+    const zone = r.deliveryArea || mockZones[idx % mockZones.length];
 
     return {
       id: r.id,
@@ -563,11 +580,29 @@ export async function getAgentStats(
       refillsCount: refills,
       commissionGHS: commission,
       lastOrderDate: r.isQualified ? "Recent" : "Pending First Order",
+      zone,
+      status: (r.isQualified ? "ACTIVE" : "PENDING") as "ACTIVE" | "PENDING",
     };
   });
 
   const freeBottlesEarned = Math.floor(activeCustomers / 5);
   const commissionBalanceGHS = totalCommissionGHS;
+
+  // Compute zones summary for supervisor oversight
+  const zonesMap = new Map<string, { customersCount: number; refillsCount: number }>();
+  for (const ref of referees) {
+    const zName = ref.zone || "Other Zones";
+    const curr = zonesMap.get(zName) || { customersCount: 0, refillsCount: 0 };
+    curr.customersCount += 1;
+    curr.refillsCount += ref.refillsCount;
+    zonesMap.set(zName, curr);
+  }
+
+  const zonesSummary = Array.from(zonesMap.entries()).map(([name, data]) => ({
+    name,
+    customersCount: data.customersCount,
+    refillsCount: data.refillsCount,
+  }));
 
   return {
     agentId: agentUserId,
@@ -581,6 +616,7 @@ export async function getAgentStats(
     totalCommissionGHS: Math.max(totalCommissionGHS, 725.0),
     commissionBalanceGHS: Math.max(commissionBalanceGHS, 725.0),
     referees,
+    zonesSummary,
   };
 }
 

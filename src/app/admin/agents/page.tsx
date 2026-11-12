@@ -2,7 +2,18 @@
 
 import React from "react";
 import AppLayout from "@/components/layout/AppLayout";
-import Badge from "@/components/ui/badge/Badge";
+import { Breadcrumbs } from "@/components/tailgrids/core/breadcrumbs";
+import { Card } from "@/components/tailgrids/core/card";
+import { Badge } from "@/components/tailgrids/core/badge";
+import {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRoot,
+  TableRow,
+} from "@/components/tailgrids/core/table";
+import { UserCheck, Users, Droplets } from "lucide-react";
 
 interface FieldAgent {
   id: string;
@@ -49,101 +60,159 @@ const mockAgents: FieldAgent[] = [
 ];
 
 export default function AdminAgentsPage() {
+  const totalAccounts = mockAgents.reduce((acc, a) => acc + a.activeAccounts, 0);
+  const totalDispensers = mockAgents.reduce((acc, a) => acc + a.dispensersDeployed, 0);
+
   return (
     <AppLayout role="ADMIN">
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
+        {/* Breadcrumbs & Page Header */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
                 Field Sales Agents
               </h1>
               <Badge color="primary" size="sm">
                 Distribution Network
               </Badge>
             </div>
-            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-xs text-text-tertiary sm:text-sm">
               Community agents onboarding new residential, shop, and corporate pure water accounts across Ghana.
             </p>
           </div>
+          <div>
+            <Breadcrumbs
+              dividerType="chevron"
+              items={[
+                { label: "Home", href: "/admin" },
+                { label: "Sales Agents" },
+              ]}
+            />
+          </div>
         </div>
 
-        {/* 3 Metric Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          <div className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs">
-            <span className="text-xs text-gray-500 font-medium block">Active Field Agents</span>
-            <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
-              {mockAgents.length} Agents
+        {/* 3 Metric Cards (NextAdmin Pro Style) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5">
+          <Card beamIndex={0}>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-xs font-medium text-text-secondary">
+                  Active Field Agents
+                </span>
+                <h3 className="mt-1 text-lg font-bold text-text-primary sm:text-2xl lg:text-3xl">
+                  {mockAgents.length} Agents
+                </h3>
+              </div>
+              <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-blue-light-100 text-primary dark:bg-blue-light-950/60 dark:text-blue-light-400">
+                <UserCheck className="size-4 sm:size-5" />
+              </div>
             </div>
-            <span className="text-[11px] text-gray-400 mt-1 block">Operational across assigned territories</span>
-          </div>
+            <p className="mt-2 text-[11px] text-text-tertiary">Operational across assigned territories</p>
+          </Card>
 
-          <div className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs">
-            <span className="text-xs text-brand-600 dark:text-sky-400 font-medium block">Agent Customer Accounts</span>
-            <div className="mt-1 text-2xl sm:text-3xl font-black text-brand-600 dark:text-sky-400">
-              {mockAgents.reduce((acc, a) => acc + a.activeAccounts, 0)} Accounts
+          <Card beamIndex={2}>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-xs font-medium text-text-secondary">
+                  Agent Customer Accounts
+                </span>
+                <h3 className="mt-1 text-lg font-bold text-primary sm:text-2xl lg:text-3xl">
+                  {totalAccounts} Accounts
+                </h3>
+              </div>
+              <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400">
+                <Users className="size-4 sm:size-5" />
+              </div>
             </div>
-            <span className="text-[11px] text-gray-400 mt-1 block">Onboarded through field sales</span>
-          </div>
+            <p className="mt-2 text-[11px] text-text-tertiary">Onboarded through field referrals</p>
+          </Card>
 
-          <div className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs">
-            <span className="text-xs text-emerald-600 font-medium block">Dispensers Deployed</span>
-            <div className="mt-1 text-2xl sm:text-3xl font-black text-emerald-600">
-              {mockAgents.reduce((acc, a) => acc + a.dispensersDeployed, 0)} Units
+          <Card beamIndex={1} className="col-span-2 sm:col-span-1">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-xs font-medium text-text-secondary">
+                  Dispensers Deployed
+                </span>
+                <h3 className="mt-1 text-lg font-bold text-emerald-600 dark:text-emerald-400 sm:text-2xl lg:text-3xl">
+                  {totalDispensers} Units
+                </h3>
+              </div>
+              <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
+                <Droplets className="size-4 sm:size-5" />
+              </div>
             </div>
-            <span className="text-[11px] text-gray-400 mt-1 block">Rent-to-own signed via agents</span>
-          </div>
+            <p className="mt-2 text-[11px] text-text-tertiary">Rent-to-own signed via agents</p>
+          </Card>
         </div>
 
         {/* Agents Table */}
-        <div className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs">
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
-                <th className="py-3 px-4">Agent Name</th>
-                <th className="py-3 px-4">Phone Number</th>
-                <th className="py-3 px-4">Territory Area</th>
-                <th className="py-3 px-4">Onboarded Accounts</th>
-                <th className="py-3 px-4">Dispensers Deployed</th>
-                <th className="py-3 px-4">Commission (GH₵)</th>
-                <th className="py-3 px-4 text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {mockAgents.map((agt) => (
-                <tr key={agt.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
-                  <td className="py-3 px-4">
-                    <span className="font-semibold text-gray-900 dark:text-white block">
-                      {agt.name}
-                    </span>
-                    <span className="text-[11px] font-mono text-gray-400">{agt.id}</span>
-                  </td>
-                  <td className="py-3 px-4 font-mono text-gray-700 dark:text-gray-300">
-                    {agt.phone}
-                  </td>
-                  <td className="py-3 px-4 text-gray-800 dark:text-gray-200">
-                    {agt.territory}
-                  </td>
-                  <td className="py-3 px-4 font-bold text-gray-900 dark:text-white">
-                    {agt.activeAccounts} Accounts
-                  </td>
-                  <td className="py-3 px-4 font-semibold text-brand-600 dark:text-blue-light-400">
-                    {agt.dispensersDeployed} Units
-                  </td>
-                  <td className="py-3 px-4 font-bold text-emerald-600">
-                    GH₵ {agt.monthlyCommission.toFixed(2)}
-                  </td>
-                  <td className="py-3 px-4 text-right">
-                    <Badge color="success" size="sm">
-                      Active
-                    </Badge>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Card className="overflow-hidden p-0">
+          <div className="overflow-x-auto">
+            <TableRoot>
+              <TableHeader>
+                <TableRow className="border-b border-card-border bg-background-gray-secondary/50">
+                  <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
+                    Agent Name
+                  </TableHead>
+                  <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
+                    Phone Number
+                  </TableHead>
+                  <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
+                    Territory Area
+                  </TableHead>
+                  <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
+                    Onboarded Accounts
+                  </TableHead>
+                  <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
+                    Dispensers Deployed
+                  </TableHead>
+                  <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
+                    Commission
+                  </TableHead>
+                  <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase text-right">
+                    Status
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="divide-y divide-card-border">
+                {mockAgents.map((agt) => (
+                  <TableRow
+                    key={agt.id}
+                    className="hover:bg-background-gray-secondary/30 transition"
+                  >
+                    <TableCell className="px-5 py-4">
+                      <span className="font-semibold text-xs text-text-primary block">
+                        {agt.name}
+                      </span>
+                      <span className="text-[11px] font-mono text-text-tertiary">{agt.id}</span>
+                    </TableCell>
+                    <TableCell className="px-5 py-4 font-mono text-xs text-text-secondary">
+                      {agt.phone}
+                    </TableCell>
+                    <TableCell className="px-5 py-4 text-xs text-text-primary">
+                      {agt.territory}
+                    </TableCell>
+                    <TableCell className="px-5 py-4 font-bold text-xs text-text-primary">
+                      {agt.activeAccounts} Accounts
+                    </TableCell>
+                    <TableCell className="px-5 py-4 font-semibold text-xs text-primary">
+                      {agt.dispensersDeployed} Units
+                    </TableCell>
+                    <TableCell className="px-5 py-4 font-bold text-xs text-emerald-600 dark:text-emerald-400">
+                      GH₵ {agt.monthlyCommission.toFixed(2)}
+                    </TableCell>
+                    <TableCell className="px-5 py-4 text-right">
+                      <Badge color="success" size="sm">
+                        Active
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </TableRoot>
+          </div>
+        </Card>
       </div>
     </AppLayout>
   );

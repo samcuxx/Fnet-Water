@@ -52,7 +52,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -12, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className={`pointer-events-auto p-4 rounded-2xl border shadow-xl flex items-start gap-3 backdrop-blur-md ${
+              className={`pointer-events-auto p-4 rounded-lg border shadow-xl flex items-start gap-3 backdrop-blur-md ${
                 toast.type === "success"
                   ? "bg-emerald-50/95 border-emerald-200 text-emerald-950 dark:bg-emerald-950/90 dark:border-emerald-800 dark:text-emerald-100"
                   : toast.type === "warning"

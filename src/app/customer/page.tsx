@@ -1,17 +1,22 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import dynamic from "next/dynamic";
-import { motion } from "framer-motion";
-import { useTheme } from "next-themes";
-import type { ApexOptions } from "apexcharts";
 import AppLayout from "@/components/layout/AppLayout";
-import Badge from "@/components/ui/Badge";
+import { Badge } from "@/components/tailgrids/core/badge";
+import Breadcrumbs from "@/components/tailgrids/core/breadcrumbs";
+import { Button } from "@/components/tailgrids/core/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/tailgrids/core/card";
 import Modal from "@/components/ui/Modal";
-import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { StoredAddress, StoredCustomerProfile } from "@/lib/customer-store";
+import { cn } from "@/utils/cn";
+import { ArrowUpIcon } from "@/utils/icon";
+import { ChatIcon, InvoiceIcon, TableIcon, TaskIcon } from "@/components/common/sidebar/icon";
+import type { ApexOptions } from "apexcharts";
+import { Cpu, FileText, Gift, MapPin, Package, Plus } from "lucide-react";
+import { useTheme } from "next-themes";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useCallback, useEffect, useState } from "react";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -63,7 +68,6 @@ export default function CustomerDashboardPage() {
 
   const isDark = mounted && resolvedTheme === "dark";
 
-  // Load customer profile and addresses
   const loadCustomerData = useCallback(async () => {
     try {
       const [profRes, addrRes] = await Promise.all([
@@ -90,13 +94,10 @@ export default function CustomerDashboardPage() {
     loadCustomerData();
   }, [loadCustomerData]);
 
-  // Default address
-  const defaultAddress =
-    addresses.find((a) => a.isDefault) || addresses[0] || null;
+  const defaultAddress = addresses.find((a) => a.isDefault) || addresses[0] || null;
 
-  // Monthly Consumption ApexChart
   const barOptions: ApexOptions = {
-    colors: ["#0057B8"],
+    colors: ["#0057b8"],
     chart: {
       fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       type: "bar",
@@ -113,18 +114,18 @@ export default function CustomerDashboardPage() {
     dataLabels: { enabled: false },
     xaxis: {
       categories: ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov"],
-      labels: { style: { colors: isDark ? "#9CA3AF" : "#667085", fontSize: "11px" } },
+      labels: { style: { colors: isDark ? "#98a2b3" : "#667085", fontSize: "11px" } },
       axisBorder: { show: false },
       axisTicks: { show: false },
     },
     yaxis: {
       labels: {
-        style: { colors: isDark ? "#9CA3AF" : "#667085", fontSize: "11px" },
+        style: { colors: isDark ? "#98a2b3" : "#667085", fontSize: "11px" },
         formatter: (val) => `${val}`,
       },
     },
     grid: {
-      borderColor: isDark ? "#1F2937" : "#F2F4F7",
+      borderColor: isDark ? "#1d2939" : "#f2f4f7",
       strokeDashArray: 3,
     },
     tooltip: {
@@ -139,17 +140,16 @@ export default function CustomerDashboardPage() {
     },
   ];
 
-  // Dispenser Rent-to-Own Radial Gauge calculation
   const paidMonths = profile?.dispenserPaidMonths ?? 8;
   const totalMonths = profile?.dispenserTotalMonths ?? 12;
   const gaugePercent = Math.round((paidMonths / totalMonths) * 100);
 
   const radialOptions: ApexOptions = {
-    colors: ["#0057B8"],
+    colors: ["#0057b8"],
     chart: {
       fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       type: "radialBar",
-      height: 240,
+      height: 220,
       sparkline: { enabled: true },
     },
     plotOptions: {
@@ -158,30 +158,28 @@ export default function CustomerDashboardPage() {
         endAngle: 85,
         hollow: { size: "72%" },
         track: {
-          background: isDark ? "#1F2937" : "#E4E7EC",
+          background: isDark ? "#1d2939" : "#e4e7ec",
           strokeWidth: "100%",
           margin: 5,
         },
         dataLabels: {
           name: { show: false },
           value: {
-            fontSize: "26px",
+            fontSize: "24px",
             fontWeight: "700",
-            offsetY: -25,
-            color: isDark ? "#F9FAFB" : "#1D2939",
+            offsetY: -20,
+            color: isDark ? "#f9fafb" : "#101828",
             formatter: (val) => `${val}%`,
           },
         },
       },
     },
-    fill: { type: "solid", colors: ["#0057B8"] },
+    fill: { type: "solid", colors: ["#0057b8"] },
     stroke: { lineCap: "round" },
-    labels: ["Installment Progress"],
   };
 
   const radialSeries = [gaugePercent];
 
-  // Copy referral code to clipboard
   const handleCopyCode = () => {
     const code = profile?.referralCode || "FNW-AMA01";
     navigator.clipboard.writeText(code);
@@ -196,7 +194,7 @@ export default function CustomerDashboardPage() {
       case "Delivered":
         return <Badge color="success" size="sm">Delivered</Badge>;
       case "Assigned":
-        return <Badge color="info" size="sm">Assigned</Badge>;
+        return <Badge color="primary" size="sm">Driver Assigned</Badge>;
       case "Pending":
         return <Badge color="warning" size="sm">Pending</Badge>;
     }
@@ -204,116 +202,134 @@ export default function CustomerDashboardPage() {
 
   return (
     <AppLayout role="CUSTOMER">
-      <motion.div
-        variants={staggerContainer}
-        initial="initial"
-        animate="animate"
-        className="space-y-6 max-w-5xl mx-auto"
-      >
-        {/* Header: Greeting & Primary Order Action */}
-        <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-gray-900/70 p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs">
+      <div className="mt-4 space-y-6 px-2 lg:px-4 max-w-5xl mx-auto">
+        {/* NextAdmin Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
+            <div className="mb-2">
+              <Breadcrumbs
+                dividerType="chevron"
+                items={[
+                  { label: "Home", href: "/customer" },
+                  { label: "Portals", href: "/customer" },
+                  { label: "Customer Portal" },
+                ]}
+              />
+            </div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 dark:text-white">
+              <h1 className="text-[28px] leading-8 font-semibold text-text-primary tracking-tight">
                 Hello, {userName}
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-sky-400 border border-brand-200 dark:border-brand-800/80">
+              <Badge color="primary" size="sm">
                 {profile?.customerCode || "CUST-8802"}
-              </span>
+              </Badge>
             </div>
-
             {defaultAddress && (
               <Link
                 href="/customer/addresses"
-                className="mt-1.5 inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-brand-600 dark:text-gray-400 dark:hover:text-sky-400 transition"
+                className="mt-1.5 inline-flex items-center gap-1.5 text-xs text-text-tertiary hover:text-primary transition-colors"
               >
-                <svg className="size-3.5 text-brand-500 shrink-0 fill-current" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                </svg>
-                <span className="truncate max-w-[200px] sm:max-w-xs">{defaultAddress.areaName}</span>
-                <span className="font-mono text-[11px] text-gray-400">({defaultAddress.digitalAddress})</span>
+                <MapPin className="size-3.5 text-primary shrink-0" />
+                <span className="truncate max-w-xs">{defaultAddress.areaName}</span>
+                <span className="font-mono text-[11px] text-text-tertiary">
+                  ({defaultAddress.digitalAddress})
+                </span>
               </Link>
             )}
           </div>
 
-          <Link
-            href="/customer/order"
-            className="inline-flex items-center justify-center px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs self-start sm:self-auto cursor-pointer"
-          >
-            Order Water Refill
-          </Link>
-        </motion.div>
+          <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+            {/* Order Refill: Primary blue with white text */}
+            <Button asChild size="md" className="gap-2 cursor-pointer shadow-xs">
+              <Link href="/customer/order?type=refill">
+                <Plus className="size-4" />
+                <span>Order Refill</span>
+              </Link>
+            </Button>
 
-        {/* 3-Pill Status Summary Strip */}
-        <div className="grid grid-cols-3 gap-3 sm:gap-4">
-          <motion.div
-            variants={fadeInUp}
-            whileHover={cardHoverMotion.whileHover}
-            transition={cardHoverMotion.transition}
-            className="p-4 sm:p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs text-center"
-          >
-            <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 block truncate font-medium">
-              Bottles Held
-            </span>
-            <div className="mt-1.5 text-xl sm:text-2xl font-black text-gray-900 dark:text-white">
-              {profile?.bottlesHeld ?? 4}
-            </div>
-            <span className="mt-0.5 text-[10px] sm:text-[11px] text-brand-600 dark:text-sky-400 font-bold block truncate">
-              Empty bottles ready
-            </span>
-          </motion.div>
-
-          <motion.div
-            variants={fadeInUp}
-            whileHover={cardHoverMotion.whileHover}
-            transition={cardHoverMotion.transition}
-            className="p-4 sm:p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs text-center"
-          >
-            <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 block truncate font-medium">
-              Free Credits
-            </span>
-            <div className="mt-1.5 text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
-              {profile?.freeBottleBalance ?? 1}
-            </div>
-            <span className="mt-0.5 text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 font-semibold block truncate">
-              Referral reward
-            </span>
-          </motion.div>
-
-          <motion.div
-            variants={fadeInUp}
-            whileHover={cardHoverMotion.whileHover}
-            transition={cardHoverMotion.transition}
-            className="p-4 sm:p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs text-center"
-          >
-            <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 block truncate font-medium">
-              Dispenser Plan
-            </span>
-            <div className="mt-1.5 text-xl sm:text-2xl font-black text-gray-900 dark:text-white">
-              {paidMonths}/{totalMonths}m
-            </div>
-            <span className="mt-0.5 text-[10px] sm:text-[11px] text-sky-600 dark:text-sky-400 font-bold block truncate">
-              Rent-to-own
-            </span>
-          </motion.div>
+            {/* Order Non-Refill: White background with blue words */}
+            <Button
+              asChild
+              size="md"
+              appearance="outline"
+              className="gap-2 bg-white text-primary border-2 border-primary hover:bg-blue-50/80 font-semibold shadow-xs dark:bg-card-surface-area dark:text-sky-400 dark:border-sky-500 dark:hover:bg-sky-950/40 cursor-pointer"
+            >
+              <Link href="/customer/order?type=non-refill">
+                <Package className="size-4" />
+                <span>Order Non-Refill</span>
+              </Link>
+            </Button>
+          </div>
         </div>
 
-        {/* 4 Clean Quick Actions (2x2 on mobile, 4x1 on desktop) */}
+        {/* 3-Card NextAdmin Overview Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5">
+          <Card beamIndex={0}>
+            <CardHeader className="justify-between">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-blue-light-50 text-primary dark:bg-blue-light-950">
+                <TableIcon />
+              </div>
+            </CardHeader>
+            <CardContent className="mt-3.5 sm:mt-5 p-0">
+              <div className="text-lg leading-6 font-bold text-text-primary sm:text-xl md:text-2xl">
+                {profile?.bottlesHeld ?? 4}
+              </div>
+            </CardContent>
+            <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
+              <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Bottles Held</span>
+              <span className="text-[11px] leading-4 sm:text-xs font-semibold text-primary">Empties ready</span>
+            </CardFooter>
+          </Card>
+
+          <Card beamIndex={1}>
+            <CardHeader className="justify-between">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-success-50 text-green-600 dark:bg-success-950">
+                <Gift className="size-4.5" />
+              </div>
+            </CardHeader>
+            <CardContent className="mt-3.5 sm:mt-5 p-0">
+              <div className="text-lg leading-6 font-bold text-green-600 sm:text-xl md:text-2xl">
+                {profile?.freeBottleBalance ?? 1}
+              </div>
+            </CardContent>
+            <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
+              <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Free Refill Credits</span>
+              <span className="text-[11px] leading-4 sm:text-xs font-semibold text-green-600">Referral reward</span>
+            </CardFooter>
+          </Card>
+
+          <Card beamIndex={4} className="col-span-2 sm:col-span-1">
+            <CardHeader className="justify-between">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-brand-50 text-brand-500 dark:bg-brand-950">
+                <Cpu className="size-4.5" />
+              </div>
+            </CardHeader>
+            <CardContent className="mt-3.5 sm:mt-5 p-0">
+              <div className="text-lg leading-6 font-bold text-brand-600 dark:text-brand-400 sm:text-xl md:text-2xl">
+                {paidMonths}/{totalMonths}m
+              </div>
+            </CardContent>
+            <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
+              <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Dispenser Plan</span>
+              <span className="text-[11px] leading-4 sm:text-xs font-semibold text-brand-600">Rent-to-own</span>
+            </CardFooter>
+          </Card>
+        </div>
+
+        {/* 4 Clean Quick Actions */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Link
             href="/customer/orders"
-            className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 hover:border-gray-300 dark:hover:border-gray-700 transition shadow-xs flex items-center gap-3 cursor-pointer"
+            className="p-4 rounded-xl border border-card-border bg-card-background hover:border-primary/40 transition-colors shadow-xs flex items-center gap-3 cursor-pointer"
           >
-            <div className="size-10 rounded-xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-              <svg className="size-5 fill-current" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 01-1.581.814L10 14.197l-4.419 2.617A1 1 0 014 16V4zm2 2v8.528l3.419-2.025a1 1 0 011.162 0L14 14.528V6H6z" clipRule="evenodd" />
-              </svg>
+            <div className="size-10 rounded-lg bg-blue-light-50 dark:bg-blue-light-950 text-primary flex items-center justify-center shrink-0">
+              <Package className="size-5" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white truncate">
+              <h3 className="text-xs sm:text-sm font-bold text-text-primary truncate">
                 My Orders
               </h3>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
+              <p className="text-[11px] text-text-tertiary truncate">
                 Track deliveries
               </p>
             </div>
@@ -321,18 +337,16 @@ export default function CustomerDashboardPage() {
 
           <Link
             href="/customer/addresses"
-            className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 hover:border-gray-300 dark:hover:border-gray-700 transition shadow-xs flex items-center gap-3 cursor-pointer"
+            className="p-4 rounded-xl border border-card-border bg-card-background hover:border-primary/40 transition-colors shadow-xs flex items-center gap-3 cursor-pointer"
           >
-            <div className="size-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-              <svg className="size-5 fill-current" viewBox="0 0 24 24">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z" />
-              </svg>
+            <div className="size-10 rounded-lg bg-brand-50 dark:bg-brand-950 text-brand-500 flex items-center justify-center shrink-0">
+              <MapPin className="size-5" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white truncate">
+              <h3 className="text-xs sm:text-sm font-bold text-text-primary truncate">
                 Address Book
               </h3>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
+              <p className="text-[11px] text-text-tertiary truncate">
                 {addresses.length} saved locations
               </p>
             </div>
@@ -340,18 +354,16 @@ export default function CustomerDashboardPage() {
 
           <Link
             href="/customer/dispenser"
-            className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 hover:border-gray-300 dark:hover:border-gray-700 transition shadow-xs flex items-center gap-3 cursor-pointer"
+            className="p-4 rounded-xl border border-card-border bg-card-background hover:border-primary/40 transition-colors shadow-xs flex items-center gap-3 cursor-pointer"
           >
-            <div className="size-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-              <svg className="size-5 fill-current" viewBox="0 0 24 24">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-              </svg>
+            <div className="size-10 rounded-lg bg-orange-50 dark:bg-orange-950 text-orange-500 flex items-center justify-center shrink-0">
+              <Cpu className="size-5" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white truncate">
+              <h3 className="text-xs sm:text-sm font-bold text-text-primary truncate">
                 Smart Dispenser
               </h3>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
+              <p className="text-[11px] text-text-tertiary truncate">
                 Rent-to-own tracking
               </p>
             </div>
@@ -359,64 +371,63 @@ export default function CustomerDashboardPage() {
 
           <Link
             href="/customer/referrals"
-            className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 hover:border-gray-300 dark:hover:border-gray-700 transition shadow-xs flex items-center gap-3 text-left cursor-pointer"
+            className="p-4 rounded-xl border border-card-border bg-card-background hover:border-primary/40 transition-colors shadow-xs flex items-center gap-3 text-left cursor-pointer"
           >
-            <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-              <svg className="size-5 fill-current" viewBox="0 0 24 24">
-                <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.5 2.5 0 0 0-5 0c0 .35.07.69.18 1H11a2.5 2.5 0 0 0-5 0c0 .35.07.69.18 1H4a2 2 0 0 0-2 2v3a1 1 0 0 0 1 1h1v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7h1a1 1 0 0 0 1-1V8a2 2 0 0 0-2-2z" />
-              </svg>
+            <div className="size-10 rounded-lg bg-success-50 dark:bg-success-950 text-green-600 flex items-center justify-center shrink-0">
+              <Gift className="size-5" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white truncate">
+              <h3 className="text-xs sm:text-sm font-bold text-text-primary truncate">
                 Refer Friends
               </h3>
-              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold truncate">
+              <p className="text-[11px] text-green-600 font-bold truncate">
                 5:1 Free bottle rule
               </p>
             </div>
           </Link>
         </div>
 
-        {/* Clean Visual Hub with Tab Switcher */}
-        <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs">
-          <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
-            {/* Pill Tab Switcher */}
-            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-gray-100 dark:bg-gray-800 text-xs">
+        {/* Tabbed Visual Hub with ApexCharts */}
+        <Card className="p-5 sm:p-6">
+          <CardHeader className="border-b border-border-primary pb-3">
+            <div className="flex items-center gap-1 rounded-lg border border-card-border bg-background-gray-primary p-0.5">
               <button
                 type="button"
                 onClick={() => setChartTab("consumption")}
-                className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                className={cn(
+                  "px-3 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer",
                   chartTab === "consumption"
-                    ? "bg-white dark:bg-gray-900 text-brand-600 dark:text-sky-400 shadow-xs"
-                    : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-                }`}
+                    ? "bg-card-background text-text-primary shadow-xs"
+                    : "text-text-tertiary hover:text-text-primary"
+                )}
               >
                 Refill Usage
               </button>
               <button
                 type="button"
                 onClick={() => setChartTab("dispenser")}
-                className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                className={cn(
+                  "px-3 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer",
                   chartTab === "dispenser"
-                    ? "bg-white dark:bg-gray-900 text-brand-600 dark:text-sky-400 shadow-xs"
-                    : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-                }`}
+                    ? "bg-card-background text-text-primary shadow-xs"
+                    : "text-text-tertiary hover:text-text-primary"
+                )}
               >
                 Dispenser Plan
               </button>
             </div>
 
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {chartTab === "consumption" ? "Avg 8.6 btls/mo" : `${gaugePercent}% paid`}
+            <span className="text-xs text-text-tertiary">
+              {chartTab === "consumption" ? "Avg 8.6 bottles/month" : `${gaugePercent}% paid off`}
             </span>
-          </div>
+          </CardHeader>
 
-          <div className="pt-3">
+          <div className="pt-4">
             {chartTab === "consumption" ? (
               <Chart options={barOptions} series={barSeries} type="bar" height={200} />
             ) : (
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                <div className="relative size-32 rounded-2xl overflow-hidden bg-sky-50 dark:bg-gray-800/60 p-2 shrink-0 border border-gray-100 dark:border-gray-800">
+                <div className="relative size-32 rounded-xl overflow-hidden bg-background-gray-primary p-2 shrink-0 border border-card-border">
                   <Image
                     src="/images/product/fnet-smart-dispenser.jpg"
                     alt="Smart Digital Dispenser"
@@ -427,7 +438,7 @@ export default function CustomerDashboardPage() {
                 </div>
                 <div className="flex flex-col items-center flex-1 w-full max-w-sm">
                   <Chart options={radialOptions} series={radialSeries} type="radialBar" height={220} />
-                  <div className="w-full pt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800">
+                  <div className="w-full pt-2 flex items-center justify-between text-xs text-text-tertiary border-t border-border-primary">
                     <span>Paid: GH₵ {(paidMonths * 200).toFixed(2)}</span>
                     <span>Remaining: GH₵ {((totalMonths - paidMonths) * 200).toFixed(2)}</span>
                   </div>
@@ -435,46 +446,39 @@ export default function CustomerDashboardPage() {
               </div>
             )}
           </div>
-        </div>
+        </Card>
 
-        {/* Recent Activity List (Mobile Friendly & Clean) */}
-        <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold text-gray-900 dark:text-white">
-              Recent Refills
-            </h3>
-            <span className="text-xs text-gray-400">Past 30 days</span>
-          </div>
+        {/* Recent Refills Activity Card */}
+        <Card className="p-5 sm:p-6">
+          <CardHeader className="mb-4">
+            <CardTitle>Recent Refills</CardTitle>
+            <span className="text-xs text-text-tertiary">Past 30 days</span>
+          </CardHeader>
 
-          <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          <div className="divide-y divide-border-primary">
             {RECENT_ORDERS.map((ord) => (
               <div key={ord.id} className="py-3 flex items-center justify-between gap-3 first:pt-0 last:pb-0">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 flex items-center justify-center shrink-0">
-                    <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <rect x="3" y="2" width="14" height="16" rx="2" />
-                      <line x1="6.5" y1="6" x2="13.5" y2="6" />
-                      <line x1="6.5" y1="9" x2="13.5" y2="9" />
-                      <line x1="6.5" y1="12" x2="10" y2="12" />
-                    </svg>
+                  <div className="size-8 rounded-lg bg-background-gray-primary text-icon-tertiary flex items-center justify-center shrink-0 border border-card-border">
+                    <FileText className="size-4" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+                      <span className="text-xs font-semibold text-text-primary truncate">
                         {ord.title}
                       </span>
-                      <span className="font-mono text-[10px] text-gray-400">
+                      <span className="font-mono text-[10px] text-text-tertiary">
                         {ord.id}
                       </span>
                     </div>
-                    <span className="text-[11px] text-gray-500 dark:text-gray-400 block">
+                    <span className="text-[11px] text-text-tertiary block">
                       {ord.date}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2.5 shrink-0 text-right">
-                  <span className="text-xs font-semibold text-gray-900 dark:text-white">
+                  <span className="text-xs font-semibold text-text-primary">
                     {ord.amount}
                   </span>
                   {getStatusBadge(ord.status)}
@@ -482,7 +486,7 @@ export default function CustomerDashboardPage() {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
 
         {/* Referral Reward Modal */}
         <Modal
@@ -491,55 +495,47 @@ export default function CustomerDashboardPage() {
           title="Refer Friends, Earn Free Refills"
         >
           <div className="space-y-4">
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+            <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
               Earn 1 free 19L refill credit for every 5 friends who complete their first refill order with your code.
             </p>
 
-            <div className="p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3">
+            <div className="p-3.5 rounded-xl bg-background-gray-primary border border-card-border flex items-center justify-between gap-3">
               <div>
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block">
+                <span className="text-[11px] text-text-tertiary block">
                   Your Referral Code
                 </span>
-                <div className="text-base font-mono font-bold text-brand-600 dark:text-blue-light-400 tracking-wider">
+                <div className="text-base font-mono font-bold text-primary tracking-wider">
                   {profile?.referralCode || "FNW-AMA01"}
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={handleCopyCode}
-                className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 hover:bg-brand-600 text-white transition shadow-theme-xs cursor-pointer"
-              >
+              <Button size="sm" onClick={handleCopyCode} className="cursor-pointer">
                 {copied ? "Copied!" : "Copy Code"}
-              </button>
+              </Button>
             </div>
 
             <div>
               <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-gray-600 dark:text-gray-400">Next Free Refill</span>
-                <span className="font-semibold text-brand-600 dark:text-blue-light-400">
+                <span className="text-text-secondary">Next Free Refill</span>
+                <span className="font-semibold text-primary">
                   {referralsTowardsNext} / 5 completed
                 </span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-background-gray-secondary rounded-full h-2 overflow-hidden">
                 <div
-                  className="bg-brand-500 h-2 rounded-full transition-all"
+                  className="bg-primary h-2 rounded-full transition-all"
                   style={{ width: `${(referralsTowardsNext / 5) * 100}%` }}
                 />
               </div>
             </div>
 
-            <div className="flex justify-end pt-2 border-t border-gray-100 dark:border-gray-800">
-              <button
-                type="button"
-                onClick={() => setIsReferralModalOpen(false)}
-                className="px-4 py-2 text-xs font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
-              >
+            <div className="flex justify-end pt-2 border-t border-card-border">
+              <Button variant="ghost" size="sm" onClick={() => setIsReferralModalOpen(false)}>
                 Close
-              </button>
+              </Button>
             </div>
           </div>
         </Modal>
-      </motion.div>
+      </div>
     </AppLayout>
   );
 }

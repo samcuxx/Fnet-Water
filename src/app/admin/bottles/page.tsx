@@ -1,13 +1,23 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
-import Badge from "@/components/ui/badge/Badge";
-import Input from "@/components/form/input/InputField";
+import { Badge } from "@/components/tailgrids/core/badge";
+import Breadcrumbs from "@/components/tailgrids/core/breadcrumbs";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/tailgrids/core/card";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/tailgrids/core/input-group";
+import {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRoot,
+  TableRow,
+} from "@/components/tailgrids/core/table";
 import { SkeletonMetrics, SkeletonTable } from "@/components/ui/skeleton";
-import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { BottleExchangeRecord } from "@/lib/dispatch-store";
+import { SearchIcon } from "@/components/common/header/icons";
+import { InvoiceIcon, TableIcon, TaskIcon, Widget4Icon } from "@/components/common/sidebar/icon";
+import React, { useCallback, useEffect, useState } from "react";
 
 export default function AdminBottlesPage() {
   const [exchanges, setExchanges] = useState<BottleExchangeRecord[]>([]);
@@ -49,161 +59,207 @@ export default function AdminBottlesPage() {
 
   return (
     <AppLayout role="ADMIN">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
-                Bottle Exchanges &amp; Returns Log
-              </h1>
-              <Badge color="primary" size="sm">
-                Executive
-              </Badge>
-            </div>
-            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              Audit log of empty bottle returns, filled deliveries, and damaged units recorded by van drivers.
-            </p>
+      <div className="mt-4 space-y-6 px-2 lg:px-4">
+        {/* NextAdmin Page Header */}
+        <div>
+          <div className="mb-2">
+            <Breadcrumbs
+              dividerType="chevron"
+              items={[
+                { label: "Home", href: "/admin" },
+                { label: "Operations", href: "/admin/orders" },
+                { label: "Bottle Tracking" },
+              ]}
+            />
           </div>
+          <h1 className="mb-1 text-[28px] leading-8 font-semibold text-text-primary tracking-tight">
+            Bottle Exchanges &amp; Returns Log
+          </h1>
+          <p className="text-sm leading-5 text-text-tertiary">
+            Audit log of empty bottle returns, filled deliveries, and damaged units recorded by van drivers.
+          </p>
         </div>
 
-        {/* 4 Metric Cards */}
+        {/* 4-Card NextAdmin Pro Overview Stats */}
         {isLoading ? (
           <SkeletonMetrics count={4} />
         ) : (
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
-          >
-            <motion.div
-              variants={fadeInUp}
-              {...cardHoverMotion}
-              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
-            >
-              <span className="text-xs text-brand-600 dark:text-sky-400 font-medium block">Bottles Delivered</span>
-              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
-                {summary.totalFilledDelivered}
-              </div>
-              <span className="text-[11px] text-gray-400 mt-1 block">Filled 18.9L bottles</span>
-            </motion.div>
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+            <Card beamIndex={0}>
+              <CardHeader className="justify-between">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-blue-light-50 text-primary dark:bg-blue-light-950">
+                  <TaskIcon />
+                </div>
+              </CardHeader>
+              <CardContent className="mt-3.5 sm:mt-5 p-0">
+                <div className="text-lg leading-6 font-bold text-text-primary sm:text-xl md:text-2xl">
+                  {summary.totalFilledDelivered}
+                </div>
+              </CardContent>
+              <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
+                <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Bottles Delivered</span>
+                <span className="text-[11px] leading-4 sm:text-xs font-semibold text-primary">Filled 19L units</span>
+              </CardFooter>
+            </Card>
 
-            <motion.div
-              variants={fadeInUp}
-              {...cardHoverMotion}
-              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
-            >
-              <span className="text-xs text-cyan-600 font-medium block">Empty Bottles Collected</span>
-              <div className="mt-1 text-2xl sm:text-3xl font-black text-cyan-600">
-                {summary.totalEmptyCollected}
-              </div>
-              <span className="text-[11px] text-gray-400 mt-1 block">Returned from customers</span>
-            </motion.div>
+            <Card beamIndex={2}>
+              <CardHeader className="justify-between">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-brand-50 text-brand-500 dark:bg-brand-950">
+                  <TableIcon />
+                </div>
+              </CardHeader>
+              <CardContent className="mt-3.5 sm:mt-5 p-0">
+                <div className="text-lg leading-6 font-bold text-brand-600 dark:text-brand-400 sm:text-xl md:text-2xl">
+                  {summary.totalEmptyCollected}
+                </div>
+              </CardContent>
+              <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
+                <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Empties Returned</span>
+                <span className="text-[11px] leading-4 sm:text-xs font-semibold text-brand-600">No deposit fee</span>
+              </CardFooter>
+            </Card>
 
-            <motion.div
-              variants={fadeInUp}
-              {...cardHoverMotion}
-              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
-            >
-              <span className="text-xs text-amber-600 font-medium block">Damaged Bottles</span>
-              <div className="mt-1 text-2xl sm:text-3xl font-black text-amber-600">
-                {summary.totalDamaged}
-              </div>
-              <span className="text-[11px] text-gray-400 mt-1 block">Cracked or decommissioned</span>
-            </motion.div>
+            <Card beamIndex={3}>
+              <CardHeader className="justify-between">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-orange-50 text-orange-500 dark:bg-orange-950">
+                  <Widget4Icon />
+                </div>
+              </CardHeader>
+              <CardContent className="mt-3.5 sm:mt-5 p-0">
+                <div className="text-lg leading-6 font-bold text-orange-600 dark:text-orange-400 sm:text-xl md:text-2xl">
+                  {summary.totalDamaged}
+                </div>
+              </CardContent>
+              <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
+                <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Damaged Bottles</span>
+                <span className="text-[11px] leading-4 sm:text-xs font-semibold text-orange-500">Decommissioned</span>
+              </CardFooter>
+            </Card>
 
-            <motion.div
-              variants={fadeInUp}
-              {...cardHoverMotion}
-              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs cursor-pointer"
-            >
-              <span className="text-xs text-emerald-600 font-medium block">Cash Collected</span>
-              <div className="mt-1 text-2xl sm:text-3xl font-black text-emerald-600">
-                GH₵ {summary.totalCashCollected.toFixed(2)}
-              </div>
-              <span className="text-[11px] text-gray-400 mt-1 block">Point-of-delivery cash</span>
-            </motion.div>
-          </motion.div>
+            <Card beamIndex={1}>
+              <CardHeader className="justify-between">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-success-50 text-green-600 dark:bg-success-950">
+                  <InvoiceIcon />
+                </div>
+              </CardHeader>
+              <CardContent className="mt-3.5 sm:mt-5 p-0">
+                <div className="text-lg leading-6 font-bold text-green-600 sm:text-xl md:text-2xl">
+                  GH₵ {summary.totalCashCollected.toFixed(2)}
+                </div>
+              </CardContent>
+              <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
+                <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Cash Collected</span>
+                <span className="text-[11px] leading-4 sm:text-xs font-semibold text-green-600">Direct settlement</span>
+              </CardFooter>
+            </Card>
+          </div>
         )}
 
-        {/* Table Filter */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <Input
-            type="text"
-            placeholder="Search exchanges by record ID, stop, notes..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-72 text-xs"
-          />
-          <span className="text-xs text-gray-500">
-            {filtered.length} exchange records
-          </span>
-        </div>
+        {/* Main Exchanges Table Card */}
+        <Card className="p-0 overflow-hidden">
+          <CardHeader className="p-5 pb-4">
+            <div>
+              <CardTitle>Exchange Audit Log</CardTitle>
+              <p className="mt-0.5 text-xs text-text-tertiary">
+                Showing {filtered.length} exchange records
+              </p>
+            </div>
 
-        {/* Table */}
-        {isLoading ? (
-          <SkeletonTable rows={5} columns={7} />
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
-          >
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
-                  <th className="py-3 px-4">Date &amp; Time</th>
-                  <th className="py-3 px-4">Record ID</th>
-                  <th className="py-3 px-4">Bottles Delivered</th>
-                  <th className="py-3 px-4">Empties Returned</th>
-                  <th className="py-3 px-4">Damaged</th>
-                  <th className="py-3 px-4">Cash Collected</th>
-                  <th className="py-3 px-4">Customer Notes</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {filtered.map((e) => (
-                  <tr key={e.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
-                    <td className="py-3 px-4 text-gray-500 font-mono text-[11px]">
-                      {new Date(e.createdAt).toLocaleString("en-GB", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                      })}
-                    </td>
-                    <td className="py-3 px-4 font-mono font-semibold text-gray-900 dark:text-white">
-                      {e.id}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="font-bold text-gray-900 dark:text-white">
-                        {e.filledDelivered} Bottles
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="font-bold text-cyan-600">
-                        {e.emptyCollected} Empties
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      {e.damagedCount > 0 ? (
-                        <span className="font-bold text-amber-600">{e.damagedCount}</span>
-                      ) : (
-                        <span className="text-gray-400">0</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 font-bold text-gray-900 dark:text-white">
-                      {e.cashCollected > 0 ? `GH₵ ${e.cashCollected.toFixed(2)}` : "-"}
-                    </td>
-                    <td className="py-3 px-4 text-gray-500 max-w-xs truncate">
-                      {e.customerNotes || "Standard exchange signoff"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </motion.div>
-        )}
+            <InputGroup className="h-9 w-64 sm:w-80">
+              <InputGroupAddon align="inline-start" className="pr-0 text-icon-tertiary">
+                <SearchIcon />
+              </InputGroupAddon>
+              <InputGroupInput
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search record ID, notes..."
+                className="pl-2 text-xs"
+              />
+            </InputGroup>
+          </CardHeader>
+
+          {/* Table */}
+          {isLoading ? (
+            <div className="p-5">
+              <SkeletonTable rows={5} columns={7} />
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <TableRoot className="w-full rounded-none border-none">
+                <TableHeader>
+                  <TableRow className="border-t border-b border-border-primary bg-background-gray-primary/40">
+                    <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
+                      Date &amp; Time
+                    </TableHead>
+                    <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
+                      Record ID
+                    </TableHead>
+                    <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
+                      Bottles Delivered
+                    </TableHead>
+                    <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
+                      Empties Collected
+                    </TableHead>
+                    <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
+                      Damaged
+                    </TableHead>
+                    <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
+                      Cash Collected
+                    </TableHead>
+                    <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
+                      Customer Notes
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody>
+                  {filtered.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="py-10 text-center text-xs text-text-tertiary">
+                        No bottle exchange records match your search.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filtered.map((e) => (
+                      <TableRow key={e.id} className="hover:bg-background-gray-primary/50 transition-colors">
+                        <TableCell className="px-5 py-3 font-mono text-xs text-text-tertiary whitespace-nowrap">
+                          {new Date(e.createdAt).toLocaleString("en-GB", {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          })}
+                        </TableCell>
+                        <TableCell className="px-5 py-3 font-mono text-xs font-bold text-text-primary">
+                          {e.id}
+                        </TableCell>
+                        <TableCell className="px-5 py-3 text-xs font-semibold text-text-primary">
+                          {e.filledDelivered} Bottles
+                        </TableCell>
+                        <TableCell className="px-5 py-3 text-xs font-semibold text-brand-600 dark:text-brand-400">
+                          {e.emptyCollected} Empties
+                        </TableCell>
+                        <TableCell className="px-5 py-3 text-xs">
+                          {e.damagedCount > 0 ? (
+                            <Badge color="warning" size="sm">
+                              {e.damagedCount} damaged
+                            </Badge>
+                          ) : (
+                            <span className="text-text-tertiary">0</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="px-5 py-3 text-xs font-bold text-text-primary">
+                          {e.cashCollected > 0 ? `GH₵ ${e.cashCollected.toFixed(2)}` : "-"}
+                        </TableCell>
+                        <TableCell className="px-5 py-3 text-xs text-text-secondary max-w-xs truncate">
+                          {e.customerNotes || "Standard exchange signoff"}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </TableRoot>
+            </div>
+          )}
+        </Card>
       </div>
     </AppLayout>
   );
