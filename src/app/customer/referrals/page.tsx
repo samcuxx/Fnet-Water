@@ -122,10 +122,10 @@ export default function CustomerReferralsPage() {
           </div>
 
           <Link
-            href="/customer/order"
+            href="/customer/order?type=refill"
             className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs self-start sm:self-auto cursor-pointer"
           >
-            <span>Order Water Refill</span>
+            <span>Order Refill</span>
           </Link>
         </div>
 

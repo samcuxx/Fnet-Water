@@ -66,6 +66,44 @@ export default function MobileDock({ role }: MobileDockProps) {
         ),
       },
     ],
+    AGENT: [
+      {
+        name: "Hub",
+        href: "/agent",
+        icon: (
+          <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+          </svg>
+        ),
+      },
+      {
+        name: "Zones",
+        href: "/agent#zones",
+        icon: (
+          <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+          </svg>
+        ),
+      },
+      {
+        name: "Customers",
+        href: "/agent#customers",
+        icon: (
+          <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+          </svg>
+        ),
+      },
+      {
+        name: "Notifications",
+        href: "/notifications",
+        icon: (
+          <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+          </svg>
+        ),
+      },
+    ],
     DRIVER: [
       {
         name: "Today's Stops",

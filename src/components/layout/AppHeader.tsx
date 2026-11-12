@@ -16,7 +16,7 @@ export const AppHeader: React.FC = () => {
     if (pathname.startsWith("/admin")) return "Executive Administration";
     if (pathname.startsWith("/manager")) return "Operations Management";
     if (pathname.startsWith("/driver")) return "Driver Dispatch Run";
-    if (pathname.startsWith("/agent")) return "Agent Partner Portal";
+    if (pathname.startsWith("/agent")) return "Zone Supervisor & Agent Hub";
     if (pathname.startsWith("/customer")) return "Customer Portal";
     if (pathname.startsWith("/notifications")) return "Notification Center";
     return "F Net Water Hub";

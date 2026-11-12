@@ -1,23 +1,26 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import Badge from "@/components/ui/Badge";
+import Modal from "@/components/ui/Modal";
 import { SkeletonCard } from "@/components/ui/skeleton";
 import type { StoredProduct } from "@/lib/product-store";
-import type { StoredAddress, StoredCustomerProfile } from "@/lib/customer-store";
+import type { StoredAddress, StoredCustomerProfile, AddressCategory } from "@/lib/customer-store";
 import type { PaymentMethod } from "@/lib/order-store";
 
 interface CartState {
   [productId: string]: number;
 }
 
-export default function OrderWaterPage() {
+function OrderWaterInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const orderType = searchParams.get("type"); // "refill" | "non-refill"
 
   // Data
   const [products, setProducts] = useState<StoredProduct[]>([]);
@@ -26,20 +29,46 @@ export default function OrderWaterPage() {
   const [loading, setLoading] = useState(true);
 
   // Cart & Order Options
-  const [cart, setCart] = useState<CartState>({ prod_001: 2 }); // Default 2 refill bottles
+  // Default based on query param: non-refill selects prod_005, refill selects prod_001
+  const [cart, setCart] = useState<CartState>(
+    orderType === "non-refill" ? { prod_005: 1 } : { prod_001: 2 }
+  );
   const [hasEmptyBottleExchange, setHasEmptyBottleExchange] = useState(true);
   const [redeemFreeBottle, setRedeemFreeBottle] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
-  const [deliverySlot, setDeliverySlot] = useState<"Morning (8am - 12pm)" | "Afternoon (12pm - 4pm)" | "Evening (4pm - 7pm)">("Morning (8am - 12pm)");
+  const [deliverySlot, setDeliverySlot] = useState<
+    "Morning (8am - 12pm)" | "Afternoon (12pm - 4pm)" | "Evening (4pm - 7pm)"
+  >("Morning (8am - 12pm)");
   const [deliveryDate, setDeliveryDate] = useState<string>("Today");
   const [deliveryInstructions, setDeliveryInstructions] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("MOBILE_MONEY");
+
+  // Inline Add Delivery Address Modal state
+  const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
+  const [addressInputMode, setAddressInputMode] = useState<"gps" | "digital">("gps");
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [locationDetectedText, setLocationDetectedText] = useState<string | null>(null);
+  const [newAddressCategory, setNewAddressCategory] = useState<AddressCategory>("HOME");
+  const [newAreaName, setNewAreaName] = useState("");
+  const [newDigitalAddress, setNewDigitalAddress] = useState("");
+  const [newDeliveryInstructions, setNewDeliveryInstructions] = useState("");
+  const [newAddressError, setNewAddressError] = useState<string | null>(null);
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
 
   // Submission & Confirmed Order
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittingStatus, setSubmittingStatus] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [confirmedOrder, setConfirmedOrder] = useState<any | null>(null);
+
+  // Sync initial cart if orderType query param changes
+  useEffect(() => {
+    if (orderType === "non-refill") {
+      setCart({ prod_005: 1 });
+    } else if (orderType === "refill") {
+      setCart({ prod_001: 2 });
+    }
+  }, [orderType]);
 
   // Load initial data
   const loadData = useCallback(async () => {
@@ -95,19 +124,118 @@ export default function OrderWaterPage() {
   // Pricing calculations
   const totalItemsCount = Object.values(cart).reduce((a, b) => a + b, 0);
   const refillBottlesCount = cart["prod_001"] || 0;
+  const nonRefillBottlesCount = cart["prod_005"] || 0;
 
   const subtotal = Object.entries(cart).reduce((sum, [pId, qty]) => {
     const prod = products.find((p) => p.id === pId);
     return sum + (prod ? prod.price * qty : 0);
   }, 0);
 
-  const depositFee = !hasEmptyBottleExchange && refillBottlesCount > 0
-    ? refillBottlesCount * 80.0
-    : 0.0;
+  // Deposit fee only applies to refill bottles if customer is not returning an empty bottle
+  const depositFee =
+    !hasEmptyBottleExchange && refillBottlesCount > 0 ? refillBottlesCount * 80.0 : 0.0;
 
-  const deliveryFee = subtotal >= 100 || refillBottlesCount >= 3 || totalItemsCount === 0 ? 0.0 : 10.0;
-  const discountAmount = redeemFreeBottle && (profile?.freeBottleBalance ?? 0) > 0 && refillBottlesCount > 0 ? 25.0 : 0.0;
+  const deliveryFee =
+    subtotal >= 100 || refillBottlesCount + nonRefillBottlesCount >= 3 || totalItemsCount === 0
+      ? 0.0
+      : 10.0;
+  const discountAmount =
+    redeemFreeBottle && (profile?.freeBottleBalance ?? 0) > 0 && refillBottlesCount > 0 ? 25.0 : 0.0;
   const totalAmount = Math.max(0, subtotal + depositFee + deliveryFee - discountAmount);
+
+  // Live GPS Detector for inline modal
+  const handleDetectGPS = () => {
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      setNewAddressError("Geolocation is not supported by your browser. Please type your digital address.");
+      return;
+    }
+
+    setIsDetectingLocation(true);
+    setNewAddressError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const latPart = Math.abs(Math.round(latitude * 100));
+        const lngPart = Math.abs(Math.round(longitude * 1000)).toString().padStart(4, "0").slice(-4);
+        const generatedCode = `GA-${latPart}-${lngPart}`;
+
+        let detectedArea = "Current Live Location, Accra";
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3500);
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+            { signal: controller.signal }
+          );
+          clearTimeout(timeoutId);
+          if (res.ok) {
+            const data = await res.json();
+            const a = data.address || {};
+            const road = a.road || a.suburb || a.neighbourhood || a.quarter;
+            const city = a.city || a.town || a.county || "Accra";
+            if (road) {
+              detectedArea = `${road}, ${city}`;
+            }
+          }
+        } catch {
+          detectedArea = `GPS Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)}), Accra`;
+        }
+
+        setNewDigitalAddress(generatedCode);
+        if (!newAreaName) setNewAreaName(detectedArea);
+        setLocationDetectedText(`Captured: ${latitude.toFixed(4)}° N, ${longitude.toFixed(4)}° E`);
+        setIsDetectingLocation(false);
+      },
+      (err) => {
+        console.warn("Geolocation lookup error:", err);
+        setNewAddressError("Could not retrieve current location. Please allow location permissions or type your digital address.");
+        setIsDetectingLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 9000 }
+    );
+  };
+
+  // Save new address from modal
+  const handleSaveNewAddress = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setNewAddressError(null);
+    setIsSavingAddress(true);
+
+    try {
+      const res = await fetch("/api/customer/addresses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category: newAddressCategory,
+          areaName: newAreaName,
+          digitalAddress: newDigitalAddress,
+          deliveryInstructions: newDeliveryInstructions,
+          isDefault: true,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setNewAddressError(data.message || "Failed to save location.");
+        setIsSavingAddress(false);
+        return;
+      }
+
+      const saved: StoredAddress = data.address;
+      setAddresses((prev) => [saved, ...prev]);
+      setSelectedAddressId(saved.id);
+      setIsAddAddressModalOpen(false);
+      setNewAreaName("");
+      setNewDigitalAddress("");
+      setNewDeliveryInstructions("");
+      setLocationDetectedText(null);
+    } catch {
+      setNewAddressError("Network error occurred.");
+    } finally {
+      setIsSavingAddress(false);
+    }
+  };
 
   // Place Order
   const handlePlaceOrder = async () => {
@@ -137,7 +265,10 @@ export default function OrderWaterPage() {
           items: orderItems,
           deliveryAddressId: selectedAddressId || (addresses[0]?.id ?? ""),
           deliverySlot,
-          deliveryDate: deliveryDate === "Today" ? new Date().toISOString() : new Date(Date.now() + 86400000).toISOString(),
+          deliveryDate:
+            deliveryDate === "Today"
+              ? new Date().toISOString()
+              : new Date(Date.now() + 86400000).toISOString(),
           deliveryInstructions,
           hasEmptyBottleExchange,
           redeemFreeRefill: redeemFreeBottle,
@@ -193,6 +324,12 @@ export default function OrderWaterPage() {
 
   const selectedAddress = addresses.find((a) => a.id === selectedAddressId) || addresses[0];
 
+  // List of primary bottle products to feature in checkout
+  const featuredProducts = products.filter(
+    (p) => p.id === "prod_001" || p.id === "prod_005" || p.id === "prod_002"
+  );
+  const displayProducts = featuredProducts.length > 0 ? featuredProducts : products.slice(0, 3);
+
   return (
     <AppLayout role="CUSTOMER">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -203,7 +340,7 @@ export default function OrderWaterPage() {
               Order Water Delivery
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              Select your refill bottles and schedule fast delivery to your door.
+              Select your refill or non-refill bottles and schedule fast delivery to your door.
             </p>
           </div>
           <Link
@@ -258,7 +395,11 @@ export default function OrderWaterPage() {
               <div className="flex justify-between">
                 <span className="text-gray-500">Bottle Exchange:</span>
                 <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                  {hasEmptyBottleExchange ? "Returning empties (No deposit fee)" : "Deposit included"}
+                  {refillBottlesCount > 0
+                    ? hasEmptyBottleExchange
+                      ? "Returning empties (No deposit fee)"
+                      : "Deposit included"
+                    : "Non-Refill (Single-use, no return needed)"}
                 </span>
               </div>
             </div>
@@ -289,9 +430,14 @@ export default function OrderWaterPage() {
             <div className="lg:col-span-7 space-y-5">
               {/* 1. Products Selection */}
               <div className="bg-white dark:bg-gray-900/70 p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs space-y-4">
-                <span className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider block">
-                  1. Select Bottles
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider block">
+                    1. Select Bottles
+                  </span>
+                  <span className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Refill &amp; Non-Refill available
+                  </span>
+                </div>
 
                 {loading ? (
                   <div className="space-y-3">
@@ -300,9 +446,10 @@ export default function OrderWaterPage() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {products.slice(0, 2).map((prod) => {
+                    {displayProducts.map((prod) => {
                       const qty = cart[prod.id] || 0;
-                      const is19L = prod.type === "REFILLABLE_BOTTLE";
+                      const isRefill = prod.id === "prod_001" || prod.type === "REFILLABLE_BOTTLE";
+                      const isNonRefill = prod.id === "prod_005";
 
                       return (
                         <div
@@ -327,10 +474,29 @@ export default function OrderWaterPage() {
                             )}
 
                             <div className="min-w-0 flex-1">
-                              <h3 className="text-sm font-bold text-gray-900 dark:text-white truncate">
-                                {prod.name}
-                              </h3>
-                              <div className="text-xs font-bold text-brand-600 dark:text-sky-400 mt-0.5">
+                              <div className="flex items-center gap-2">
+                                <h3 className="text-sm font-bold text-gray-900 dark:text-white truncate">
+                                  {prod.name}
+                                </h3>
+                                {isRefill && (
+                                  <Badge color="primary" size="sm">
+                                    Refill
+                                  </Badge>
+                                )}
+                                {isNonRefill && (
+                                  <Badge color="info" size="sm">
+                                    Non-Refill
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
+                                {isRefill
+                                  ? "Reusable bottle returned or swapped for refill."
+                                  : isNonRefill
+                                  ? "Single-use bottle. Keep it without returning empties."
+                                  : prod.description}
+                              </p>
+                              <div className="text-xs font-bold text-brand-600 dark:text-sky-400 mt-1">
                                 GH₵ {prod.price.toFixed(2)}{" "}
                                 <span className="text-[11px] font-normal text-gray-400">/ {prod.unit}</span>
                               </div>
@@ -369,8 +535,8 @@ export default function OrderWaterPage() {
                             </div>
                           </div>
 
-                          {/* Empty Bottle Return Checkbox for 19L */}
-                          {is19L && qty > 0 && (
+                          {/* Empty Bottle Return Checkbox for Refill Bottles */}
+                          {isRefill && qty > 0 && (
                             <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-800">
                               <label className="flex items-center gap-2.5 cursor-pointer text-xs">
                                 <input
@@ -390,6 +556,16 @@ export default function OrderWaterPage() {
                               )}
                             </div>
                           )}
+
+                          {/* Non-Refill Note */}
+                          {isNonRefill && qty > 0 && (
+                            <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-800 text-[11px] text-brand-700 dark:text-sky-300 flex items-center gap-1.5">
+                              <svg className="size-3.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                              <span>Single-use bottle included with water. No empty bottle return required.</span>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -403,24 +579,39 @@ export default function OrderWaterPage() {
                   <span className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider block">
                     2. Delivery Location &amp; Time
                   </span>
-                  <Link
-                    href="/customer/addresses"
-                    className="text-xs text-brand-600 dark:text-sky-400 font-bold hover:underline"
-                  >
-                    Manage Addresses
-                  </Link>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsAddAddressModalOpen(true)}
+                      className="text-xs text-brand-600 dark:text-sky-400 font-bold hover:underline cursor-pointer"
+                    >
+                      + Add Location
+                    </button>
+                    <Link
+                      href="/customer/addresses"
+                      className="text-xs text-gray-500 hover:text-gray-900 dark:hover:text-white font-medium"
+                    >
+                      Manage
+                    </Link>
+                  </div>
                 </div>
 
                 {/* Address Selector */}
                 {addresses.length === 0 ? (
-                  <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300 flex items-center justify-between">
-                    <span>No saved delivery address found.</span>
-                    <Link
-                      href="/customer/addresses"
-                      className="font-bold underline ml-2"
+                  <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300 flex items-center justify-between">
+                    <div>
+                      <span className="font-bold block">No delivery address saved.</span>
+                      <span className="text-[11px] text-amber-700 dark:text-amber-400">
+                        Use current location or type your digital address.
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddAddressModalOpen(true)}
+                      className="px-3 py-1.5 bg-brand-500 text-white rounded-xl font-bold cursor-pointer hover:bg-brand-600 transition"
                     >
-                      Add Address
-                    </Link>
+                      Add Location
+                    </button>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -428,7 +619,7 @@ export default function OrderWaterPage() {
                       value={selectedAddressId}
                       onChange={(e) => setSelectedAddressId(e.target.value)}
                       aria-label="Select Delivery Address"
-                      className="w-full h-11 px-3 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 shadow-2xs"
+                      className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 shadow-2xs"
                     >
                       {addresses.map((a) => (
                         <option key={a.id} value={a.id}>
@@ -476,7 +667,7 @@ export default function OrderWaterPage() {
                 <div>
                   <input
                     type="text"
-                    placeholder="Delivery instructions (e.g. Call at gate, leave with reception)"
+                    placeholder="Delivery instructions (e.g. Call 0244950505 upon arrival, leave with security reception)"
                     value={deliveryInstructions}
                     onChange={(e) => setDeliveryInstructions(e.target.value)}
                     className="w-full h-11 px-3.5 text-xs rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 shadow-2xs"
@@ -576,7 +767,7 @@ export default function OrderWaterPage() {
                       </span>
                     </label>
                     <span className="text-[11px] text-emerald-700 dark:text-emerald-300 pl-6.5 block">
-                      You have {profile?.freeBottleBalance} free bottle reward {profile?.freeBottleBalance === 1 ? "credit" : "credits"} available from your referrals!
+                      You have {profile?.freeBottleBalance} free bottle reward credit available!
                     </span>
                   </div>
                 )}
@@ -655,7 +846,201 @@ export default function OrderWaterPage() {
             </div>
           </div>
         )}
+
+        {/* MODAL: Inline Add Delivery Address (Dual Choice: Live GPS Location vs Type Digital Address) */}
+        <Modal
+          isOpen={isAddAddressModalOpen}
+          onClose={() => setIsAddAddressModalOpen(false)}
+          title="Add Delivery Location"
+        >
+          {newAddressError && (
+            <div className="mb-4 p-3 rounded-lg text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400">
+              {newAddressError}
+            </div>
+          )}
+
+          <form onSubmit={handleSaveNewAddress} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                How would you like to set your delivery location?
+              </label>
+              <div className="p-1 rounded-2xl bg-gray-100 dark:bg-gray-800/80 flex items-center gap-1 border border-gray-200/80 dark:border-gray-700">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddressInputMode("gps");
+                    handleDetectGPS();
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                    addressInputMode === "gps"
+                      ? "bg-white dark:bg-gray-900 text-brand-600 dark:text-sky-400 shadow-xs"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <svg className="size-3.5 text-brand-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M12 2v3m0 14v3M2 12h3m14 0h3" />
+                  </svg>
+                  <span>Use Current Location</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAddressInputMode("digital")}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                    addressInputMode === "digital"
+                      ? "bg-white dark:bg-gray-900 text-brand-600 dark:text-sky-400 shadow-xs"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <svg className="size-3.5 text-sky-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 01-1.581.814L10 14.197l-4.419 2.617A1 1 0 014 16V4zm2 2v8.528l3.419-2.025a1 1 0 011.162 0L14 14.528V6H6z" clipRule="evenodd" />
+                  </svg>
+                  <span>Type Digital Address</span>
+                </button>
+              </div>
+            </div>
+
+            {/* GPS Detection Box */}
+            {addressInputMode === "gps" && (
+              <div className="p-3.5 rounded-2xl bg-brand-50/50 dark:bg-brand-950/20 border border-brand-200/80 dark:border-brand-900/60 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-brand-800 dark:text-sky-300">
+                    Live GPS Geolocation
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleDetectGPS}
+                    disabled={isDetectingLocation}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 px-3 py-1.5 rounded-xl transition shadow-xs disabled:opacity-50 cursor-pointer"
+                  >
+                    {isDetectingLocation ? (
+                      <>
+                        <span className="inline-block size-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Locating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="3" />
+                          <path d="M12 2v3m0 14v3M2 12h3m14 0h3" />
+                        </svg>
+                        <span>Detect Location</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {locationDetectedText ? (
+                  <div className="flex items-center gap-2 text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 p-2 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                    <svg className="size-4 shrink-0 text-emerald-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    <span>{locationDetectedText}</span>
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                    Tap &ldquo;Detect Location&rdquo; to use your device GPS for instant delivery to where you are.
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Location Type
+                </label>
+                <select
+                  value={newAddressCategory}
+                  onChange={(e) => setNewAddressCategory(e.target.value as AddressCategory)}
+                  className="w-full h-10 px-3 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+                >
+                  <option value="HOME">Residential Home</option>
+                  <option value="OFFICE">Corporate Office</option>
+                  <option value="SHOP">Commercial Shop / Store</option>
+                  <option value="WAREHOUSE">Warehouse / Facility</option>
+                  <option value="SCHOOL">School / Institution</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Ghana Digital Address
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. GA-492-1029"
+                  value={newDigitalAddress}
+                  onChange={(e) => setNewDigitalAddress(e.target.value)}
+                  className="w-full h-10 px-3 text-xs sm:text-sm font-mono rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition uppercase"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Street Name &amp; Area Landmark
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. House 14, Boundary Road"
+                value={newAreaName}
+                onChange={(e) => setNewAreaName(e.target.value)}
+                className="w-full h-10 px-3 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Drop-Off &amp; Driver Instructions (Optional)
+              </label>
+              <textarea
+                rows={2}
+                placeholder="e.g. Call 0244950505 upon arrival, leave with security reception."
+                value={newDeliveryInstructions}
+                onChange={(e) => setNewDeliveryInstructions(e.target.value)}
+                className="w-full p-2.5 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+              <button
+                type="button"
+                onClick={() => setIsAddAddressModalOpen(false)}
+                className="px-4 py-2 text-xs font-medium rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSavingAddress}
+                className="px-4 py-2 text-xs font-bold rounded-xl text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs disabled:opacity-50 cursor-pointer"
+              >
+                {isSavingAddress ? "Saving..." : "Save Location"}
+              </button>
+            </div>
+          </form>
+        </Modal>
       </div>
     </AppLayout>
+  );
+}
+
+export default function OrderWaterPage() {
+  return (
+    <Suspense
+      fallback={
+        <AppLayout role="CUSTOMER">
+          <div className="max-w-4xl mx-auto py-12 flex justify-center">
+            <div className="size-8 rounded-full border-2 border-brand-500 border-t-transparent animate-spin" />
+          </div>
+        </AppLayout>
+      }
+    >
+      <OrderWaterInner />
+    </Suspense>
   );
 }

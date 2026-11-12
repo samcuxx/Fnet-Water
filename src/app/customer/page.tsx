@@ -236,12 +236,21 @@ export default function CustomerDashboardPage() {
             )}
           </div>
 
-          <Link
-            href="/customer/order"
-            className="inline-flex items-center justify-center px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs self-start sm:self-auto cursor-pointer"
-          >
-            Order Water Refill
-          </Link>
+          {/* Dual Order Actions: Refill & Non-Refill */}
+          <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
+            <Link
+              href="/customer/order?type=refill"
+              className="inline-flex items-center justify-center px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs cursor-pointer"
+            >
+              Order Refill
+            </Link>
+            <Link
+              href="/customer/order?type=non-refill"
+              className="inline-flex items-center justify-center px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-brand-600 dark:text-sky-400 bg-white dark:bg-gray-900 border border-brand-500/80 dark:border-sky-400/80 hover:bg-brand-50/60 dark:hover:bg-brand-950/40 active:bg-brand-100 transition shadow-xs cursor-pointer"
+            >
+              Order Non-Refill
+            </Link>
+          </div>
         </motion.div>
 
         {/* 3-Pill Status Summary Strip */}

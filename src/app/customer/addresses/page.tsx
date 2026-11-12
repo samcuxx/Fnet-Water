@@ -25,15 +25,87 @@ export default function CustomerAddressesPage() {
   const [activeAddress, setActiveAddress] = useState<StoredAddress | null>(null);
 
   // Form state
-  const [formData, setFormData] = useState({
-    category: "HOME" as AddressCategory,
+  const [formData, setFormData] = useState<{
+    category: AddressCategory;
+    areaName: string;
+    digitalAddress: string;
+    deliveryInstructions: string;
+    isDefault: boolean;
+    gpsLatitude?: number;
+    gpsLongitude?: number;
+  }>({
+    category: "HOME",
     areaName: "",
     digitalAddress: "",
     deliveryInstructions: "",
     isDefault: false,
+    gpsLatitude: undefined,
+    gpsLongitude: undefined,
   });
+  const [addressInputMode, setAddressInputMode] = useState<"gps" | "digital">("gps");
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [locationDetectedText, setLocationDetectedText] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // GPS Location detector
+  const handleDetectCurrentLocation = () => {
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      setFormError("Geolocation is not supported by your browser. Please type your digital address.");
+      return;
+    }
+
+    setIsDetectingLocation(true);
+    setFormError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const latPart = Math.abs(Math.round(latitude * 100));
+        const lngPart = Math.abs(Math.round(longitude * 1000)).toString().padStart(4, "0").slice(-4);
+        const generatedCode = `GA-${latPart}-${lngPart}`;
+        
+        let detectedArea = "Current Location, Greater Accra";
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3500);
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+            { signal: controller.signal }
+          );
+          clearTimeout(timeoutId);
+          if (res.ok) {
+            const data = await res.json();
+            const a = data.address || {};
+            const road = a.road || a.suburb || a.neighbourhood || a.quarter;
+            const city = a.city || a.town || a.county || "Accra";
+            if (road) {
+              detectedArea = `${road}, ${city}`;
+            }
+          }
+        } catch {
+          detectedArea = `GPS Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)}), Accra`;
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          digitalAddress: generatedCode,
+          areaName: prev.areaName ? prev.areaName : detectedArea,
+          gpsLatitude: latitude,
+          gpsLongitude: longitude,
+        }));
+
+        setLocationDetectedText(`Location captured: ${latitude.toFixed(4)}° N, ${longitude.toFixed(4)}° E`);
+        setIsDetectingLocation(false);
+      },
+      (err) => {
+        console.warn("Geolocation lookup error:", err);
+        setFormError("Could not retrieve current location. Please allow location access or type your digital address.");
+        setIsDetectingLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 9000 }
+    );
+  };
 
   // Load addresses from API
   const loadAddresses = useCallback(async () => {
@@ -483,6 +555,92 @@ export default function CustomerAddressesPage() {
           )}
 
           <form onSubmit={handleCreateAddress} className="space-y-4">
+            {/* Location Selection Method: Current GPS Location vs Type Digital Address */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                How would you like to set your delivery location?
+              </label>
+              <div className="p-1 rounded-2xl bg-gray-100 dark:bg-gray-800/80 flex items-center gap-1 border border-gray-200/80 dark:border-gray-700">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddressInputMode("gps");
+                    handleDetectCurrentLocation();
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                    addressInputMode === "gps"
+                      ? "bg-white dark:bg-gray-900 text-brand-600 dark:text-sky-400 shadow-xs"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <svg className="size-3.5 text-brand-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M12 2v3m0 14v3M2 12h3m14 0h3" />
+                  </svg>
+                  <span>Use Current Location</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAddressInputMode("digital")}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                    addressInputMode === "digital"
+                      ? "bg-white dark:bg-gray-900 text-brand-600 dark:text-sky-400 shadow-xs"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <svg className="size-3.5 text-sky-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 01-1.581.814L10 14.197l-4.419 2.617A1 1 0 014 16V4zm2 2v8.528l3.419-2.025a1 1 0 011.162 0L14 14.528V6H6z" clipRule="evenodd" />
+                  </svg>
+                  <span>Type Digital Address</span>
+                </button>
+              </div>
+            </div>
+
+            {/* GPS Detection Box */}
+            {addressInputMode === "gps" && (
+              <div className="p-3.5 rounded-2xl bg-brand-50/50 dark:bg-brand-950/20 border border-brand-200/80 dark:border-brand-900/60 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-brand-800 dark:text-sky-300">
+                    Live GPS Geolocation
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleDetectCurrentLocation}
+                    disabled={isDetectingLocation}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 px-3 py-1.5 rounded-xl transition shadow-xs disabled:opacity-50 cursor-pointer"
+                  >
+                    {isDetectingLocation ? (
+                      <>
+                        <span className="inline-block size-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Locating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="3" />
+                          <path d="M12 2v3m0 14v3M2 12h3m14 0h3" />
+                        </svg>
+                        <span>Detect Location</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {locationDetectedText ? (
+                  <div className="flex items-center gap-2 text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 p-2 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                    <svg className="size-4 shrink-0 text-emerald-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    <span>{locationDetectedText}</span>
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                    Click &ldquo;Detect Location&rdquo; to use your phone or browser GPS to deliver water directly to where you are.
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -493,7 +651,7 @@ export default function CustomerAddressesPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, category: e.target.value as AddressCategory })
                   }
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+                  className="w-full h-10 px-3 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
                 >
                   <option value="HOME">Residential Home</option>
                   <option value="OFFICE">Corporate Office</option>
@@ -514,7 +672,7 @@ export default function CustomerAddressesPage() {
                   placeholder="e.g. GA-492-1029"
                   value={formData.digitalAddress}
                   onChange={(e) => setFormData({ ...formData, digitalAddress: e.target.value })}
-                  className="w-full h-9 px-3 text-sm font-mono rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition uppercase"
+                  className="w-full h-10 px-3 text-xs sm:text-sm font-mono rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition uppercase"
                 />
               </div>
             </div>
@@ -529,7 +687,7 @@ export default function CustomerAddressesPage() {
                 placeholder="e.g. House 14, Boundary Road"
                 value={formData.areaName}
                 onChange={(e) => setFormData({ ...formData, areaName: e.target.value })}
-                className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+                className="w-full h-10 px-3 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
               />
             </div>
 
@@ -539,10 +697,10 @@ export default function CustomerAddressesPage() {
               </label>
               <textarea
                 rows={2}
-                placeholder="e.g. Call 0241000005 upon arrival, leave with security reception."
+                placeholder="e.g. Call 0244950505 upon arrival, leave with security reception."
                 value={formData.deliveryInstructions}
                 onChange={(e) => setFormData({ ...formData, deliveryInstructions: e.target.value })}
-                className="w-full p-2.5 text-xs sm:text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+                className="w-full p-2.5 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
               />
             </div>
 
@@ -554,7 +712,7 @@ export default function CustomerAddressesPage() {
                 onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
                 className="rounded border-gray-300 text-brand-600 focus:ring-brand-500"
               />
-              <label htmlFor="isDefaultAdd" className="text-xs text-gray-700 dark:text-gray-300">
+              <label htmlFor="isDefaultAdd" className="text-xs text-gray-700 dark:text-gray-300 cursor-pointer">
                 Set as my default delivery location for water orders
               </label>
             </div>
@@ -563,14 +721,14 @@ export default function CustomerAddressesPage() {
               <button
                 type="button"
                 onClick={() => setIsAddModalOpen(false)}
-                className="px-4 py-2 text-xs font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
+                className="px-4 py-2 text-xs font-medium rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 text-xs font-medium rounded-lg text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs disabled:opacity-50 cursor-pointer"
+                className="px-4 py-2 text-xs font-bold rounded-xl text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs disabled:opacity-50 cursor-pointer"
               >
                 {isSubmitting ? "Saving..." : "Save Location"}
               </button>
@@ -591,6 +749,21 @@ export default function CustomerAddressesPage() {
           )}
 
           <form onSubmit={handleSaveEdit} className="space-y-4">
+            {/* Quick Detect / Update with Current Location */}
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-brand-50/50 dark:bg-brand-950/20 border border-brand-200/80 dark:border-brand-900/60 text-xs">
+              <span className="font-medium text-brand-800 dark:text-sky-300">
+                Want to update with current location?
+              </span>
+              <button
+                type="button"
+                onClick={handleDetectCurrentLocation}
+                disabled={isDetectingLocation}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 transition shadow-xs disabled:opacity-50 cursor-pointer"
+              >
+                {isDetectingLocation ? "Locating..." : "Use Current GPS"}
+              </button>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -601,7 +774,7 @@ export default function CustomerAddressesPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, category: e.target.value as AddressCategory })
                   }
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+                  className="w-full h-10 px-3 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
                 >
                   <option value="HOME">Residential Home</option>
                   <option value="OFFICE">Corporate Office</option>
@@ -621,7 +794,7 @@ export default function CustomerAddressesPage() {
                   required
                   value={formData.digitalAddress}
                   onChange={(e) => setFormData({ ...formData, digitalAddress: e.target.value })}
-                  className="w-full h-9 px-3 text-sm font-mono rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition uppercase"
+                  className="w-full h-10 px-3 text-xs sm:text-sm font-mono rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition uppercase"
                 />
               </div>
             </div>

@@ -126,13 +126,17 @@ const memoryCustomerProfiles: Map<string, StoredCustomerProfile> = (() => {
 })();
 
 /**
- * Validate Ghana Digital Address format (e.g. GA-183-9021, AK-039-1102)
+ * Validate Ghana Digital Address format (e.g. GA-183-9021, AK-039-1102) or GPS Coordinates
  */
 export function isValidGhanaDigitalAddress(code: string): boolean {
+  if (!code) return false;
   const cleaned = code.trim().toUpperCase();
   // Standard format: 2 letters, 3-4 digits, 4 digits (e.g. GA-492-1029 or GA4921029)
   const regex = /^[A-Z]{2}-?\d{3,4}-?\d{4}$/;
-  return regex.test(cleaned);
+  // GPS coordinates format (e.g. "GPS: 5.6508, -0.1554", "5.6508, -0.1554", "GA-GPS-1029")
+  const gpsRegex = /^(GPS:?\s*)?-?\d{1,3}\.\d+,\s*-?\d{1,3}\.\d+$/i;
+  const gpsTagRegex = /^[A-Z]{2,4}-(GPS|\d{3,4})-\d{4}$/i;
+  return regex.test(cleaned) || gpsRegex.test(cleaned) || gpsTagRegex.test(cleaned);
 }
 
 /**

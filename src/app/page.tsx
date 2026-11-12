@@ -1091,6 +1091,7 @@ export default function HomePage() {
               <li><Link href="/customer" className="hover:text-white transition">Customer Portal</Link></li>
               <li><Link href="/driver" className="hover:text-white transition">Driver Delivery App</Link></li>
               <li><Link href="/manager" className="hover:text-white transition">Dispatch & Operations</Link></li>
+              <li><Link href="/agent" className="hover:text-white transition">Agents & Supervisors</Link></li>
               <li><Link href="/admin" className="hover:text-white transition">Executive Admin Overview</Link></li>
             </ul>
           </div>
@@ -1098,7 +1099,7 @@ export default function HomePage() {
           <div>
             <h4 className="font-bold text-white uppercase tracking-wider mb-3">Support</h4>
             <div className="space-y-1.5">
-              <div>Phone: +233 24 000 0000</div>
+              <div>Phone: <a href="tel:+233244950505" className="hover:text-white transition">0244 95 05 05</a> / <a href="tel:+233550222888" className="hover:text-white transition">0550 222 888</a></div>
               <div>Hours: Mon – Sat, 6:00 AM – 7:00 PM</div>
               <div className="pt-2 text-[11px] text-gray-500">
                 &copy; {new Date().getFullYear()} F Net Water Hub. All rights reserved.

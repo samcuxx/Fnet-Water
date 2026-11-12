@@ -30,7 +30,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
     useSidebar();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
-  const isSidebarVisible = isExpanded || isHovered;
+  // When the mobile drawer is open or sidebar is expanded/hovered, show full names and details
+  const isSidebarVisible = isMobileOpen || isExpanded || isHovered;
 
   const toggleSubmenu = (name: string) => {
     setOpenSubmenu((prev) => (prev === name ? null : name));
@@ -218,11 +219,29 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
     ],
     AGENT: [
       {
-        name: "Agent Portal",
+        name: "Agent & Supervisor Hub",
         href: "/agent",
         icon: (
           <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+          </svg>
+        ),
+      },
+      {
+        name: "Zone Customers",
+        href: "/agent#customers",
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+          </svg>
+        ),
+      },
+      {
+        name: "Register Customer",
+        href: "/agent#register",
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M11 5a3 3 0 11-6 0 3 3 0 016 0zM2.615 16.428a1.224 1.224 0 01-.569-1.047 6.996 6.996 0 0110.87-5.845.75.75 0 00.868-.12 8.46 8.46 0 00-1.534-.916A4.5 4.5 0 008.5 8a4.5 4.5 0 10-.12 8.998c.414 0 .817-.035 1.208-.102a.75.75 0 00.327-.14 7.027 7.027 0 01-7.299-.328zM17 12.5a.75.75 0 00-.75.75v1.5h-1.5a.75.75 0 000 1.5h1.5v1.5a.75.75 0 001.5 0v-1.5h1.5a.75.75 0 000-1.5h-1.5v-1.5A.75.75 0 0017 12.5z" />
           </svg>
         ),
       },
