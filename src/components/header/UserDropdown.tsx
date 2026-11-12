@@ -2,10 +2,9 @@
 
 import React, { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { User, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
 import { Dropdown } from "@/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
-import Badge from "@/components/ui/badge";
+import Badge from "@/components/ui/badge/Badge";
 
 export default function UserDropdown() {
   const { data: session } = useSession();
@@ -82,11 +81,21 @@ export default function UserDropdown() {
           </span>
         </div>
 
-        <ChevronDown
+        <svg
           className={`size-4 text-gray-400 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
           }`}
-        />
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+        >
+          <path
+            d="M5 7.5L10 12.5L15 7.5"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       </button>
 
       <Dropdown
@@ -99,7 +108,7 @@ export default function UserDropdown() {
             <span className="block font-semibold text-xs text-gray-900 dark:text-white truncate max-w-[150px]">
               {displayName}
             </span>
-            <Badge size="sm" color="primary">
+            <Badge size="sm" variant="light" color="primary">
               {displayRole}
             </Badge>
           </div>
@@ -110,12 +119,20 @@ export default function UserDropdown() {
 
         <div className="space-y-1">
           <DropdownItem tag="a" href="/profile" onItemClick={closeDropdown}>
-            <User className="size-4 text-gray-500" />
+            <svg className="size-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fillRule="evenodd"
+                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                clipRule="evenodd"
+              />
+            </svg>
             <span>My Profile</span>
           </DropdownItem>
 
           <DropdownItem tag="a" href={getDashboardHref(displayRole)} onItemClick={closeDropdown}>
-            <LayoutDashboard className="size-4 text-gray-500" />
+            <svg className="size-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+            </svg>
             <span>Dashboard</span>
           </DropdownItem>
         </div>
@@ -127,7 +144,13 @@ export default function UserDropdown() {
             disabled={isSigningOut}
             className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition text-left cursor-pointer disabled:opacity-50"
           >
-            <LogOut className="size-4" />
+            <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fillRule="evenodd"
+                d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+                clipRule="evenodd"
+              />
+            </svg>
             <span>{isSigningOut ? "Signing Out..." : "Sign Out"}</span>
           </button>
         </div>

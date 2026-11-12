@@ -77,18 +77,18 @@ export default function BottleCirculationGauge({
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card text-card-foreground p-5 sm:p-6 shadow-xs flex flex-col justify-between h-full">
+    <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base sm:text-lg font-bold text-card-foreground">
+            <h3 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white">
               Bottle Circulation
             </h3>
-            <p className="mt-0.5 text-xs text-muted-foreground">
+            <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
               Active working bottles across customer fleet
             </p>
           </div>
-          <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+          <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
             Active Fleet
           </span>
         </div>
@@ -98,16 +98,16 @@ export default function BottleCirculationGauge({
         </div>
       </div>
 
-      <div className="pt-3 border-t border-border grid grid-cols-3 gap-2 text-center text-xs">
+      <div className="pt-3 border-t border-gray-100 dark:border-gray-800 grid grid-cols-3 gap-2 text-center text-xs">
         <div>
-          <span className="text-muted-foreground block text-[11px]">With Customers</span>
-          <span className="font-bold text-card-foreground text-sm">
+          <span className="text-gray-400 block text-[11px]">With Customers</span>
+          <span className="font-bold text-gray-900 dark:text-white text-sm">
             {withCustomers}
           </span>
         </div>
         <div>
-          <span className="text-muted-foreground block text-[11px]">In Warehouse</span>
-          <span className="font-bold text-card-foreground text-sm">
+          <span className="text-gray-400 block text-[11px]">In Warehouse</span>
+          <span className="font-bold text-gray-900 dark:text-white text-sm">
             {inWarehouse}
           </span>
         </div>

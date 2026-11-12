@@ -4,19 +4,6 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import {
-  Bell,
-  CheckCircle2,
-  ShoppingBag,
-  Truck,
-  Gift,
-  Cpu,
-  AlertTriangle,
-  Info,
-  CreditCard,
-  Check,
-  ChevronRight,
-} from "lucide-react";
 import { useToast } from "@/context/ToastContext";
 
 export interface NotificationItem {
@@ -82,6 +69,7 @@ export default function NotificationDropdown() {
 
   useEffect(() => {
     fetchNotifications();
+    // Poll every 30 seconds for live updates
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
   }, [session?.user]);
@@ -99,6 +87,7 @@ export default function NotificationDropdown() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
+  // Toggle open
   const toggleDropdown = () => {
     if (!isOpen) {
       fetchNotifications();
@@ -148,21 +137,19 @@ export default function NotificationDropdown() {
     }
   };
 
-  const handleNotificationClick = async (notif: NotificationItem) => {
+  // Click notification to navigate
+  const handleNotificationClick = (notif: NotificationItem) => {
     if (!notif.isRead) {
-      try {
-        await fetch("/api/notifications", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: notif.id }),
-        });
-        setNotifications((prev) =>
-          prev.map((n) => (n.id === notif.id ? { ...n, isRead: true } : n))
-        );
-        setUnreadCount((prev) => Math.max(0, prev - 1));
-      } catch (err) {
-        console.warn("Failed marking notification read on click", err);
-      }
+      // Mark read in background
+      fetch("/api/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: notif.id }),
+      }).catch(() => {});
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notif.id ? { ...n, isRead: true } : n))
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
     }
     setIsOpen(false);
     if (notif.linkUrl) {
@@ -170,37 +157,13 @@ export default function NotificationDropdown() {
     }
   };
 
-  const filteredNotifications = notifications.filter((notif) => {
-    if (activeTab === "UNREAD") return !notif.isRead;
-    if (activeTab === "ORDERS") return notif.type === "ORDER" || notif.type === "DELIVERY";
-    if (activeTab === "ALERTS")
-      return (
-        notif.type === "DISPENSER" ||
-        notif.type === "INVENTORY" ||
-        notif.type === "SYSTEM"
-      );
+  // Filtered list
+  const filteredNotifications = notifications.filter((n) => {
+    if (activeTab === "UNREAD") return !n.isRead;
+    if (activeTab === "ORDERS") return n.type === "ORDER" || n.type === "DELIVERY";
+    if (activeTab === "ALERTS") return n.type === "DISPENSER" || n.type === "INVENTORY";
     return true;
   });
-
-  const getNotificationIcon = (type: NotificationItem["type"]) => {
-    switch (type) {
-      case "ORDER":
-        return <ShoppingBag className="size-4" />;
-      case "DELIVERY":
-        return <Truck className="size-4" />;
-      case "REWARD":
-        return <Gift className="size-4" />;
-      case "DISPENSER":
-        return <Cpu className="size-4" />;
-      case "INVENTORY":
-        return <AlertTriangle className="size-4" />;
-      case "PAYMENT":
-        return <CreditCard className="size-4" />;
-      case "SYSTEM":
-      default:
-        return <Info className="size-4" />;
-    }
-  };
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -209,12 +172,25 @@ export default function NotificationDropdown() {
         type="button"
         onClick={toggleDropdown}
         aria-label="View notifications"
-        className="relative flex items-center justify-center size-9 rounded-xl border border-border bg-card text-foreground hover:bg-muted transition shadow-xs focus:outline-hidden cursor-pointer"
+        className="relative flex items-center justify-center size-9 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition shadow-xs focus:outline-hidden cursor-pointer"
       >
-        <Bell className="size-4.5" />
+        <svg
+          className="size-4.5"
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
 
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground ring-2 ring-background animate-pulse">
+          <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-brand-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-gray-950 animate-pulse">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
@@ -222,15 +198,15 @@ export default function NotificationDropdown() {
 
       {/* Dropdown Menu Panel */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 rounded-lg border border-border bg-popover/95 text-popover-foreground shadow-2xl backdrop-blur-xl z-50 overflow-hidden flex flex-col animate-in fade-in-0 zoom-in-95 duration-150">
+        <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 rounded-2xl border border-gray-200/90 dark:border-gray-800/90 bg-white/95 dark:bg-gray-900/95 shadow-2xl backdrop-blur-xl z-50 overflow-hidden flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/40">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800/80 bg-gray-50/50 dark:bg-gray-950/40">
             <div className="flex items-center gap-2">
-              <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">
                 Notification Center
               </h4>
               {unreadCount > 0 && (
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-sky-300">
                   {unreadCount} unread
                 </span>
               )}
@@ -239,7 +215,7 @@ export default function NotificationDropdown() {
               <button
                 type="button"
                 onClick={handleMarkAllRead}
-                className="text-[11px] font-semibold text-primary hover:underline transition cursor-pointer"
+                className="text-[11px] font-semibold text-brand-600 dark:text-sky-400 hover:text-brand-800 dark:hover:text-sky-300 transition cursor-pointer"
               >
                 Mark all read
               </button>
@@ -247,14 +223,14 @@ export default function NotificationDropdown() {
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex items-center gap-1 px-3 py-2 border-b border-border bg-popover overflow-x-auto text-[11px]">
+          <div className="flex items-center gap-1 px-3 py-2 border-b border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900 overflow-x-auto text-[11px]">
             <button
               type="button"
               onClick={() => setActiveTab("ALL")}
               className={`px-2.5 py-1 rounded-lg font-medium transition cursor-pointer whitespace-nowrap ${
                 activeTab === "ALL"
-                  ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:bg-muted"
+                  ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900 font-bold"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
               }`}
             >
               All
@@ -264,19 +240,19 @@ export default function NotificationDropdown() {
               onClick={() => setActiveTab("UNREAD")}
               className={`px-2.5 py-1 rounded-lg font-medium transition cursor-pointer whitespace-nowrap ${
                 activeTab === "UNREAD"
-                  ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:bg-muted"
+                  ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900 font-bold"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
               }`}
             >
-              Unread
+              Unread ({unreadCount})
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("ORDERS")}
               className={`px-2.5 py-1 rounded-lg font-medium transition cursor-pointer whitespace-nowrap ${
                 activeTab === "ORDERS"
-                  ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:bg-muted"
+                  ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900 font-bold"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
               }`}
             >
               Orders
@@ -286,8 +262,8 @@ export default function NotificationDropdown() {
               onClick={() => setActiveTab("ALERTS")}
               className={`px-2.5 py-1 rounded-lg font-medium transition cursor-pointer whitespace-nowrap ${
                 activeTab === "ALERTS"
-                  ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:bg-muted"
+                  ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900 font-bold"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
               }`}
             >
               Alerts
@@ -295,20 +271,26 @@ export default function NotificationDropdown() {
           </div>
 
           {/* Notifications List */}
-          <div className="max-h-80 overflow-y-auto divide-y divide-border custom-scrollbar">
+          <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-800/60">
             {isLoading && notifications.length === 0 ? (
-              <div className="p-8 text-center text-xs text-muted-foreground">
+              <div className="p-8 text-center text-xs text-gray-500 dark:text-gray-400">
                 Loading notifications...
               </div>
             ) : filteredNotifications.length === 0 ? (
               <div className="p-8 text-center">
-                <div className="size-10 rounded-full bg-muted flex items-center justify-center mx-auto mb-2 text-muted-foreground">
-                  <CheckCircle2 className="size-5 text-emerald-500" />
+                <div className="size-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-2 text-gray-400">
+                  <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 </div>
-                <p className="text-xs font-semibold text-foreground">
+                <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                   No notifications
                 </p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
                   You are all caught up on alerts.
                 </p>
               </div>
@@ -317,9 +299,9 @@ export default function NotificationDropdown() {
                 <div
                   key={notif.id}
                   onClick={() => handleNotificationClick(notif)}
-                  className={`p-3.5 flex items-start gap-3 hover:bg-muted/50 transition cursor-pointer group ${
+                  className={`p-3.5 flex items-start gap-3 hover:bg-gray-50/80 dark:hover:bg-gray-800/40 transition cursor-pointer group ${
                     !notif.isRead
-                      ? "bg-accent/40"
+                      ? "bg-brand-50/25 dark:bg-brand-950/20"
                       : "bg-transparent"
                   }`}
                 >
@@ -327,32 +309,74 @@ export default function NotificationDropdown() {
                   <div
                     className={`size-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
                       notif.type === "ORDER"
-                        ? "bg-primary/10 text-primary"
+                        ? "bg-brand-100 text-brand-600 dark:bg-brand-950 dark:text-sky-300"
                         : notif.type === "DELIVERY"
-                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300"
                         : notif.type === "REWARD"
-                        ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                        ? "bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-300"
                         : notif.type === "DISPENSER"
-                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                        ? "bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-300"
                         : notif.type === "INVENTORY"
-                        ? "bg-destructive/10 text-destructive"
-                        : "bg-muted text-muted-foreground"
+                        ? "bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-300"
+                        : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
                     }`}
                   >
-                    {getNotificationIcon(notif.type)}
+                    {notif.type === "ORDER" && (
+                      <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+                        <path
+                          fillRule="evenodd"
+                          d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                    {notif.type === "DELIVERY" && (
+                      <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                        <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7h-2v4h4v-2a2 2 0 00-2-2z" />
+                      </svg>
+                    )}
+                    {notif.type === "REWARD" && (
+                      <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fillRule="evenodd"
+                          d="M10 2a1 1 0 01.894.553l2.991 5.982 6.603.96a1 1 0 01.554 1.705l-4.778 4.657 1.128 6.576a1 1 0 01-1.451 1.054L10 16.347l-5.921 3.14a1 1 0 01-1.451-1.054l1.128-6.576L-1.022 11.2a1 1 0 01.554-1.705l6.603-.96 2.991-5.982A1 1 0 0110 2z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                    {(notif.type === "DISPENSER" || notif.type === "INVENTORY") && (
+                      <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fillRule="evenodd"
+                          d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                    {(notif.type === "SYSTEM" || notif.type === "PAYMENT") && (
+                      <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
                   </div>
 
                   {/* Notification Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-1">
-                      <h5 className="text-xs font-bold text-foreground truncate">
+                      <h5 className="text-xs font-bold text-gray-900 dark:text-white truncate">
                         {notif.title}
                       </h5>
-                      <span className="text-[10px] text-muted-foreground whitespace-nowrap shrink-0">
+                      <span className="text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap shrink-0">
                         {formatRelativeTime(notif.createdAt)}
                       </span>
                     </div>
-                    <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5 leading-relaxed">
+                    <p className="text-[11px] text-gray-600 dark:text-gray-400 line-clamp-2 mt-0.5 leading-relaxed">
                       {notif.message}
                     </p>
                   </div>
@@ -363,9 +387,15 @@ export default function NotificationDropdown() {
                       type="button"
                       title="Mark as read"
                       onClick={(e) => handleMarkSingleRead(notif.id, e)}
-                      className="size-5 rounded-full hover:bg-muted flex items-center justify-center shrink-0 opacity-0 group-hover:opacity-100 transition cursor-pointer text-muted-foreground hover:text-foreground"
+                      className="size-5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center shrink-0 opacity-0 group-hover:opacity-100 transition cursor-pointer text-gray-400 hover:text-gray-700 dark:hover:text-white"
                     >
-                      <Check className="size-3" />
+                      <svg className="size-3" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                     </button>
                   )}
                 </div>
@@ -374,14 +404,13 @@ export default function NotificationDropdown() {
           </div>
 
           {/* Bottom Footer Link */}
-          <div className="p-2.5 border-t border-border bg-muted/30 text-center">
+          <div className="p-2.5 border-t border-gray-100 dark:border-gray-800/80 bg-gray-50/50 dark:bg-gray-950/40 text-center">
             <Link
               href="/notifications"
               onClick={() => setIsOpen(false)}
-              className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline transition"
+              className="text-xs font-bold text-brand-600 dark:text-sky-400 hover:text-brand-800 dark:hover:text-sky-300 transition"
             >
-              <span>View all notifications</span>
-              <ChevronRight className="size-3.5" />
+              View all notifications →
             </Link>
           </div>
         </div>

@@ -1,10 +1,9 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/tailgrids/core/card";
-import type { ApexOptions } from "apexcharts";
-import { useTheme } from "next-themes";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import React, { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
+import type { ApexOptions } from "apexcharts";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -20,7 +19,7 @@ export default function MonthlyTarget() {
   const series = [72];
 
   const options: ApexOptions = {
-    colors: ["#12b76a"],
+    colors: ["#10B981"],
     chart: {
       fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
       type: "radialBar",
@@ -37,7 +36,7 @@ export default function MonthlyTarget() {
           size: "72%",
         },
         track: {
-          background: isDark ? "#1d2939" : "#e4e7ec",
+          background: isDark ? "#1F2937" : "#E4E7EC",
           strokeWidth: "100%",
           margin: 0,
         },
@@ -57,28 +56,25 @@ export default function MonthlyTarget() {
   };
 
   return (
-    <Card className="flex flex-col justify-between h-full">
-      <CardHeader>
-        <div>
-          <CardTitle className="text-sm font-semibold">Refill Quota & Returns</CardTitle>
-          <p className="text-xs text-text-tertiary mt-0.5">Accra monthly fulfillment goal</p>
-        </div>
-      </CardHeader>
-
-      <CardContent className="my-1 flex flex-col items-center justify-center">
-        <div className="text-3xl font-black text-text-primary tracking-tight">
+    <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs flex flex-col justify-between h-full">
+      <div>
+        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+          Refill Quota &amp; Bottle Returns
+        </span>
+        <div className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight mt-3">
           72%
         </div>
-        <div className="w-full flex justify-center items-center relative overflow-hidden -mb-4">
-          <Chart options={options} series={series} type="radialBar" height={200} width="100%" />
-        </div>
-      </CardContent>
+      </div>
 
-      <div className="text-center pt-2 border-t border-border-primary">
-        <span className="text-[11px] font-medium text-text-tertiary">
-          11,200 of 15,000 refills completed
+      <div className="my-2 flex justify-center items-center relative overflow-hidden -mb-4">
+        <Chart options={options} series={series} type="radialBar" height={220} width="100%" />
+      </div>
+
+      <div className="text-center pt-2">
+        <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500">
+          Deviation Index 2% · 11,200 of 15,000 Refills
         </span>
       </div>
-    </Card>
+    </div>
   );
 }

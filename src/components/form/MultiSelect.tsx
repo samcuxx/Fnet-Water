@@ -2,7 +2,6 @@
 
 import type React from "react";
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown, Check, X } from "lucide-react";
 
 export interface MultiSelectOption {
   value: string;
@@ -99,7 +98,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                     }}
                     className="cursor-pointer hover:text-brand-900 dark:hover:text-white"
                   >
-                    <X className="size-3" />
+                    ×
                   </span>
                 </span>
               );
@@ -107,11 +106,21 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
           )}
         </div>
 
-        <ChevronDown
+        <svg
           className={`size-4 text-gray-500 shrink-0 transition-transform ${
             isOpen ? "rotate-180" : ""
           }`}
-        />
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+        >
+          <path
+            d="M5 7.5L10 12.5L15 7.5"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       </button>
 
       {isOpen && (
@@ -130,7 +139,13 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
               >
                 <span>{opt.text}</span>
                 {isSelected && (
-                  <Check className="size-4 text-brand-600" />
+                  <svg className="size-4 text-brand-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      fillRule="evenodd"
+                      d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 )}
               </div>
             );

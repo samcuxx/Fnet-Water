@@ -1,31 +1,23 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo, Suspense } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
-import { Breadcrumbs } from "@/components/tailgrids/core/breadcrumbs";
-import { Card } from "@/components/tailgrids/core/card";
-import { Badge } from "@/components/tailgrids/core/badge";
-import { Button } from "@/components/tailgrids/core/button";
-import { SkeletonCard, SkeletonAppShell } from "@/components/ui/skeleton";
+import Badge from "@/components/ui/Badge";
+import { SkeletonCard } from "@/components/ui/skeleton";
 import type { StoredProduct } from "@/lib/product-store";
 import type { StoredAddress, StoredCustomerProfile } from "@/lib/customer-store";
 import type { PaymentMethod } from "@/lib/order-store";
-import { cn } from "@/utils/cn";
-import { Check, Minus, Plus, Droplet, ArrowRight, ShieldCheck, Package } from "lucide-react";
 
 interface CartState {
   [productId: string]: number;
 }
 
-type ProductFilterTab = "ALL" | "REFILL" | "NON_REFILL";
-
-function OrderWaterContent() {
+export default function OrderWaterPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const typeParam = searchParams.get("type");
 
   // Data
   const [products, setProducts] = useState<StoredProduct[]>([]);
@@ -33,28 +25,12 @@ function OrderWaterContent() {
   const [profile, setProfile] = useState<StoredCustomerProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Filter tab: defaults to query parameter
-  const [activeTab, setActiveTab] = useState<ProductFilterTab>(
-    typeParam === "non-refill" ? "NON_REFILL" : typeParam === "refill" ? "REFILL" : "ALL"
-  );
-
   // Cart & Order Options
-  const [cart, setCart] = useState<CartState>(() => {
-    const initial: CartState = {};
-    if (typeParam === "non-refill") {
-      initial["prod_001_non_refill"] = 1;
-    } else {
-      initial["prod_001"] = 2;
-    }
-    return initial;
-  });
-
+  const [cart, setCart] = useState<CartState>({ prod_001: 2 }); // Default 2 refill bottles
   const [hasEmptyBottleExchange, setHasEmptyBottleExchange] = useState(true);
   const [redeemFreeBottle, setRedeemFreeBottle] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
-  const [deliverySlot, setDeliverySlot] = useState<
-    "Morning (8am - 12pm)" | "Afternoon (12pm - 4pm)" | "Evening (4pm - 7pm)"
-  >("Morning (8am - 12pm)");
+  const [deliverySlot, setDeliverySlot] = useState<"Morning (8am - 12pm)" | "Afternoon (12pm - 4pm)" | "Evening (4pm - 7pm)">("Morning (8am - 12pm)");
   const [deliveryDate, setDeliveryDate] = useState<string>("Today");
   const [deliveryInstructions, setDeliveryInstructions] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("MOBILE_MONEY");
@@ -102,26 +78,6 @@ function OrderWaterContent() {
     loadData();
   }, [loadData]);
 
-  // If query parameter changes, sync tab
-  useEffect(() => {
-    if (typeParam === "non-refill") {
-      setActiveTab("NON_REFILL");
-    } else if (typeParam === "refill") {
-      setActiveTab("REFILL");
-    }
-  }, [typeParam]);
-
-  // Filtered products list
-  const filteredProducts = useMemo(() => {
-    if (activeTab === "REFILL") {
-      return products.filter((p) => p.type === "REFILLABLE_BOTTLE");
-    }
-    if (activeTab === "NON_REFILL") {
-      return products.filter((p) => p.type !== "REFILLABLE_BOTTLE");
-    }
-    return products;
-  }, [products, activeTab]);
-
   // Adjust quantity
   const handleQuantityChange = (productId: string, delta: number) => {
     setCart((prev) => {
@@ -138,30 +94,19 @@ function OrderWaterContent() {
 
   // Pricing calculations
   const totalItemsCount = Object.values(cart).reduce((a, b) => a + b, 0);
-
-  const refillBottlesCount = Object.entries(cart).reduce((sum, [pId, qty]) => {
-    const prod = products.find((p) => p.id === pId);
-    return prod?.type === "REFILLABLE_BOTTLE" ? sum + qty : sum;
-  }, 0);
+  const refillBottlesCount = cart["prod_001"] || 0;
 
   const subtotal = Object.entries(cart).reduce((sum, [pId, qty]) => {
     const prod = products.find((p) => p.id === pId);
     return sum + (prod ? prod.price * qty : 0);
   }, 0);
 
-  const depositFee =
-    !hasEmptyBottleExchange && refillBottlesCount > 0
-      ? refillBottlesCount * 80.0
-      : 0.0;
+  const depositFee = !hasEmptyBottleExchange && refillBottlesCount > 0
+    ? refillBottlesCount * 80.0
+    : 0.0;
 
-  const deliveryFee =
-    subtotal >= 100 || refillBottlesCount >= 3 || totalItemsCount === 0 ? 0.0 : 10.0;
-
-  const discountAmount =
-    redeemFreeBottle && (profile?.freeBottleBalance ?? 0) > 0 && refillBottlesCount > 0
-      ? 25.0
-      : 0.0;
-
+  const deliveryFee = subtotal >= 100 || refillBottlesCount >= 3 || totalItemsCount === 0 ? 0.0 : 10.0;
+  const discountAmount = redeemFreeBottle && (profile?.freeBottleBalance ?? 0) > 0 && refillBottlesCount > 0 ? 25.0 : 0.0;
   const totalAmount = Math.max(0, subtotal + depositFee + deliveryFee - discountAmount);
 
   // Place Order
@@ -192,10 +137,7 @@ function OrderWaterContent() {
           items: orderItems,
           deliveryAddressId: selectedAddressId || (addresses[0]?.id ?? ""),
           deliverySlot,
-          deliveryDate:
-            deliveryDate === "Today"
-              ? new Date().toISOString()
-              : new Date(Date.now() + 86400000).toISOString(),
+          deliveryDate: deliveryDate === "Today" ? new Date().toISOString() : new Date(Date.now() + 86400000).toISOString(),
           deliveryInstructions,
           hasEmptyBottleExchange,
           redeemFreeRefill: redeemFreeBottle,
@@ -210,14 +152,14 @@ function OrderWaterContent() {
         return;
       }
 
-      // Cash on delivery: show confirmation
+      // If Cash on Delivery: show instant confirmation
       if (paymentMethod === "CASH_ON_DELIVERY" || totalAmount === 0) {
         setConfirmedOrder(data.order);
         setIsSubmitting(false);
         return;
       }
 
-      // Online payment initialization
+      // Online Payment: Initialize gateway
       setSubmittingStatus("Redirecting to secure payment...");
       const origin = typeof window !== "undefined" ? window.location.origin : "";
       const initRes = await fetch("/api/payments/initialize", {
@@ -235,15 +177,16 @@ function OrderWaterContent() {
       const initData = await initRes.json();
       if (!initRes.ok || !initData.success || !initData.authorizationUrl) {
         setErrorMessage(
-          initData.error || "Could not connect to payment gateway. Please retry."
+          initData.error || "Could not connect to payment provider. Please try again."
         );
         setIsSubmitting(false);
         return;
       }
 
+      // Redirect to secure payment gateway
       window.location.href = initData.authorizationUrl;
     } catch {
-      setErrorMessage("Network connection error. Please try again.");
+      setErrorMessage("Network error occurred. Please try again.");
       setIsSubmitting(false);
     }
   };
@@ -252,153 +195,103 @@ function OrderWaterContent() {
 
   return (
     <AppLayout role="CUSTOMER">
-      <div className="space-y-6">
-        {/* Breadcrumbs & Page Header */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
               Order Water Delivery
             </h1>
-            <p className="mt-1 text-xs text-text-tertiary sm:text-sm">
-              Select your Refill or Non-Refill bottles and schedule fast delivery to your door in Ghana.
+            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              Select your refill bottles and schedule fast delivery to your door.
             </p>
           </div>
-          <div className="flex items-center gap-2.5">
-            <Breadcrumbs
-              dividerType="chevron"
-              items={[
-                { label: "Home", href: "/customer" },
-                { label: "Order Water" },
-              ]}
-            />
-          </div>
+          <Link
+            href="/customer/orders"
+            className="text-xs font-bold text-brand-600 dark:text-sky-400 hover:underline"
+          >
+            Past Orders →
+          </Link>
         </div>
 
         {/* FEEDBACK ALERT */}
         {errorMessage && (
-          <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs font-semibold text-rose-800 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
+          <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-xs font-medium text-rose-700 dark:text-rose-300">
             {errorMessage}
           </div>
         )}
 
-        {/* CONFIRMATION VIEW */}
+        {/* CONFIRMATION VIEW (When Cash on Delivery order is placed) */}
         {confirmedOrder ? (
-          <Card className="mx-auto max-w-lg p-6 sm:p-8 text-center space-y-5">
-            <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
-              <Check className="size-8" />
+          <div className="bg-white dark:bg-gray-900/70 rounded-[28px] p-6 sm:p-10 border border-gray-100 dark:border-gray-800/80 shadow-xs text-center max-w-lg mx-auto space-y-5">
+            <div className="size-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-xs">
+              <svg className="size-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
             </div>
 
             <div>
-              <Badge color="success" size="sm">
+              <span className="text-xs uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-bold block">
                 Order Confirmed
-              </Badge>
-              <h2 className="mt-2 text-2xl font-bold text-text-primary">
+              </span>
+              <h2 className="text-2xl font-black text-gray-900 dark:text-white mt-1">
                 {confirmedOrder.orderNumber}
               </h2>
-              <p className="mt-1 text-xs text-text-tertiary">
-                Scheduled delivery for {confirmedOrder.deliverySlot}.
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Scheduled for {confirmedOrder.deliverySlot}.
               </p>
             </div>
 
-            <div className="rounded-xl bg-background-gray-secondary p-4 text-left text-xs space-y-2.5 border border-card-border">
+            <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 text-left text-xs space-y-2.5">
               <div className="flex justify-between">
-                <span className="text-text-tertiary">Delivery Address:</span>
-                <span className="font-semibold text-text-primary truncate max-w-[200px]">
+                <span className="text-gray-500">Delivery Address:</span>
+                <span className="font-semibold text-gray-900 dark:text-white truncate max-w-[200px]">
                   {confirmedOrder.deliveryAddressText || selectedAddress?.areaName || "Saved Address"}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-text-tertiary">Payment:</span>
-                <span className="font-semibold text-text-primary font-mono">
+                <span className="text-gray-500">Payment:</span>
+                <span className="font-semibold text-gray-900 dark:text-white">
                   Cash on Delivery (GH₵ {confirmedOrder.totalAmount?.toFixed(2) || totalAmount.toFixed(2)})
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-text-tertiary">Bottle Option:</span>
+                <span className="text-gray-500">Bottle Exchange:</span>
                 <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                  {refillBottlesCount > 0
-                    ? hasEmptyBottleExchange
-                      ? "Refill: Returning empties (No deposit fee)"
-                      : "Refill: Deposit included"
-                    : "Non-Refill (Single use)"}
+                  {hasEmptyBottleExchange ? "Returning empties (No deposit fee)" : "Deposit included"}
                 </span>
               </div>
             </div>
 
-            <div className="flex flex-col gap-2.5 pt-2 sm:flex-row">
-              <Button asChild className="w-full">
-                <Link href="/customer/orders">Track My Delivery</Link>
-              </Button>
-              <Button
-                appearance="outline"
-                className="w-full"
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+              <Link
+                href="/customer/orders"
+                className="w-full py-3 rounded-2xl text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 transition shadow-xs text-center"
+              >
+                Track My Delivery
+              </Link>
+              <button
+                type="button"
                 onClick={() => {
                   setConfirmedOrder(null);
                   setCart({ prod_001: 2 });
                 }}
+                className="w-full py-3 rounded-2xl text-xs font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 transition text-center cursor-pointer"
               >
                 Order More
-              </Button>
+              </button>
             </div>
-          </Card>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
+          /* ONE-PAGE CHECKOUT */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* LEFT COLUMN: Products, Address, Payment */}
-            <div className="space-y-6 lg:col-span-7">
+            <div className="lg:col-span-7 space-y-5">
               {/* 1. Products Selection */}
-              <Card className="p-6 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-card-border pb-3">
-                  <div>
-                    <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
-                      1. Select Bottles &amp; Products
-                    </h3>
-                    <p className="text-[11px] text-text-tertiary mt-0.5">
-                      Choose between reusable Refill bottles and single-use Non-Refill products.
-                    </p>
-                  </div>
-
-                  {/* Refill vs Non-Refill Tabs */}
-                  <div className="flex items-center gap-1 rounded-lg border border-card-border p-1 bg-background-gray-secondary/50 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("ALL")}
-                      className={cn(
-                        "px-2.5 py-1 text-xs font-semibold rounded-md transition cursor-pointer",
-                        activeTab === "ALL"
-                          ? "bg-primary text-white shadow-xs"
-                          : "text-text-tertiary hover:text-text-primary"
-                      )}
-                    >
-                      All
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("REFILL")}
-                      className={cn(
-                        "px-2.5 py-1 text-xs font-semibold rounded-md transition cursor-pointer flex items-center gap-1",
-                        activeTab === "REFILL"
-                          ? "bg-primary text-white shadow-xs"
-                          : "text-text-tertiary hover:text-text-primary"
-                      )}
-                    >
-                      <Droplet className="size-3" />
-                      <span>Refill</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("NON_REFILL")}
-                      className={cn(
-                        "px-2.5 py-1 text-xs font-semibold rounded-md transition cursor-pointer flex items-center gap-1",
-                        activeTab === "NON_REFILL"
-                          ? "bg-primary text-white shadow-xs"
-                          : "text-text-tertiary hover:text-text-primary"
-                      )}
-                    >
-                      <Package className="size-3" />
-                      <span>Non-Refill</span>
-                    </button>
-                  </div>
-                </div>
+              <div className="bg-white dark:bg-gray-900/70 p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs space-y-4">
+                <span className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider block">
+                  1. Select Bottles
+                </span>
 
                 {loading ? (
                   <div className="space-y-3">
@@ -407,22 +300,22 @@ function OrderWaterContent() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {filteredProducts.map((prod) => {
+                    {products.slice(0, 2).map((prod) => {
                       const qty = cart[prod.id] || 0;
-                      const isRefill = prod.type === "REFILLABLE_BOTTLE";
+                      const is19L = prod.type === "REFILLABLE_BOTTLE";
 
                       return (
                         <div
                           key={prod.id}
-                          className={`rounded-xl border p-4 transition ${
+                          className={`p-4 rounded-2xl border transition ${
                             qty > 0
-                              ? "border-primary/50 bg-blue-light-50/20 dark:bg-blue-light-950/20"
-                              : "border-card-border bg-card-background"
+                              ? "border-brand-500/80 bg-brand-50/20 dark:bg-brand-950/20 shadow-xs"
+                              : "border-gray-100 dark:border-gray-800 bg-gray-50/40 dark:bg-gray-800/20"
                           }`}
                         >
-                          <div className="flex items-start gap-3.5 sm:gap-4">
+                          <div className="flex items-center gap-3.5">
                             {prod.image && (
-                              <div className="relative size-16 shrink-0 overflow-hidden rounded-xl border border-card-border bg-white dark:bg-card-background">
+                              <div className="relative size-16 rounded-xl overflow-hidden bg-white dark:bg-gray-800 shrink-0 border border-gray-100 dark:border-gray-800 shadow-2xs">
                                 <Image
                                   src={prod.image}
                                   alt={prod.name}
@@ -434,74 +327,65 @@ function OrderWaterContent() {
                             )}
 
                             <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <h4 className="text-sm font-bold text-text-primary">
-                                  {prod.name}
-                                </h4>
-                                <Badge
-                                  color={isRefill ? "primary" : "sky"}
-                                  size="sm"
-                                  className="text-[10px] px-1.5 py-0"
-                                >
-                                  {isRefill ? "Refill" : "Non-Refill"}
-                                </Badge>
-                              </div>
-
-                              <p className="mt-1 text-xs text-text-tertiary leading-relaxed">
-                                {isRefill
-                                  ? "A reusable bottle that customers return or bring back to be refilled."
-                                  : prod.description ||
-                                    "A new bottle sold as a single-use product. Customers do not return it for refilling."}
-                              </p>
-
-                              <div className="mt-1.5 text-xs font-bold text-primary font-mono">
+                              <h3 className="text-sm font-bold text-gray-900 dark:text-white truncate">
+                                {prod.name}
+                              </h3>
+                              <div className="text-xs font-bold text-brand-600 dark:text-sky-400 mt-0.5">
                                 GH₵ {prod.price.toFixed(2)}{" "}
-                                <span className="font-normal text-text-tertiary">/ {prod.unit}</span>
+                                <span className="text-[11px] font-normal text-gray-400">/ {prod.unit}</span>
                               </div>
                             </div>
 
                             {/* Quantity Buttons */}
-                            <div className="flex items-center gap-1.5 sm:gap-2 rounded-lg border border-card-border bg-card-background p-1 shrink-0">
-                              <button
+                            <div className="flex items-center gap-2 shrink-0 bg-white dark:bg-gray-900 p-1.5 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xs">
+                              <motion.button
+                                whileHover={{ scale: 1.08 }}
+                                whileTap={{ scale: 0.92 }}
                                 type="button"
                                 onClick={() => handleQuantityChange(prod.id, -1)}
                                 disabled={qty === 0}
                                 aria-label={`Decrease ${prod.name}`}
-                                className="flex size-7 items-center justify-center rounded-md bg-background-gray-secondary text-text-primary font-bold disabled:opacity-40 hover:bg-background-gray-tertiary transition cursor-pointer"
+                                className="size-7 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-white font-bold flex items-center justify-center disabled:opacity-40 transition cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
                               >
-                                <Minus className="size-3.5" />
-                              </button>
-                              <span className="w-5 text-center text-xs font-bold text-text-primary">
+                                <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M4 10a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H4.75A.75.75 0 014 10z" clipRule="evenodd" />
+                                </svg>
+                              </motion.button>
+                              <span className="w-5 text-center text-xs font-bold text-gray-900 dark:text-white">
                                 {qty}
                               </span>
-                              <button
+                              <motion.button
+                                whileHover={{ scale: 1.08 }}
+                                whileTap={{ scale: 0.92 }}
                                 type="button"
                                 onClick={() => handleQuantityChange(prod.id, 1)}
                                 aria-label={`Increase ${prod.name}`}
-                                className="flex size-7 items-center justify-center rounded-md bg-primary text-white font-bold hover:bg-brand-600 transition cursor-pointer shadow-xs"
+                                className="size-7 rounded-xl bg-brand-500 text-white font-bold flex items-center justify-center hover:bg-brand-600 transition shadow-xs cursor-pointer"
                               >
-                                <Plus className="size-3.5" />
-                              </button>
+                                <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                                </svg>
+                              </motion.button>
                             </div>
                           </div>
 
-                          {/* Empty Bottle Return Checkbox for Refillable Bottles */}
-                          {isRefill && qty > 0 && (
-                            <div className="mt-3 border-t border-card-border pt-3">
+                          {/* Empty Bottle Return Checkbox for 19L */}
+                          {is19L && qty > 0 && (
+                            <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-800">
                               <label className="flex items-center gap-2.5 cursor-pointer text-xs">
                                 <input
                                   type="checkbox"
                                   checked={hasEmptyBottleExchange}
                                   onChange={(e) => setHasEmptyBottleExchange(e.target.checked)}
-                                  className="size-4 rounded border-card-border text-primary focus:ring-primary cursor-pointer"
+                                  className="size-4 rounded-md border-gray-300 text-brand-500 focus:ring-brand-500 cursor-pointer"
                                 />
-                                <span className="text-text-primary font-medium">
+                                <span className="text-gray-700 dark:text-gray-300 font-semibold">
                                   Returning empty bottles on delivery (No deposit fee)
                                 </span>
                               </label>
                               {!hasEmptyBottleExchange && (
-                                <p className="mt-1 pl-6 text-[11px] text-amber-600 dark:text-amber-400">
-                                  +GH₵ {(qty * 80).toFixed(2)} refundable bottle deposit will be added.
+                                <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1 pl-6">
+                                  +GH₵ {(qty * 80).toFixed(2)} container deposit will be added.
                                 </p>
                               )}
                             </div>
@@ -511,24 +395,25 @@ function OrderWaterContent() {
                     })}
                   </div>
                 )}
-              </Card>
+              </div>
 
               {/* 2. Delivery Address & Time */}
-              <Card className="p-6 space-y-4">
+              <div className="bg-white dark:bg-gray-900/70 p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
+                  <span className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider block">
                     2. Delivery Location &amp; Time
-                  </h3>
+                  </span>
                   <Link
                     href="/customer/addresses"
-                    className="text-xs text-primary font-semibold hover:underline"
+                    className="text-xs text-brand-600 dark:text-sky-400 font-bold hover:underline"
                   >
                     Manage Addresses
                   </Link>
                 </div>
 
+                {/* Address Selector */}
                 {addresses.length === 0 ? (
-                  <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800 dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-300 flex items-center justify-between">
+                  <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300 flex items-center justify-between">
                     <span>No saved delivery address found.</span>
                     <Link
                       href="/customer/addresses"
@@ -538,241 +423,219 @@ function OrderWaterContent() {
                     </Link>
                   </div>
                 ) : (
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold text-text-primary">
-                      Delivery Address
-                    </label>
-                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                      {addresses.map((addr) => {
-                        const isSelected = selectedAddressId === addr.id;
-                        return (
-                          <div
-                            key={addr.id}
-                            onClick={() => setSelectedAddressId(addr.id)}
-                            className={`cursor-pointer rounded-xl border p-3 transition ${
-                              isSelected
-                                ? "border-primary bg-primary/5 text-primary"
-                                : "border-card-border bg-card-background hover:border-border-secondary"
-                            }`}
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold text-text-primary truncate">
-                                {addr.areaName}
-                              </span>
-                              {addr.isDefault && (
-                                <Badge color="primary" size="sm" className="text-[10px]">
-                                  Default
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="mt-1 font-mono text-[11px] text-text-tertiary">
-                              {addr.digitalAddress}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                  <div className="space-y-2">
+                    <select
+                      value={selectedAddressId}
+                      onChange={(e) => setSelectedAddressId(e.target.value)}
+                      aria-label="Select Delivery Address"
+                      className="w-full h-11 px-3 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 shadow-2xs"
+                    >
+                      {addresses.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.areaName} ({a.digitalAddress}) {a.isDefault ? "• Default" : ""}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 )}
 
-                {/* Delivery Time & Slot */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-2">
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold text-text-primary">
-                      Delivery Day
-                    </label>
-                    <div className="flex gap-2">
-                      {["Today", "Tomorrow"].map((day) => (
+                {/* Delivery Slot Pills */}
+                <div>
+                  <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 block mb-2">
+                    Preferred Time Slot
+                  </span>
+                  <div className="grid grid-cols-3 gap-2.5">
+                    {(
+                      [
+                        "Morning (8am - 12pm)",
+                        "Afternoon (12pm - 4pm)",
+                        "Evening (4pm - 7pm)",
+                      ] as const
+                    ).map((slot) => {
+                      const isSelected = deliverySlot === slot;
+                      const shortLabel = slot.split(" ")[0];
+                      return (
                         <button
-                          key={day}
+                          key={slot}
                           type="button"
-                          onClick={() => setDeliveryDate(day)}
-                          className={`flex-1 rounded-lg border py-2 text-xs font-bold transition cursor-pointer ${
-                            deliveryDate === day
-                              ? "border-primary bg-primary text-white shadow-xs"
-                              : "border-card-border bg-card-background text-text-secondary hover:bg-background-gray-secondary"
+                          onClick={() => setDeliverySlot(slot)}
+                          className={`py-2.5 px-2 text-center rounded-2xl text-xs font-bold border transition cursor-pointer ${
+                            isSelected
+                              ? "border-brand-500 bg-brand-500 text-white shadow-xs"
+                              : "border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 bg-gray-50/60 dark:bg-gray-800/40 hover:border-gray-300"
                           }`}
                         >
-                          {day}
+                          {shortLabel}
                         </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold text-text-primary">
-                      Preferred Time Slot
-                    </label>
-                    <select
-                      value={deliverySlot}
-                      onChange={(e) => setDeliverySlot(e.target.value as any)}
-                      className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
-                    >
-                      <option value="Morning (8am - 12pm)">Morning (8am - 12pm)</option>
-                      <option value="Afternoon (12pm - 4pm)">Afternoon (12pm - 4pm)</option>
-                      <option value="Evening (4pm - 7pm)">Evening (4pm - 7pm)</option>
-                    </select>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* Instructions */}
+                {/* Delivery Notes */}
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-text-primary">
-                    Delivery Instructions (Optional)
-                  </label>
                   <input
                     type="text"
-                    placeholder="e.g. Leave at gate security, call 0244..."
+                    placeholder="Delivery instructions (e.g. Call at gate, leave with reception)"
                     value={deliveryInstructions}
                     onChange={(e) => setDeliveryInstructions(e.target.value)}
-                    className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
+                    className="w-full h-11 px-3.5 text-xs rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-hidden focus:border-brand-500 shadow-2xs"
                   />
                 </div>
-              </Card>
+              </div>
 
               {/* 3. Payment Method */}
-              <Card className="p-6 space-y-4">
-                <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
+              <div className="bg-white dark:bg-gray-900/70 p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs space-y-3.5">
+                <span className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider block">
                   3. Payment Method
-                </h3>
+                </span>
 
-                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Option A: Pay Online */}
                   <div
                     onClick={() => setPaymentMethod("MOBILE_MONEY")}
-                    className={`flex cursor-pointer items-center justify-between rounded-xl border p-3.5 transition ${
-                      paymentMethod === "MOBILE_MONEY"
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "border-card-border bg-card-background hover:border-border-secondary"
+                    className={`p-4 rounded-2xl border-2 transition cursor-pointer flex items-start gap-3.5 ${
+                      paymentMethod !== "CASH_ON_DELIVERY"
+                        ? "border-brand-500 bg-brand-50/25 dark:bg-brand-950/25 shadow-xs"
+                        : "border-gray-100 dark:border-gray-800/80 hover:border-gray-300 bg-white dark:bg-gray-900"
                     }`}
                   >
-                    <div>
-                      <span className="block text-xs font-bold text-text-primary">
-                        Mobile Money
-                      </span>
-                      <span className="text-[11px] text-text-tertiary">
-                        MTN MoMo, Telecel Cash, AT Money
-                      </span>
+                    <div
+                      className={`mt-0.5 size-4 rounded-full border flex items-center justify-center shrink-0 ${
+                        paymentMethod !== "CASH_ON_DELIVERY"
+                          ? "border-brand-500 bg-brand-500"
+                          : "border-gray-300 dark:border-gray-600"
+                      }`}
+                    >
+                      {paymentMethod !== "CASH_ON_DELIVERY" && (
+                        <div className="size-1.5 rounded-full bg-white" />
+                      )}
                     </div>
-                    {paymentMethod === "MOBILE_MONEY" && <Check className="size-4 text-primary" />}
+                    <div>
+                      <span className="text-xs font-bold text-gray-900 dark:text-white block">
+                        Pay Online
+                      </span>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                        Mobile Money (MTN, Telecel, AT) or Card
+                      </p>
+                    </div>
                   </div>
 
+                  {/* Option B: Cash on Delivery */}
                   <div
                     onClick={() => setPaymentMethod("CASH_ON_DELIVERY")}
-                    className={`flex cursor-pointer items-center justify-between rounded-xl border p-3.5 transition ${
+                    className={`p-4 rounded-2xl border-2 transition cursor-pointer flex items-start gap-3.5 ${
                       paymentMethod === "CASH_ON_DELIVERY"
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "border-card-border bg-card-background hover:border-border-secondary"
+                        ? "border-brand-500 bg-brand-50/25 dark:bg-brand-950/25 shadow-xs"
+                        : "border-gray-100 dark:border-gray-800/80 hover:border-gray-300 bg-white dark:bg-gray-900"
                     }`}
                   >
+                    <div
+                      className={`mt-0.5 size-4 rounded-full border flex items-center justify-center shrink-0 ${
+                        paymentMethod === "CASH_ON_DELIVERY"
+                          ? "border-brand-500 bg-brand-500"
+                          : "border-gray-300 dark:border-gray-600"
+                      }`}
+                    >
+                      {paymentMethod === "CASH_ON_DELIVERY" && (
+                        <div className="size-1.5 rounded-full bg-white" />
+                      )}
+                    </div>
                     <div>
-                      <span className="block text-xs font-bold text-text-primary">
+                      <span className="text-xs font-bold text-gray-900 dark:text-white block">
                         Cash on Delivery
                       </span>
-                      <span className="text-[11px] text-text-tertiary">
-                        Pay driver when water arrives
-                      </span>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                        Pay cash directly to driver at doorstep
+                      </p>
                     </div>
-                    {paymentMethod === "CASH_ON_DELIVERY" && <Check className="size-4 text-primary" />}
                   </div>
                 </div>
-              </Card>
+              </div>
             </div>
 
-            {/* RIGHT COLUMN: Order Summary & Checkout */}
-            <div className="space-y-6 lg:col-span-5">
-              <Card className="p-6 space-y-5 sticky top-6">
-                <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
+            {/* RIGHT COLUMN: Order Summary */}
+            <div className="lg:col-span-5 lg:sticky lg:top-8">
+              <div className="bg-white dark:bg-gray-900/70 p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs space-y-4">
+                <span className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider block">
                   Order Summary
-                </h3>
+                </span>
 
-                {/* Items breakdown */}
-                <div className="space-y-2 border-b border-card-border pb-4 text-xs">
+                {/* Free Bottle Credit Reward Option */}
+                {(profile?.freeBottleBalance ?? 0) > 0 && refillBottlesCount > 0 && (
+                  <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 space-y-1">
+                    <label className="flex items-center gap-2.5 cursor-pointer text-xs">
+                      <input
+                        type="checkbox"
+                        checked={redeemFreeBottle}
+                        onChange={(e) => setRedeemFreeBottle(e.target.checked)}
+                        className="size-4 rounded-md border-emerald-400 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                      />
+                      <span className="font-bold text-emerald-900 dark:text-emerald-200">
+                        Use 1 Free Bottle Reward (-GH₵ 25.00)
+                      </span>
+                    </label>
+                    <span className="text-[11px] text-emerald-700 dark:text-emerald-300 pl-6.5 block">
+                      You have {profile?.freeBottleBalance} free bottle reward {profile?.freeBottleBalance === 1 ? "credit" : "credits"} available from your referrals!
+                    </span>
+                  </div>
+                )}
+
+                <div className="divide-y divide-gray-100 dark:divide-gray-800 text-xs">
                   {Object.entries(cart).map(([pId, qty]) => {
                     const prod = products.find((p) => p.id === pId);
-                    if (!prod || qty === 0) return null;
-                    const isRefill = prod.type === "REFILLABLE_BOTTLE";
-
+                    if (!prod) return null;
                     return (
-                      <div key={pId} className="flex justify-between items-center">
-                        <div className="min-w-0 flex-1 pr-2">
-                          <span className="font-semibold text-text-primary truncate block">
-                            {qty}x {prod.name}
-                          </span>
-                          <span className="text-[10px] text-text-tertiary">
-                            {isRefill ? "Refill bottle" : "Non-Refill product"}
-                          </span>
-                        </div>
-                        <span className="font-bold text-text-primary font-mono shrink-0">
+                      <div key={pId} className="py-2.5 flex items-center justify-between">
+                        <span className="text-gray-700 dark:text-gray-300">
+                          {prod.name} × {qty}
+                        </span>
+                        <span className="font-bold text-gray-900 dark:text-white">
                           GH₵ {(prod.price * qty).toFixed(2)}
                         </span>
                       </div>
                     );
                   })}
 
-                  {totalItemsCount === 0 && (
-                    <div className="py-2 text-center text-text-tertiary text-xs">
-                      No bottles selected in cart.
-                    </div>
-                  )}
-                </div>
-
-                {/* Free bottle reward redemption */}
-                {(profile?.freeBottleBalance ?? 0) > 0 && refillBottlesCount > 0 && (
-                  <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-3 text-xs dark:border-emerald-900/60 dark:bg-emerald-950/30">
-                    <label className="flex items-center gap-2 cursor-pointer font-medium text-emerald-800 dark:text-emerald-300">
-                      <input
-                        type="checkbox"
-                        checked={redeemFreeBottle}
-                        onChange={(e) => setRedeemFreeBottle(e.target.checked)}
-                        className="size-4 rounded border-emerald-400 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
-                      />
-                      <span>Redeem 1 Free Refill Bottle (Reward)</span>
-                    </label>
-                  </div>
-                )}
-
-                {/* Totals */}
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between text-text-secondary">
-                    <span>Subtotal ({totalItemsCount} items):</span>
-                    <span className="font-mono text-text-primary">GH₵ {subtotal.toFixed(2)}</span>
-                  </div>
-
                   {depositFee > 0 && (
-                    <div className="flex justify-between text-amber-600 dark:text-amber-400">
-                      <span>Bottle Deposits ({refillBottlesCount} bottles):</span>
-                      <span className="font-mono">+GH₵ {depositFee.toFixed(2)}</span>
+                    <div className="py-2.5 flex items-center justify-between text-amber-600 dark:text-amber-400">
+                      <span>Bottle Deposit ({refillBottlesCount} bottles)</span>
+                      <span className="font-bold">+GH₵ {depositFee.toFixed(2)}</span>
                     </div>
                   )}
 
-                  <div className="flex justify-between text-text-secondary">
-                    <span>Delivery Fee:</span>
-                    <span className="font-mono text-text-primary">
-                      {deliveryFee === 0 ? "FREE" : `GH₵ ${deliveryFee.toFixed(2)}`}
+                  <div className="py-2.5 flex items-center justify-between">
+                    <span className="text-gray-500 dark:text-gray-400">Delivery Fee</span>
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      {deliveryFee === 0 ? (
+                        <span className="text-emerald-600 dark:text-emerald-400 font-black">FREE</span>
+                      ) : (
+                        `GH₵ ${deliveryFee.toFixed(2)}`
+                      )}
                     </span>
                   </div>
 
                   {discountAmount > 0 && (
-                    <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-medium">
-                      <span>Referral Reward Discount:</span>
-                      <span className="font-mono">-GH₵ {discountAmount.toFixed(2)}</span>
+                    <div className="py-2.5 flex items-center justify-between text-emerald-600 dark:text-emerald-400 font-semibold">
+                      <span>Free Bottle Reward (1 Refill)</span>
+                      <span>-GH₵ {discountAmount.toFixed(2)}</span>
                     </div>
                   )}
 
-                  <div className="border-t border-card-border pt-3 flex justify-between text-sm font-bold text-text-primary">
-                    <span>Total Amount:</span>
-                    <span className="font-mono text-lg text-primary">
+                  <div className="pt-3.5 flex items-center justify-between">
+                    <span className="text-sm font-bold text-gray-900 dark:text-white">Total</span>
+                    <span className="text-2xl font-black text-brand-600 dark:text-sky-400">
                       GH₵ {totalAmount.toFixed(2)}
                     </span>
                   </div>
                 </div>
 
-                {/* Submit Button */}
-                <Button
+                {/* Primary Order Action Button */}
+                <button
                   type="button"
                   disabled={isSubmitting || totalItemsCount === 0}
                   onClick={handlePlaceOrder}
-                  className="w-full justify-center py-3 text-xs sm:text-sm font-bold shadow-xs cursor-pointer"
+                  className="w-full py-3.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <span>{submittingStatus || "Processing..."}</span>
@@ -781,26 +644,18 @@ function OrderWaterContent() {
                   ) : (
                     <span>Confirm Order • GH₵ {totalAmount.toFixed(2)}</span>
                   )}
-                </Button>
+                </button>
 
-                <div className="border-t border-card-border pt-3 text-center">
-                  <span className="text-[11px] text-text-tertiary">
-                    Hygienic sealed bottles • Fast doorstep delivery across Accra
+                <div className="pt-2 border-t border-gray-100 dark:border-gray-800 text-center">
+                  <span className="text-[11px] text-gray-400">
+                    Sealed hygienic bottles • Fast doorstep delivery
                   </span>
                 </div>
-              </Card>
+              </div>
             </div>
           </div>
         )}
       </div>
     </AppLayout>
-  );
-}
-
-export default function OrderWaterPage() {
-  return (
-    <Suspense fallback={<SkeletonAppShell />}>
-      <OrderWaterContent />
-    </Suspense>
   );
 }

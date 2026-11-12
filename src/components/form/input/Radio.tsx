@@ -26,7 +26,7 @@ export const Radio: React.FC<RadioProps> = ({
   return (
     <label
       htmlFor={id}
-      className={`inline-flex items-center gap-2.5 text-xs sm:text-sm text-foreground select-none ${
+      className={`inline-flex items-center gap-2.5 text-xs sm:text-sm text-gray-700 dark:text-gray-300 select-none ${
         disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
       } ${className}`}
     >
@@ -39,7 +39,7 @@ export const Radio: React.FC<RadioProps> = ({
         defaultChecked={defaultChecked}
         disabled={disabled}
         onChange={(e) => onChange?.(e.target.value)}
-        className="size-4 border-input text-primary focus:ring-ring/20 bg-background"
+        className="size-4 border-gray-300 dark:border-gray-700 text-brand-600 focus:ring-brand-500/20 dark:bg-gray-800"
       />
       {label && <span>{label}</span>}
     </label>

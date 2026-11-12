@@ -77,18 +77,18 @@ export default function ReferralProgressGauge({
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card text-card-foreground p-5 sm:p-6 shadow-xs flex flex-col justify-between h-full">
+    <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 sm:p-6 shadow-theme-xs flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base sm:text-lg font-bold text-card-foreground">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
               Free Bottle Goal
             </h3>
-            <p className="mt-0.5 text-xs text-muted-foreground">
+            <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
               5:1 Referral reward progress
             </p>
           </div>
-          <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+          <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
             {freeBottleBalance} Available
           </span>
         </div>
@@ -98,25 +98,25 @@ export default function ReferralProgressGauge({
         </div>
 
         <div className="text-center -mt-6">
-          <p className="text-xs font-semibold text-card-foreground">
+          <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">
             {remainingNeeded === 1
               ? "Just 1 more friend needed for your next free refill bottle!"
               : `${remainingNeeded} more friends needed to earn your next free bottle.`}
           </p>
-          <span className="text-[11px] text-muted-foreground block mt-0.5">
+          <span className="text-[11px] text-gray-400 block mt-0.5">
             Each free bottle saves you GH₵ 25.00 on delivery
           </span>
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-border grid grid-cols-2 gap-2 text-center text-xs">
-        <div className="p-2 rounded-xl bg-muted/50">
-          <span className="text-muted-foreground text-[10px] block">All-Time Free Bottles</span>
-          <span className="font-bold text-card-foreground text-sm">
+      <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 grid grid-cols-2 gap-2 text-center text-xs">
+        <div className="p-2 rounded-xl bg-gray-50 dark:bg-gray-800/40">
+          <span className="text-gray-400 text-[10px] block">All-Time Free Bottles</span>
+          <span className="font-bold text-gray-900 dark:text-white text-sm">
             {freeBottlesEarned} Earned
           </span>
         </div>
-        <div className="p-2 rounded-xl bg-emerald-500/10">
+        <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/30">
           <span className="text-emerald-600 dark:text-emerald-400 text-[10px] block">Ready to Spend</span>
           <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">
             {freeBottleBalance} Bottles

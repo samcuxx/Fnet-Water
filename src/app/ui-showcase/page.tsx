@@ -78,7 +78,7 @@ export default function UiShowcasePage() {
     <AppLayout role="ADMIN">
       <div className="space-y-6">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-border">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-gray-200 dark:border-gray-800">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
               Component Design System & Library
@@ -337,7 +337,7 @@ export default function UiShowcasePage() {
                   />
                 </div>
 
-                <div className="pt-2 border-t border-border space-y-3">
+                <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-3">
                   <div>
                     <Switch
                       label="Enable Auto-SMS Order Updates"
@@ -511,7 +511,7 @@ export default function UiShowcasePage() {
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-4 border-t border-border">
+            <div className="flex justify-end gap-2 pt-4 border-t border-gray-100 dark:border-gray-800">
               <Button
                 size="sm"
                 variant="outline"

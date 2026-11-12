@@ -63,39 +63,13 @@ function checkTcpPort(host = "127.0.0.1", port = 5432, timeoutMs = 80): Promise<
   });
 }
 
-function getDatabaseHostAndPort(): { host: string; port: number } {
-  try {
-    const rawUrl = process.env.DATABASE_URL;
-    if (rawUrl) {
-      const parsed = new URL(rawUrl);
-      return {
-        host: parsed.hostname || "127.0.0.1",
-        port: parsed.port ? parseInt(parsed.port, 10) : 5432,
-      };
-    }
-  } catch {
-    // Ignore URL parse error
-  }
-  return { host: "127.0.0.1", port: 5432 };
-}
-
 export async function isDatabaseConnected(): Promise<boolean> {
-  // Never attempt database connection during Next.js build / CI
-  if (
-    process.env.NEXT_PHASE === "phase-production-build" ||
-    process.env.IS_BUILD_TIME === "true" ||
-    process.env.CI === "true"
-  ) {
-    return false;
-  }
-
   const now = Date.now();
   if (dbReachability && now - dbReachability.checkedAt < PROBE_INTERVAL_MS) {
     return dbReachability.connected;
   }
 
-  const { host, port } = getDatabaseHostAndPort();
-  const isPortOpen = await checkTcpPort(host, port, 150);
+  const isPortOpen = await checkTcpPort("127.0.0.1", 5432, 80);
   if (!isPortOpen) {
     dbReachability = { connected: false, checkedAt: now };
     return false;
@@ -104,7 +78,7 @@ export async function isDatabaseConnected(): Promise<boolean> {
   try {
     const probe = prisma.$queryRaw`SELECT 1`;
     const timeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("Database probe timeout")), 300)
+      setTimeout(() => reject(new Error("Database probe timeout")), 200)
     );
     await Promise.race([probe, timeout]);
     dbReachability = { connected: true, checkedAt: now };

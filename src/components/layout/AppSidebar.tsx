@@ -4,41 +4,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  LayoutDashboard,
-  ShoppingBag,
-  Truck,
-  RotateCcw,
-  Boxes,
-  Cpu,
-  Layers,
-  CreditCard,
-  CalendarCheck,
-  BarChart3,
-  Users,
-  UserCheck,
-  Compass,
-  Briefcase,
-  Palette,
-  Bell,
-  LogOut,
-  ChevronDown,
-  X,
-  Home,
-  MapPin,
-  Gift,
-} from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import Logo from "@/components/brand/Logo";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 export interface NavItem {
   name: string;
@@ -63,23 +30,36 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
     useSidebar();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
-  const isSidebarVisible = isExpanded || isHovered || isMobileOpen;
+  const isSidebarVisible = isExpanded || isHovered;
 
   const toggleSubmenu = (name: string) => {
     setOpenSubmenu((prev) => (prev === name ? null : name));
   };
 
-  // Nav menus configured with official Lucide Icons for each role
+  // Nav menus configured for roles
   const navItemsByRole: Record<string, NavItem[]> = {
     ADMIN: [
       {
         name: "Dashboard",
         href: "/admin",
-        icon: <LayoutDashboard className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 4.25A2.25 2.25 0 014.25 2h2.5A2.25 2.25 0 019 4.25v4.5A2.25 2.25 0 016.75 11h-2.5A2.25 2.25 0 012 8.75v-4.5zM2 13.25A2.25 2.25 0 014.25 11h2.5A2.25 2.25 0 019 13.25v2.5A2.25 2.25 0 016.75 18h-2.5A2.25 2.25 0 012 15.75v-2.5zM11 4.25A2.25 2.25 0 0113.25 2h2.5A2.25 2.25 0 0118 4.25v2.5A2.25 2.25 0 0115.75 9h-2.5A2.25 2.25 0 0111 6.75v-2.5zM11 11.25A2.25 2.25 0 0113.25 9h2.5A2.25 2.25 0 0118 11.25v4.5A2.25 2.25 0 0115.75 18h-2.5A2.25 2.25 0 0111 15.75v-4.5z" />
+          </svg>
+        ),
       },
       {
         name: "Water Orders",
-        icon: <ShoppingBag className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+            <path
+              fillRule="evenodd"
+              d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+        ),
         subItems: [
           { name: "All Orders", href: "/admin/orders" },
           { name: "Deliveries & Dispatch", href: "/admin/deliveries" },
@@ -88,7 +68,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
       },
       {
         name: "Inventory & Assets",
-        icon: <Boxes className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+          </svg>
+        ),
         subItems: [
           { name: "Inventory & Stock", href: "/admin/inventory" },
           { name: "Smart Dispensers", href: "/admin/dispensers" },
@@ -97,7 +81,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
       },
       {
         name: "Finance & Payments",
-        icon: <CreditCard className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10.75 2.75a.75.75 0 00-1.5 0v1.087a4.5 4.5 0 00-2.42 1.343.75.75 0 101.06 1.06 3 3 0 012.86-.74v4.54a4.5 4.5 0 00-2.42 1.343.75.75 0 101.06 1.06 3 3 0 011.5-.477v1.134a.75.75 0 001.5 0v-1.087a4.5 4.5 0 002.42-1.343.75.75 0 10-1.06-1.06 3 3 0 01-2.86.74v-4.54a4.5 4.5 0 002.42-1.343.75.75 0 10-1.06-1.06 3 3 0 01-1.5.477V2.75z" />
+          </svg>
+        ),
         subItems: [
           { name: "MoMo & Card Transactions", href: "/admin/finance/transactions" },
           { name: "Installment Contracts", href: "/admin/finance/installments" },
@@ -106,11 +94,19 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
       {
         name: "Reports & Analytics",
         href: "/admin/reports",
-        icon: <BarChart3 className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+          </svg>
+        ),
       },
       {
         name: "Users & Fleet",
-        icon: <Users className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+          </svg>
+        ),
         subItems: [
           { name: "Staff Directory", href: "/admin/users" },
           { name: "Customer Directory", href: "/admin/customers" },
@@ -122,105 +118,192 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
         name: "Component Library",
         href: "/ui-showcase",
         badge: "PRO",
-        icon: <Palette className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fillRule="evenodd"
+              d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 012 10z"
+              clipRule="evenodd"
+            />
+          </svg>
+        ),
       },
       {
         name: "Notifications",
         href: "/notifications",
-        icon: <Bell className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+          </svg>
+        ),
       },
     ],
     MANAGER: [
       {
         name: "Logistics Hub",
         href: "/manager",
-        icon: <LayoutDashboard className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 4.25A2.25 2.25 0 014.25 2h2.5A2.25 2.25 0 019 4.25v4.5A2.25 2.25 0 016.75 11h-2.5A2.25 2.25 0 012 8.75v-4.5zM2 13.25A2.25 2.25 0 014.25 11h2.5A2.25 2.25 0 019 13.25v2.5A2.25 2.25 0 016.75 18h-2.5A2.25 2.25 0 012 15.75v-2.5zM11 4.25A2.25 2.25 0 0113.25 2h2.5A2.25 2.25 0 0118 4.25v2.5A2.25 2.25 0 0115.75 9h-2.5A2.25 2.25 0 0111 6.75v-2.5zM11 11.25A2.25 2.25 0 0113.25 9h2.5A2.25 2.25 0 0118 11.25v4.5A2.25 2.25 0 0115.75 18h-2.5A2.25 2.25 0 0111 15.75v-4.5z" />
+          </svg>
+        ),
       },
       {
         name: "Deliveries Queue",
         href: "/manager/deliveries",
-        icon: <Truck className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+          </svg>
+        ),
       },
       {
         name: "Inventory & Stock",
         href: "/manager/inventory",
-        icon: <Boxes className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+          </svg>
+        ),
       },
       {
         name: "Smart Dispensers",
         href: "/manager/dispensers",
-        icon: <Cpu className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.993.883L4 8v8a2 2 0 001.85 1.995L6 18h8a2 2 0 001.995-1.85L16 16V8a1 1 0 00-.883-.993L15 7h-1V6a4 4 0 00-4-4zm0 2a2 2 0 012 2v1H8V6a2 2 0 012-2z" />
+          </svg>
+        ),
       },
       {
         name: "Operational Reports",
         href: "/admin/reports",
-        icon: <BarChart3 className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+          </svg>
+        ),
       },
       {
         name: "Notifications",
         href: "/notifications",
-        icon: <Bell className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+          </svg>
+        ),
       },
     ],
     DRIVER: [
       {
         name: "Dispatch Dashboard",
         href: "/driver",
-        icon: <Truck className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
+          </svg>
+        ),
       },
       {
         name: "Notifications",
         href: "/notifications",
-        icon: <Bell className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+          </svg>
+        ),
       },
     ],
     AGENT: [
       {
         name: "Agent Portal",
         href: "/agent",
-        icon: <Briefcase className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+          </svg>
+        ),
       },
       {
         name: "Notifications",
         href: "/notifications",
-        icon: <Bell className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+          </svg>
+        ),
       },
     ],
     CUSTOMER: [
       {
         name: "My Portal",
         href: "/customer",
-        icon: <Home className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 4.25A2.25 2.25 0 014.25 2h2.5A2.25 2.25 0 019 4.25v4.5A2.25 2.25 0 016.75 11h-2.5A2.25 2.25 0 012 8.75v-4.5zM2 13.25A2.25 2.25 0 014.25 11h2.5A2.25 2.25 0 019 13.25v2.5A2.25 2.25 0 016.75 18h-2.5A2.25 2.25 0 012 15.75v-2.5zM11 4.25A2.25 2.25 0 0113.25 2h2.5A2.25 2.25 0 0118 4.25v2.5A2.25 2.25 0 0115.75 9h-2.5A2.25 2.25 0 0111 6.75v-2.5zM11 11.25A2.25 2.25 0 0113.25 9h2.5A2.25 2.25 0 0118 11.25v4.5A2.25 2.25 0 0115.75 18h-2.5A2.25 2.25 0 0111 15.75v-4.5z" />
+          </svg>
+        ),
       },
       {
         name: "Order Water",
         href: "/customer/order",
-        icon: <ShoppingBag className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+          </svg>
+        ),
       },
       {
         name: "My Orders",
         href: "/customer/orders",
-        icon: <Boxes className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+            <path
+              fillRule="evenodd"
+              d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+        ),
       },
       {
         name: "Address Book",
         href: "/customer/addresses",
-        icon: <MapPin className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+          </svg>
+        ),
       },
       {
         name: "Smart Dispenser",
         href: "/customer/dispenser",
-        icon: <Cpu className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.993.883L4 8v8a2 2 0 001.85 1.995L6 18h8a2 2 0 001.995-1.85L16 16V8a1 1 0 00-.883-.993L15 7h-1V6a4 4 0 00-4-4zm0 2a2 2 0 012 2v1H8V6a2 2 0 012-2z" />
+          </svg>
+        ),
       },
       {
         name: "Refer Friends",
         href: "/customer/referrals",
-        icon: <Gift className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.5 2.5 0 0 0-5 0c0 .35.07.69.18 1H11a2.5 2.5 0 0 0-5 0c0 .35.07.69.18 1H4a2 2 0 0 0-2 2v3a1 1 0 0 0 1 1h1v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7h1a1 1 0 0 0 1-1V8a2 2 0 0 0-2-2z" />
+          </svg>
+        ),
       },
       {
         name: "Notifications",
         href: "/notifications",
-        icon: <Bell className="size-5 shrink-0" />,
+        icon: (
+          <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+          </svg>
+        ),
       },
     ],
   };
@@ -228,244 +311,228 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
   const navItems = navItemsByRole[role] || navItemsByRole.ADMIN;
 
   return (
-    <TooltipProvider delayDuration={150}>
-      <aside
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className={`fixed top-0 left-0 z-50 flex flex-col h-screen bg-sidebar text-sidebar-foreground border-r border-sidebar-border shadow-xl transition-all duration-300 ease-in-out ${
-          isMobileOpen ? "translate-x-0 w-[270px]" : isSidebarVisible ? "w-[270px]" : "w-[80px]"
-        } ${
-          isMobileOpen
-            ? "translate-x-0"
-            : "-translate-x-full xl:translate-x-0"
+    <aside
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`fixed top-0 left-0 z-50 flex flex-col h-screen bg-[#071E3D] text-white border-blue-900/40 shadow-xl transition-all duration-300 ease-in-out ${
+        isSidebarVisible ? "w-[270px]" : "w-[80px]"
+      } ${
+        isMobileOpen
+          ? "translate-x-0 w-[270px]"
+          : "-translate-x-full xl:translate-x-0"
+      }`}
+    >
+      {/* Sidebar Header with Brand Logo */}
+      <div
+        className={`flex items-center h-18 border-b border-blue-900/30 transition-all duration-300 ${
+          isSidebarVisible ? "justify-between px-5" : "justify-center px-0"
         }`}
       >
-        {/* Sidebar Header with Brand Logo */}
-        <div
-          className={`flex items-center h-18 border-b border-sidebar-border transition-all duration-300 ${
-            isSidebarVisible ? "justify-between px-5" : "justify-center px-0"
-          }`}
-        >
-          <div className="flex items-center justify-center overflow-hidden">
-            <Logo size="sm" variant="dark" iconOnly={!isSidebarVisible} />
-          </div>
-
-          {isSidebarVisible && isMobileOpen && (
-            <button
-              type="button"
-              onClick={toggleMobileSidebar}
-              aria-label="Close sidebar"
-              className="xl:hidden text-sidebar-foreground/70 hover:text-sidebar-foreground p-1 rounded-lg hover:bg-sidebar-accent transition cursor-pointer"
-            >
-              <X className="size-5" />
-            </button>
-          )}
+        <div className="flex items-center justify-center overflow-hidden">
+          <Logo size="sm" variant="dark" iconOnly={!isSidebarVisible} />
         </div>
 
-        {/* Navigation Section Header */}
-        {isSidebarVisible && (
-          <div className="px-5 pt-5 pb-1 text-[10px] font-bold tracking-widest text-sidebar-foreground/50 uppercase select-none">
-            Navigation
-          </div>
+        {isSidebarVisible && isMobileOpen && (
+          <button
+            type="button"
+            onClick={toggleMobileSidebar}
+            aria-label="Close sidebar"
+            className="xl:hidden text-blue-200 hover:text-white p-1"
+          >
+            <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fillRule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
         )}
+      </div>
 
-        {/* Navigation Links */}
-        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1.5 custom-scrollbar">
-          {navItems.map((item) => {
-            const hasSubItems = item.subItems && item.subItems.length > 0;
-            const isItemActive =
-              (item.href && pathname === item.href) ||
-              item.subItems?.some((sub) => pathname === sub.href);
-            const isSubmenuOpen = openSubmenu === item.name || isItemActive;
+      {/* Navigation Section Header */}
+      {isSidebarVisible && (
+        <div className="px-5 pt-5 pb-1 text-[10px] font-bold tracking-widest text-blue-200/50 uppercase">
+          Navigation
+        </div>
+      )}
 
-            const buttonContent = (
-              <span
-                className={`shrink-0 transition-colors ${
-                  isItemActive
-                    ? "text-sky-400"
-                    : "text-blue-200/70 group-hover:text-white"
-                }`}
-              >
-                {item.icon}
-              </span>
-            );
+      {/* Navigation Links */}
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1.5 custom-scrollbar">
+        {navItems.map((item) => {
+          const hasSubItems = item.subItems && item.subItems.length > 0;
+          const isItemActive =
+            (item.href && pathname === item.href) ||
+            item.subItems?.some((sub) => pathname === sub.href);
+          const isSubmenuOpen = openSubmenu === item.name || isItemActive;
 
-            return (
-              <div key={item.name} className="relative">
-                {hasSubItems ? (
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => toggleSubmenu(item.name)}
-                      className={`flex items-center w-full gap-3 px-3.5 py-2.5 rounded-md text-xs sm:text-sm font-medium transition-all group cursor-pointer ${
-                        isItemActive
-                          ? "bg-sidebar-accent text-sidebar-foreground font-semibold shadow-xs"
-                          : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent"
-                      } ${!isSidebarVisible ? "justify-center px-0" : ""}`}
-                    >
-                      {!isSidebarVisible ? (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="p-2">{buttonContent}</span>
-                          </TooltipTrigger>
-                          <TooltipContent side="right">
-                            {item.name}
-                          </TooltipContent>
-                        </Tooltip>
-                      ) : (
-                        buttonContent
-                      )}
-
-                      {isSidebarVisible && (
-                        <>
-                          <span className="flex-1 text-left text-xs font-medium">
-                            {item.name}
-                          </span>
-                          <ChevronDown
-                            className={`size-4 text-sidebar-foreground/60 transition-transform duration-200 ${
-                              isSubmenuOpen ? "rotate-180 text-sidebar-foreground" : ""
-                            }`}
-                          />
-                        </>
-                      )}
-                    </button>
-
-                    {/* Submenu Accordion with Framer Motion */}
-                    <AnimatePresence initial={false}>
-                      {isSidebarVisible && isSubmenuOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="pl-9 pr-2 py-1 space-y-1 overflow-hidden"
-                        >
-                          {item.subItems?.map((sub) => {
-                            const isSubActive = pathname === sub.href;
-                            return (
-                              <Link
-                                key={sub.name}
-                                href={sub.href}
-                                onClick={() => {
-                                  if (isMobileOpen) toggleMobileSidebar();
-                                }}
-                                className={`block py-1.5 px-3 rounded-md text-xs font-medium transition ${
-                                  isSubActive
-                                    ? "bg-sidebar-accent text-sidebar-foreground font-semibold shadow-xs"
-                                    : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
-                                }`}
-                              >
-                                {sub.name}
-                              </Link>
-                            );
-                          })}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ) : (
-                  <Link
-                    href={item.href || "#"}
-                    onClick={() => {
-                      if (isMobileOpen) toggleMobileSidebar();
-                    }}
-                    className={`flex items-center w-full gap-3 px-3.5 py-2.5 rounded-md text-xs sm:text-sm font-medium transition-all group ${
+          return (
+            <div key={item.name} className="relative">
+              {hasSubItems ? (
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => toggleSubmenu(item.name)}
+                    className={`flex items-center w-full gap-3 px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-medium transition-all group ${
                       isItemActive
-                        ? "bg-sidebar-accent text-sidebar-foreground font-semibold shadow-xs"
-                        : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent"
+                        ? "bg-white/15 text-white font-semibold shadow-xs"
+                        : "text-blue-100/75 hover:text-white hover:bg-white/10"
                     } ${!isSidebarVisible ? "justify-center px-0" : ""}`}
                   >
-                    {!isSidebarVisible ? (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="p-2">{buttonContent}</span>
-                        </TooltipTrigger>
-                        <TooltipContent side="right">
-                          {item.name}
-                        </TooltipContent>
-                      </Tooltip>
-                    ) : (
-                      buttonContent
-                    )}
+                    <span
+                      className={`shrink-0 transition-colors ${
+                        isItemActive
+                          ? "text-sky-400"
+                          : "text-blue-200/70 group-hover:text-white"
+                      }`}
+                    >
+                      {item.icon}
+                    </span>
 
                     {isSidebarVisible && (
                       <>
                         <span className="flex-1 text-left text-xs font-medium">
                           {item.name}
                         </span>
-                        {item.badge && (
-                          <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-sky-400/20 text-sky-200 border border-sky-400/30">
-                            {item.badge}
-                          </span>
-                        )}
+                        <svg
+                          className={`size-3.5 text-blue-300/70 transition-transform ${
+                            isSubmenuOpen ? "rotate-180" : ""
+                          }`}
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
                       </>
                     )}
-                  </Link>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                  </button>
 
-        {/* USER ACCOUNT Section at Bottom of Sidebar */}
-        <div className="p-3.5 border-t border-sidebar-border">
-          {isSidebarVisible ? (
-            <div>
-              <div className="text-[10px] font-bold tracking-widest text-sidebar-foreground/50 uppercase px-2 mb-2 select-none">
-                User Account
-              </div>
-              <div className="flex items-center gap-3 p-2.5 rounded-lg bg-sidebar-accent/70 hover:bg-sidebar-accent transition-colors">
+                  {/* Submenu Accordion */}
+                  {isSidebarVisible && isSubmenuOpen && (
+                    <div className="pl-9 pr-2 py-1 space-y-1">
+                      {item.subItems?.map((sub) => {
+                        const isSubActive = pathname === sub.href;
+                        return (
+                          <Link
+                            key={sub.name}
+                            href={sub.href}
+                            onClick={() => {
+                              if (isMobileOpen) toggleMobileSidebar();
+                            }}
+                            className={`block py-1.5 px-3 rounded-xl text-xs font-medium transition ${
+                              isSubActive
+                                ? "bg-white/20 text-white font-semibold shadow-xs"
+                                : "text-blue-100/70 hover:text-white hover:bg-white/10"
+                            }`}
+                          >
+                            {sub.name}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ) : (
                 <Link
-                  href="/profile"
-                  className="flex items-center gap-3 flex-1 min-w-0 group"
-                  title="View Profile Settings"
+                  href={item.href || "#"}
+                  onClick={() => {
+                    if (isMobileOpen) toggleMobileSidebar();
+                  }}
+                  className={`flex items-center w-full gap-3 px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-medium transition-all group ${
+                    isItemActive
+                      ? "bg-white/15 text-white font-semibold shadow-xs"
+                      : "text-blue-100/75 hover:text-white hover:bg-white/10"
+                  } ${!isSidebarVisible ? "justify-center px-0" : ""}`}
                 >
-                  <Avatar className="size-9 ring-2 ring-primary/30 shrink-0">
-                    <AvatarFallback className="bg-primary/20 text-primary font-bold text-xs">
-                      {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "A"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-sidebar-foreground truncate group-hover:text-primary transition-colors">
-                      {session?.user?.name || "Kwaku Frimpong"}
-                    </div>
-                    <div className="text-[10px] text-sidebar-foreground/70 truncate">
-                      #{role.toLowerCase()}-2026
-                    </div>
-                  </div>
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => signOut({ callbackUrl: "/login" })}
-                  title="Sign out of account"
-                  className="size-7 rounded-md hover:bg-sidebar-accent text-sidebar-foreground/70 hover:text-sidebar-foreground flex items-center justify-center transition shrink-0 cursor-pointer"
-                >
-                  <LogOut className="size-4" />
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex justify-center py-1">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    href="/profile"
-                    title="View Profile Settings"
-                    className="relative size-9 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary shadow-xs hover:scale-105 transition"
+                  <span
+                    className={`shrink-0 transition-colors ${
+                      isItemActive
+                        ? "text-sky-400"
+                        : "text-blue-200/70 group-hover:text-white"
+                    }`}
                   >
-                    {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "A"}
-                    <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-400 ring-2 ring-sidebar" />
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  {session?.user?.name || "Profile"} (#{role})
-                </TooltipContent>
-              </Tooltip>
+                    {item.icon}
+                  </span>
+
+                  {isSidebarVisible && (
+                    <>
+                      <span className="flex-1 text-left text-xs font-medium">
+                        {item.name}
+                      </span>
+                      {item.badge && (
+                        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-sky-400/20 text-sky-200 border border-sky-400/30">
+                          {item.badge}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </Link>
+              )}
             </div>
-          )}
-        </div>
-      </aside>
-    </TooltipProvider>
+          );
+        })}
+      </div>
+
+      {/* USER ACCOUNT Section at Bottom of Sidebar matching reference */}
+      <div className="p-3.5 border-t border-blue-900/30">
+        {isSidebarVisible ? (
+          <div>
+            <div className="text-[10px] font-bold tracking-widest text-blue-200/50 uppercase px-2 mb-2">
+              User Account
+            </div>
+            <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-white/10 hover:bg-white/15 transition-colors">
+              <Link
+                href="/profile"
+                className="flex items-center gap-3 flex-1 min-w-0 group"
+                title="View Profile Settings"
+              >
+                <div className="relative size-9 rounded-full bg-gradient-to-tr from-brand-400 to-sky-300 flex items-center justify-center text-xs font-bold text-white shadow-xs shrink-0">
+                  {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "A"}
+                  <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-400 ring-2 ring-[#071E3D]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-bold text-white truncate group-hover:text-sky-300 transition-colors">
+                    {session?.user?.name || "Alex Williamson"}
+                  </div>
+                  <div className="text-[10px] text-blue-200/70 truncate">
+                    #{role.toLowerCase()}-2026
+                  </div>
+                </div>
+              </Link>
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                title="Sign out of account"
+                className="size-7 rounded-xl hover:bg-white/20 text-blue-200 hover:text-white flex items-center justify-center transition shrink-0 cursor-pointer"
+              >
+                <svg className="size-3.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fillRule="evenodd"
+                    d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center py-1">
+            <Link
+              href="/profile"
+              title="View Profile Settings"
+              className="relative size-9 rounded-full bg-gradient-to-tr from-brand-400 to-sky-300 flex items-center justify-center text-xs font-bold text-white shadow-xs hover:scale-105 transition"
+            >
+              {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "A"}
+              <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-400 ring-2 ring-[#071E3D]" />
+            </Link>
+          </div>
+        )}
+      </div>
+    </aside>
   );
 };
 

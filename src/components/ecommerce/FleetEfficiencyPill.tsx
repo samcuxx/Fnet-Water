@@ -4,7 +4,7 @@ import React from "react";
 
 export default function FleetEfficiencyPill() {
   return (
-    <div className="rounded-xl bg-[#0B1E38] text-white p-5 sm:p-6 shadow-sm flex items-center gap-4 sm:gap-5 h-full">
+    <div className="rounded-[28px] bg-[#0B1E38] text-white p-5 sm:p-6 shadow-sm flex items-center gap-4 sm:gap-5 h-full">
       {/* Circular Radial Ring */}
       <div className="relative size-16 sm:size-18 shrink-0 flex items-center justify-center">
         <svg className="size-full -rotate-90" viewBox="0 0 36 36">

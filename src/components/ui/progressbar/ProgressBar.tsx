@@ -25,14 +25,14 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   };
 
   const colorClasses = {
-    brand: "bg-primary",
-    success: "bg-emerald-500",
-    warning: "bg-amber-500",
-    error: "bg-destructive",
+    brand: "bg-brand-500",
+    success: "bg-success-500",
+    warning: "bg-warning-500",
+    error: "bg-error-500",
   };
 
   const baseClasses =
-    "relative w-full bg-muted rounded-full overflow-hidden";
+    "relative w-full bg-gray-200 rounded-full dark:bg-gray-800 overflow-hidden";
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
@@ -49,7 +49,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
         </div>
       </div>
       {label === "outside" && (
-        <span className="text-xs font-medium text-muted-foreground shrink-0">
+        <span className="text-xs font-medium text-gray-700 dark:text-gray-400 shrink-0">
           {clampedProgress}%
         </span>
       )}

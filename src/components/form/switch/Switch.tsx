@@ -38,26 +38,26 @@ const Switch: React.FC<SwitchProps> = ({
   const switchColors =
     color === "blue"
       ? {
-          background: isChecked ? "bg-primary" : "bg-muted",
-          knob: isChecked ? "translate-x-5 bg-primary-foreground" : "translate-x-0 bg-background",
+          background: isChecked ? "bg-brand-500" : "bg-gray-200 dark:bg-gray-700",
+          knob: isChecked ? "translate-x-5 bg-white" : "translate-x-0 bg-white",
         }
       : {
-          background: isChecked ? "bg-secondary-foreground" : "bg-muted",
-          knob: isChecked ? "translate-x-5 bg-background" : "translate-x-0 bg-background",
+          background: isChecked ? "bg-gray-800 dark:bg-gray-600" : "bg-gray-200 dark:bg-gray-700",
+          knob: isChecked ? "translate-x-5 bg-white" : "translate-x-0 bg-white",
         };
 
   return (
     <label
       id={id}
       className={`inline-flex items-center gap-3 text-xs sm:text-sm font-medium select-none ${
-        disabled ? "text-muted-foreground/60 cursor-not-allowed opacity-60" : "text-foreground cursor-pointer"
+        disabled ? "text-gray-400 cursor-not-allowed opacity-60" : "text-gray-700 dark:text-gray-300 cursor-pointer"
       } ${className}`}
       onClick={handleToggle}
     >
       <div className="relative">
         <div
           className={`block transition duration-200 ease-in-out h-6 w-11 rounded-full ${
-            disabled ? "bg-muted pointer-events-none opacity-50" : switchColors.background
+            disabled ? "bg-gray-200 dark:bg-gray-800 pointer-events-none" : switchColors.background
           }`}
         />
         <div

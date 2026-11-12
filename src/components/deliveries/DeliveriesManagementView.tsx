@@ -1,39 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
-import { Breadcrumbs } from "@/components/tailgrids/core/breadcrumbs";
-import { Card } from "@/components/tailgrids/core/card";
-import { Badge } from "@/components/tailgrids/core/badge";
-import { Button } from "@/components/tailgrids/core/button";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/tailgrids/core/input-group";
-import {
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRoot,
-  TableRow,
-} from "@/components/tailgrids/core/table";
+import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
 import { SkeletonMetrics, SkeletonTable } from "@/components/ui/skeleton";
-import { SearchIcon } from "@/components/common/header/icons";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { DeliveryStop, DriverProfile } from "@/lib/dispatch-store";
 import type { OrderStatus } from "@/lib/order-store";
-import {
-  AlertCircle,
-  Truck,
-  CheckCircle2,
-  Clock,
-  Check,
-  X,
-  MapPin,
-  User,
-} from "lucide-react";
 
 export default function DeliveriesManagementView({
   role = "MANAGER",
@@ -53,8 +28,6 @@ export default function DeliveriesManagementView({
   const [dispatchNotes, setDispatchNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
-
-  const homeHref = role === "ADMIN" ? "/admin" : "/manager";
 
   // Load data
   const loadData = useCallback(async () => {
@@ -125,35 +98,38 @@ export default function DeliveriesManagementView({
 
     setIsSubmitting(true);
     try {
+      const driver = drivers.find((d) => d.id === selectedDriverId);
+      const vanNumber = driver ? `${driver.vanNumber} (${driver.licensePlate})` : undefined;
+
       const res = await fetch("/api/dispatch/assign", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           orderId: activeStop.orderId,
           driverId: selectedDriverId,
-          deliveryInstructions: dispatchNotes,
+          vanNumber,
+          notes: dispatchNotes,
         }),
       });
 
       const data = await res.json();
-      if (res.ok && data.success) {
-        setFeedback({
-          type: "success",
-          text: `Order ${activeStop.orderNumber} successfully assigned to ${data.assignment?.driverName || "driver"}.`,
-        });
-        setIsAssignModalOpen(false);
-        await loadData();
-      } else {
-        setFeedback({
-          type: "error",
-          text: data.error || "Driver assignment failed. Please retry.",
-        });
+      if (!res.ok || !data.success) {
+        setFeedback({ type: "error", text: data.message || "Failed to assign driver." });
+        setIsSubmitting(false);
+        return;
       }
-    } catch {
+
+      setStops((prev) =>
+        prev.map((s) => (s.orderId === activeStop.orderId ? data.stop : s))
+      );
+
+      setIsAssignModalOpen(false);
       setFeedback({
-        type: "error",
-        text: "Network error occurred during driver assignment.",
+        type: "success",
+        text: `Order ${activeStop.orderNumber} assigned to ${driver?.name || "Driver"}.`,
       });
+    } catch {
+      setFeedback({ type: "error", text: "Network error occurred." });
     } finally {
       setIsSubmitting(false);
     }
@@ -164,13 +140,13 @@ export default function DeliveriesManagementView({
       case "DELIVERED":
         return <Badge color="success" size="sm">Delivered</Badge>;
       case "OUT_FOR_DELIVERY":
-        return <Badge color="cyan" size="sm">En Route</Badge>;
+        return <Badge color="info" size="sm">Out for Delivery</Badge>;
       case "ASSIGNED":
         return <Badge color="primary" size="sm">Driver Assigned</Badge>;
       case "PENDING":
         return <Badge color="warning" size="sm">Awaiting Driver</Badge>;
-      default:
-        return <Badge color="neutral" size="sm">Cancelled</Badge>;
+      case "CANCELLED":
+        return <Badge color="dark" size="sm">Cancelled</Badge>;
     }
   };
 
@@ -182,286 +158,261 @@ export default function DeliveriesManagementView({
 
   return (
     <AppLayout role={role}>
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-7xl mx-auto">
         {/* Feedback alert */}
         {feedback && (
           <div
-            className={`flex items-center justify-between rounded-xl p-4 text-xs font-semibold sm:text-sm ${
+            className={`p-3.5 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-between transition-all ${
               feedback.type === "success"
-                ? "border border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-300"
-                : "border border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-800/40 dark:bg-rose-950/30 dark:text-rose-300"
+                ? "bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-900/60 text-green-700 dark:text-green-300"
+                : "bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300"
             }`}
           >
-            <div className="flex items-center gap-2">
-              <Check className="size-4 shrink-0" />
-              <span>{feedback.text}</span>
-            </div>
+            <span>{feedback.text}</span>
             <button
               onClick={() => setFeedback(null)}
-              className="text-text-tertiary hover:text-text-primary cursor-pointer p-0.5"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-0.5 rounded-lg"
               aria-label="Dismiss feedback"
             >
-              <X className="size-4" />
+              <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
             </button>
           </div>
         )}
 
-        {/* Breadcrumbs & Page Header */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-800/80">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
                 Delivery Dispatch &amp; Queue
               </h1>
-              <Badge color="primary" size="sm">
+              <Badge color="info" size="sm">
                 Operations
               </Badge>
             </div>
-            <p className="mt-1 text-xs text-text-tertiary sm:text-sm">
+            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               Assign delivery orders to drivers, track bottle returns, and monitor delivery routes across Ghana.
             </p>
           </div>
-          <div>
-            <Breadcrumbs
-              dividerType="chevron"
-              items={[
-                { label: "Home", href: homeHref },
-                { label: "Delivery Dispatch" },
-              ]}
-            />
-          </div>
         </div>
 
-        {/* 4 Dispatch KPI Cards (NextAdmin Pro Style) */}
+        {/* 4 Dispatch KPI Cards */}
         {loading ? (
           <SkeletonMetrics count={4} />
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-4">
-            {/* Card 1: Unassigned Orders */}
-            <Card beamIndex={3}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
-                    Unassigned Orders
-                  </span>
-                  <h3 className="mt-1 text-lg font-bold text-amber-600 dark:text-amber-400 sm:text-2xl lg:text-3xl">
-                    {pendingCount}
-                  </h3>
-                </div>
-                <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400">
-                  <AlertCircle className="size-4 sm:size-5" />
-                </div>
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+          >
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs text-amber-600 dark:text-amber-400 font-medium block">
+                Unassigned Orders
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {pendingCount} Orders
               </div>
-              <p className="mt-2 text-[11px] text-text-tertiary">Awaiting driver assignment</p>
-            </Card>
+              <span className="text-[11px] text-gray-400 mt-1 block">Awaiting driver assignment</span>
+            </motion.div>
 
-            {/* Card 2: Assigned */}
-            <Card beamIndex={0}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-medium text-text-secondary">
-                    Assigned to Vans
-                  </span>
-                  <h3 className="mt-1 text-lg font-bold text-text-primary sm:text-2xl lg:text-3xl">
-                    {assignedCount}
-                  </h3>
-                </div>
-                <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-blue-light-100 text-primary dark:bg-blue-light-950/60 dark:text-blue-light-400">
-                  <Truck className="size-4 sm:size-5" />
-                </div>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs text-brand-600 dark:text-sky-400 font-medium block">
+                Assigned to Vans
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {assignedCount} Orders
               </div>
-              <p className="mt-2 text-[11px] text-text-tertiary">Queued for delivery run</p>
-            </Card>
+              <span className="text-[11px] text-gray-400 mt-1 block">Queued for run</span>
+            </motion.div>
 
-            {/* Card 3: En Route */}
-            <Card beamIndex={5}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-medium text-text-secondary">
-                    En Route (Live)
-                  </span>
-                  <h3 className="mt-1 text-lg font-bold text-sky-600 dark:text-sky-400 sm:text-2xl lg:text-3xl">
-                    {enRouteCount}
-                  </h3>
-                </div>
-                <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-400">
-                  <Clock className="size-4 sm:size-5" />
-                </div>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs text-sky-600 dark:text-sky-400 font-medium block">
+                En Route (Live)
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {enRouteCount} Vans
               </div>
-              <p className="mt-2 text-[11px] text-text-tertiary">Active van route stops</p>
-            </Card>
+              <span className="text-[11px] text-gray-400 mt-1 block">On doorstep delivery</span>
+            </motion.div>
 
-            {/* Card 4: Delivered */}
-            <Card beamIndex={1}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-medium text-text-secondary">
-                    Delivered Today
-                  </span>
-                  <h3 className="mt-1 text-lg font-bold text-emerald-600 dark:text-emerald-400 sm:text-2xl lg:text-3xl">
-                    {deliveredCount}
-                  </h3>
-                </div>
-                <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
-                  <CheckCircle2 className="size-4 sm:size-5" />
-                </div>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium block">
+                Delivered Today
+              </span>
+              <div className="mt-1 text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
+                {deliveredCount} Stops
               </div>
-              <p className="mt-2 text-[11px] text-text-tertiary">Completed bottle exchanges</p>
-            </Card>
-          </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Bottles exchanged</span>
+            </motion.div>
+          </motion.div>
         )}
 
         {/* Filter & Search Bar */}
-        <Card className="p-3">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex-1 max-w-md">
-              <InputGroup>
-                <InputGroupAddon className="text-icon-secondary">
-                  <SearchIcon />
-                </InputGroupAddon>
-                <InputGroupInput
-                  type="text"
-                  placeholder="Search by order number (FNW-...), customer, location, or driver..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="text-xs"
-                />
-              </InputGroup>
-            </div>
-
-            <div className="w-full sm:w-60">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                aria-label="Filter by delivery status"
-                className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition cursor-pointer"
-              >
-                <option value="ALL">All Statuses ({stops.length})</option>
-                <option value="PENDING">Awaiting Driver ({pendingCount})</option>
-                <option value="ASSIGNED">Driver Assigned ({assignedCount})</option>
-                <option value="OUT_FOR_DELIVERY">En Route ({enRouteCount})</option>
-                <option value="DELIVERED">Delivered ({deliveredCount})</option>
-              </select>
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="sm:col-span-2 relative">
+            <input
+              type="text"
+              placeholder="Search by order number (FNW-...), customer, location, or driver..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition shadow-2xs"
+            />
+            <svg
+              className="size-4 text-gray-400 absolute left-3.5 top-3.5 pointer-events-none"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
           </div>
-        </Card>
 
-        {/* Dispatch Orders Table (NextAdmin Pro TableRoot) */}
+          <div>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              aria-label="Filter by delivery status"
+              className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition cursor-pointer shadow-2xs"
+            >
+              <option value="ALL">All Statuses ({stops.length})</option>
+              <option value="PENDING">Awaiting Driver ({pendingCount})</option>
+              <option value="ASSIGNED">Driver Assigned ({assignedCount})</option>
+              <option value="OUT_FOR_DELIVERY">En Route ({enRouteCount})</option>
+              <option value="DELIVERED">Delivered ({deliveredCount})</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Dispatch Orders Table */}
         {loading ? (
           <SkeletonTable rows={6} columns={7} />
         ) : (
-          <Card className="overflow-hidden p-0">
+          <motion.div
+            variants={fadeInUp}
+            initial="initial"
+            animate="animate"
+            className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs overflow-hidden"
+          >
             {filteredStops.length === 0 ? (
-              <div className="p-12 text-center text-xs text-text-tertiary">
+              <div className="p-8 text-center text-xs text-gray-400">
                 No delivery orders match your filters.
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <TableRoot>
-                  <TableHeader>
-                    <TableRow className="border-b border-card-border bg-background-gray-secondary/50">
-                      <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                        Order #
-                      </TableHead>
-                      <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                        Customer &amp; Area
-                      </TableHead>
-                      <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                        Digital Address
-                      </TableHead>
-                      <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                        Volume
-                      </TableHead>
-                      <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                        Assigned Van
-                      </TableHead>
-                      <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                        Status
-                      </TableHead>
-                      <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase text-right">
-                        Action
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody className="divide-y divide-card-border">
-                    {filteredStops.map((stop) => (
-                      <TableRow
-                        key={stop.orderId}
-                        className="hover:bg-background-gray-secondary/30 transition"
-                      >
-                        <TableCell className="px-5 py-4 font-mono font-bold text-xs text-text-primary">
-                          {stop.orderNumber}
-                          <span className="block text-[11px] font-normal text-text-tertiary">
-                            {stop.deliverySlot}
-                          </span>
-                        </TableCell>
+                <table className="w-full text-left text-xs">
+                <thead className="bg-gray-50 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold border-b border-gray-200 dark:border-gray-800">
+                  <tr>
+                    <th className="px-4 py-3">Order</th>
+                    <th className="px-4 py-3">Customer &amp; Area</th>
+                    <th className="px-4 py-3">Digital Address</th>
+                    <th className="px-4 py-3">Refill Volume</th>
+                    <th className="px-4 py-3">Assigned Van</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                  {filteredStops.map((stop) => (
+                    <tr key={stop.orderId} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/40 transition">
+                      <td className="px-4 py-3 font-mono font-bold text-gray-900 dark:text-white">
+                        {stop.orderNumber}
+                        <span className="block text-[10px] font-normal text-gray-400">
+                          {stop.deliverySlot}
+                        </span>
+                      </td>
 
-                        <TableCell className="px-5 py-4">
-                          <div className="font-semibold text-xs text-text-primary">
-                            {stop.customerName}
-                          </div>
-                          <div className="text-xs text-text-tertiary truncate max-w-xs">
-                            {stop.deliveryAddress}
-                          </div>
-                        </TableCell>
+                      <td className="px-4 py-3">
+                        <div className="font-semibold text-gray-900 dark:text-white">
+                          {stop.customerName}
+                        </div>
+                        <div className="text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                          {stop.deliveryAddress}
+                        </div>
+                      </td>
 
-                        <TableCell className="px-5 py-4 font-mono text-xs text-text-secondary">
-                          <span className="px-2 py-0.5 rounded bg-background-gray-secondary text-[11px]">
-                            {stop.digitalAddress}
-                          </span>
-                        </TableCell>
+                      <td className="px-4 py-3 font-mono text-gray-700 dark:text-gray-300">
+                        <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-[11px]">
+                          {stop.digitalAddress}
+                        </span>
+                      </td>
 
-                        <TableCell className="px-5 py-4">
-                          <span className="font-semibold text-xs text-text-primary">
-                            {stop.bottlesDelivering} Bottles (19L)
-                          </span>
-                          <span className="block text-[11px] text-text-tertiary">
-                            {stop.hasEmptyBottleExchange ? "Bottle exchange" : "Deposit paid"}
-                          </span>
-                        </TableCell>
+                      <td className="px-4 py-3">
+                        <span className="font-semibold text-gray-900 dark:text-white">
+                          {stop.bottlesDelivering} Bottles (19L)
+                        </span>
+                        <span className="block text-[10px] text-gray-400">
+                          {stop.hasEmptyBottleExchange ? "Bottle Returned" : "Deposit Paid"}
+                        </span>
+                      </td>
 
-                        <TableCell className="px-5 py-4">
-                          {stop.driverName ? (
-                            <div>
-                              <span className="font-semibold text-xs text-text-primary block">
-                                {stop.driverName}
-                              </span>
-                              <span className="text-[11px] text-text-tertiary block">
-                                {stop.vanNumber || "Van 01"}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-text-tertiary text-xs italic">Unassigned</span>
-                          )}
-                        </TableCell>
-
-                        <TableCell className="px-5 py-4">
-                          {getStatusBadge(stop.status)}
-                        </TableCell>
-
-                        <TableCell className="px-5 py-4 text-right">
-                          {stop.status === "DELIVERED" ? (
-                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-xs">
-                              Completed
+                      <td className="px-4 py-3">
+                        {stop.driverName ? (
+                          <div>
+                            <span className="font-semibold text-gray-800 dark:text-gray-200 block">
+                              {stop.driverName}
                             </span>
-                          ) : (
-                            <Button
-                              size="sm"
-                              onClick={() => openAssignModal(stop)}
-                              className="text-xs font-semibold"
-                            >
-                              <span>{stop.driverId ? "Reassign" : "Assign Driver"}</span>
-                            </Button>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </TableRoot>
-              </div>
-            )}
-          </Card>
-        )}
+                            <span className="text-[10px] text-gray-400 block">
+                              {stop.vanNumber || "Van 01"}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 italic">Unassigned</span>
+                        )}
+                      </td>
+
+                      <td className="px-4 py-3">{getStatusBadge(stop.status)}</td>
+
+                      <td className="px-4 py-3 text-right">
+                        {stop.status === "DELIVERED" ? (
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-[11px]">
+                            Completed
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => openAssignModal(stop)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-brand-500 hover:bg-brand-600 transition shadow-xs cursor-pointer"
+                          >
+                            <span>{stop.driverId ? "Reassign" : "Assign Driver"}</span>
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </motion.div>
+      )}
 
         {/* MODAL: Assign Driver & Van */}
         <Modal
@@ -471,93 +422,89 @@ export default function DeliveriesManagementView({
         >
           {activeStop && (
             <form onSubmit={handleAssignDriver} className="space-y-4">
-              <div className="rounded-xl bg-background-gray-secondary p-4 text-xs space-y-1.5 border border-card-border">
-                <div className="flex justify-between">
-                  <span className="text-text-tertiary">Customer:</span>
-                  <span className="font-bold text-text-primary">{activeStop.customerName} ({activeStop.customerPhone})</span>
+              <div className="p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-xs space-y-1">
+                <div>
+                  <strong>Customer:</strong> {activeStop.customerName} ({activeStop.customerPhone})
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-tertiary">Address:</span>
-                  <span className="font-medium text-text-primary">{activeStop.deliveryAddress} ({activeStop.digitalAddress})</span>
+                <div>
+                  <strong>Address:</strong> {activeStop.deliveryAddress} ({activeStop.digitalAddress})
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-tertiary">Volume:</span>
-                  <span className="font-bold text-primary">{activeStop.bottlesDelivering} Refill Bottles (19L)</span>
+                <div>
+                  <strong>Delivery Volume:</strong> {activeStop.bottlesDelivering} Refill Bottles (19L)
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-text-primary uppercase tracking-wider block mb-2">
+                <label className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider block mb-1.5">
                   Select Fleet Driver &amp; Van
                 </label>
-                <div className="space-y-2 max-h-56 overflow-y-auto">
+                <div className="space-y-2">
                   {drivers.map((drv) => (
                     <label
                       key={drv.id}
                       className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition ${
                         selectedDriverId === drv.id
-                          ? "border-primary bg-blue-light-50/40 dark:bg-blue-light-950/20 ring-1 ring-primary"
-                          : "border-card-border hover:bg-background-gray-secondary/50"
+                          ? "border-brand-500 bg-brand-50/20 dark:bg-brand-950/20 ring-1 ring-brand-500/30"
+                          : "border-gray-200 dark:border-gray-800"
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2.5">
                         <input
                           type="radio"
                           name="assignedDriver"
                           value={drv.id}
                           checked={selectedDriverId === drv.id}
                           onChange={(e) => setSelectedDriverId(e.target.value)}
-                          className="text-primary"
+                          className="text-brand-500"
                         />
                         <div>
-                          <div className="text-xs font-bold text-text-primary">
+                          <div className="text-xs font-bold text-gray-900 dark:text-white">
                             {drv.name}
                           </div>
-                          <div className="text-[11px] text-text-tertiary">
-                            {drv.vanNumber || "Van 01"} • {drv.phone}
+                          <div className="text-[11px] text-gray-500 dark:text-gray-400">
+                            {drv.vanNumber} • {drv.licensePlate} • {drv.phone}
                           </div>
                         </div>
                       </div>
-                      <Badge
-                        color={drv.isAvailable ? "success" : "neutral"}
-                        size="sm"
-                      >
-                        {drv.isAvailable ? "AVAILABLE" : "BUSY"}
-                      </Badge>
+
+                      <div className="text-right">
+                        <Badge color={drv.activeStopsCount > 4 ? "warning" : "primary"} size="sm">
+                          {drv.activeStopsCount} Active Stops
+                        </Badge>
+                      </div>
                     </label>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-text-primary block mb-1">
-                  Dispatch Notes / Directions
+                <label className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider block mb-1">
+                  Dispatch Instructions (Optional)
                 </label>
-                <textarea
-                  rows={2}
+                <input
+                  type="text"
+                  placeholder="e.g. Call before arrival, gate code..."
                   value={dispatchNotes}
                   onChange={(e) => setDispatchNotes(e.target.value)}
-                  placeholder="Gate code, landmarks, special customer instructions..."
-                  className="w-full rounded-lg border border-card-border bg-card-background p-2.5 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
+                  className="w-full h-9.5 px-3 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500"
                 />
               </div>
 
-              <div className="flex justify-end gap-2.5 pt-4 border-t border-card-border">
-                <Button
+              <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+                <button
                   type="button"
-                  appearance="outline"
-                  size="sm"
                   onClick={() => setIsAssignModalOpen(false)}
+                  className="px-4 py-2 text-xs font-semibold rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
                 >
                   Cancel
-                </Button>
-                <Button
+                </button>
+                <button
                   type="submit"
-                  disabled={isSubmitting || !selectedDriverId}
-                  size="sm"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 text-xs font-semibold rounded-lg text-white bg-brand-500 hover:bg-brand-600 transition shadow-theme-xs disabled:opacity-50 cursor-pointer"
                 >
-                  {isSubmitting ? "Assigning..." : "Confirm Driver Assignment"}
-                </Button>
+                  {isSubmitting ? "Dispatching..." : "Confirm Assignment"}
+                </button>
               </div>
             </form>
           )}

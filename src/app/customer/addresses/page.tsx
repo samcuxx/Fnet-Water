@@ -1,22 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
-import { Breadcrumbs } from "@/components/tailgrids/core/breadcrumbs";
-import { Card } from "@/components/tailgrids/core/card";
-import { Badge } from "@/components/tailgrids/core/badge";
-import { Button } from "@/components/tailgrids/core/button";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/tailgrids/core/input-group";
 import Modal from "@/components/ui/Modal";
+import Badge from "@/components/ui/Badge";
 import { SkeletonCard } from "@/components/ui/skeleton";
-import { SearchIcon } from "@/components/common/header/icons";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { StoredAddress, AddressCategory } from "@/lib/customer-store";
-import { X, Plus, Edit2, Trash2, MapPin, Check, Compass, Navigation, Loader2 } from "lucide-react";
-import { cn } from "@/utils/cn";
 
 export default function CustomerAddressesPage() {
   const [addresses, setAddresses] = useState<StoredAddress[]>([]);
@@ -33,22 +24,9 @@ export default function CustomerAddressesPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [activeAddress, setActiveAddress] = useState<StoredAddress | null>(null);
 
-  // Location mode: select current location OR type digital address
-  const [locationMode, setLocationMode] = useState<"gps" | "manual">("gps");
-  const [isLocating, setIsLocating] = useState(false);
-  const [gpsCaptured, setGpsCaptured] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
-
   // Form state
-  const [formData, setFormData] = useState<{
-    category: AddressCategory;
-    areaName: string;
-    digitalAddress: string;
-    deliveryInstructions: string;
-    isDefault: boolean;
-    gpsLatitude?: number;
-    gpsLongitude?: number;
-  }>({
-    category: "HOME",
+  const [formData, setFormData] = useState({
+    category: "HOME" as AddressCategory,
     areaName: "",
     digitalAddress: "",
     deliveryInstructions: "",
@@ -56,68 +34,6 @@ export default function CustomerAddressesPage() {
   });
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // GPS Geolocation Handler
-  const handleUseCurrentLocation = () => {
-    if (typeof window === "undefined" || !navigator.geolocation) {
-      setFormError("Geolocation is not supported by your browser or phone.");
-      return;
-    }
-
-    setIsLocating(true);
-    setFormError(null);
-
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude, accuracy } = pos.coords;
-        setGpsCaptured({ lat: latitude, lng: longitude, accuracy });
-
-        const autoDigitalCode = `GA-${Math.floor(Math.abs(latitude * 100)) % 900 + 100}-${Math.floor(Math.abs(longitude * 10000)) % 9000 + 1000}`;
-
-        setFormData((prev) => ({
-          ...prev,
-          digitalAddress: prev.digitalAddress || autoDigitalCode,
-          gpsLatitude: latitude,
-          gpsLongitude: longitude,
-        }));
-
-        // Reverse geocoding via OpenStreetMap Nominatim
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-          );
-          if (res.ok) {
-            const data = await res.json();
-            if (data && data.address) {
-              const road = data.address.road || data.address.street || "";
-              const suburb = data.address.suburb || data.address.neighbourhood || data.address.residential || "";
-              const city = data.address.city || data.address.town || data.address.county || "Accra";
-              const areaParts = [road, suburb, city].filter(Boolean);
-              if (areaParts.length > 0) {
-                setFormData((prev) => ({
-                  ...prev,
-                  areaName: areaParts.join(", "),
-                }));
-              }
-            }
-          }
-        } catch {
-          // If reverse geocoding is unavailable, keep existing areaName
-        } finally {
-          setIsLocating(false);
-        }
-      },
-      (err) => {
-        setIsLocating(false);
-        if (err.code === 1) {
-          setFormError("Location permission denied. Please allow GPS access or type your digital address below.");
-        } else {
-          setFormError("Unable to retrieve GPS position. Please type your digital address manually.");
-        }
-      },
-      { enableHighAccuracy: true, timeout: 12000 }
-    );
-  };
 
   // Load addresses from API
   const loadAddresses = useCallback(async () => {
@@ -145,7 +61,7 @@ export default function CustomerAddressesPage() {
     }
   }, [feedback]);
 
-  // Client-side filtering
+  // Client-side filtering (0ms lag)
   const filteredAddresses = useMemo(() => {
     const q = search.toLowerCase().trim();
     return addresses.filter((addr) => {
@@ -180,6 +96,7 @@ export default function CustomerAddressesPage() {
         return;
       }
 
+      // Update state
       if (data.address.isDefault) {
         setAddresses((prev) => [
           data.address,
@@ -199,7 +116,7 @@ export default function CustomerAddressesPage() {
       });
       setFeedback({ type: "success", text: "New delivery location saved." });
     } catch {
-      setFormError("Network connection error occurred.");
+      setFormError("Network error occurred.");
     } finally {
       setIsSubmitting(false);
     }
@@ -255,7 +172,7 @@ export default function CustomerAddressesPage() {
       setIsEditModalOpen(false);
       setFeedback({ type: "success", text: "Address details updated." });
     } catch {
-      setFormError("Network connection error occurred.");
+      setFormError("Network error occurred.");
     } finally {
       setIsSubmitting(false);
     }
@@ -263,35 +180,34 @@ export default function CustomerAddressesPage() {
 
   // Set Default
   const handleSetDefault = async (addr: StoredAddress) => {
+    if (addr.isDefault) return;
+
+    // Optimistic update
+    setAddresses((prev) =>
+      prev.map((a) => ({
+        ...a,
+        isDefault: a.id === addr.id,
+      }))
+    );
+
     try {
       const res = await fetch("/api/customer/addresses", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "setDefault",
-          addressId: addr.id,
-        }),
+        body: JSON.stringify({ action: "default", addressId: addr.id }),
       });
-
       const data = await res.json();
-      if (res.ok && data.success) {
-        setAddresses((prev) =>
-          prev.map((a) => ({
-            ...a,
-            isDefault: a.id === addr.id,
-          }))
-        );
-        setFeedback({
-          type: "success",
-          text: `${addr.areaName} is now your default delivery address.`,
-        });
+      if (data.success) {
+        setFeedback({ type: "success", text: `${addr.areaName} set as primary delivery location.` });
+      } else {
+        loadAddresses();
       }
     } catch {
-      setFeedback({ type: "error", text: "Failed to update default address." });
+      loadAddresses();
     }
   };
 
-  // Open Delete Modal
+  // Open Delete
   const openDeleteModal = (addr: StoredAddress) => {
     setActiveAddress(addr);
     setIsDeleteModalOpen(true);
@@ -303,480 +219,415 @@ export default function CustomerAddressesPage() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch(`/api/customer/addresses?id=${activeAddress.id}`, {
+      const res = await fetch(`/api/customer/addresses?addressId=${activeAddress.id}`, {
         method: "DELETE",
       });
-
       const data = await res.json();
-      if (res.ok && data.success) {
+
+      if (data.success) {
         setAddresses((prev) => prev.filter((a) => a.id !== activeAddress.id));
         setIsDeleteModalOpen(false);
-        setFeedback({ type: "success", text: "Address removed successfully." });
+        setFeedback({ type: "success", text: "Delivery location removed." });
       } else {
-        setFeedback({
-          type: "error",
-          text: data.message || "Failed to delete address.",
-        });
+        setFeedback({ type: "error", text: data.message || "Failed to delete address." });
       }
     } catch {
-      setFeedback({ type: "error", text: "Network connection error occurred." });
+      setFeedback({ type: "error", text: "Network error occurred." });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const getCategoryBadgeColor = (category: AddressCategory): "primary" | "cyan" | "success" | "warning" | "neutral" => {
+  const getCategoryBadgeColor = (category: AddressCategory): "primary" | "info" | "success" | "warning" | "dark" => {
     switch (category) {
       case "HOME":
         return "primary";
       case "OFFICE":
-        return "cyan";
+        return "info";
       case "SHOP":
-        return "success";
-      case "SCHOOL":
         return "warning";
       case "WAREHOUSE":
+        return "dark";
       default:
-        return "neutral";
+        return "dark";
     }
   };
 
   return (
     <AppLayout role="CUSTOMER">
-      <div className="space-y-6">
+      <div className="space-y-5 max-w-5xl mx-auto">
         {/* Toast / Notification Banner */}
         {feedback && (
           <div
-            className={`flex items-center justify-between rounded-xl p-4 text-xs font-semibold sm:text-sm ${
+            className={`p-3 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-between transition-all ${
               feedback.type === "success"
-                ? "border border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-300"
-                : "border border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300"
+                ? "bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-900/60 text-green-700 dark:text-green-300"
+                : "bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300"
             }`}
           >
-            <div className="flex items-center gap-2">
-              <Check className="size-4 shrink-0" />
-              <span>{feedback.text}</span>
-            </div>
+            <span>{feedback.text}</span>
             <button
               onClick={() => setFeedback(null)}
-              className="text-text-tertiary hover:text-text-primary cursor-pointer p-0.5"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-0.5 rounded-lg"
               aria-label="Dismiss message"
             >
-              <X className="size-4" />
+              <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
             </button>
           </div>
         )}
 
-        {/* Breadcrumbs & Header Section */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800/80">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
               Delivery Addresses
             </h1>
-            <p className="mt-1 text-xs text-text-tertiary sm:text-sm">
+            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               Manage saved GhanaPost GPS locations for quick doorstep delivery.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            <Breadcrumbs
-              dividerType="chevron"
-              items={[
-                { label: "Home", href: "/customer" },
-                { label: "Addresses" },
-              ]}
-            />
-            <Button
-              size="sm"
-              onClick={() => {
-                setFormData({
-                  category: "HOME",
-                  areaName: "",
-                  digitalAddress: "",
-                  deliveryInstructions: "",
-                  isDefault: false,
-                });
-                setFormError(null);
-                setIsAddModalOpen(true);
-              }}
-              className="gap-2"
-            >
-              <Plus className="size-3.5" />
-              <span>Add Address</span>
-            </Button>
-          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setFormData({
+                category: "HOME",
+                areaName: "",
+                digitalAddress: "",
+                deliveryInstructions: "",
+                isDefault: false,
+              });
+              setFormError(null);
+              setIsAddModalOpen(true);
+            }}
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs self-start sm:self-auto cursor-pointer"
+          >
+            <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+            </svg>
+            <span>+ Add Address</span>
+          </button>
         </div>
 
         {/* Filter & Search Bar */}
-        <Card className="p-3">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex-1 max-w-md">
-              <InputGroup>
-                <InputGroupAddon className="text-icon-secondary">
-                  <SearchIcon />
-                </InputGroupAddon>
-                <InputGroupInput
-                  type="text"
-                  placeholder="Search addresses or digital codes..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="text-xs"
-                />
-              </InputGroup>
-            </div>
-
-            <div className="w-full sm:w-60">
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                aria-label="Filter by address category"
-                className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition cursor-pointer"
-              >
-                <option value="ALL">All Categories</option>
-                <option value="HOME">Home</option>
-                <option value="OFFICE">Office</option>
-                <option value="SHOP">Shop</option>
-                <option value="WAREHOUSE">Warehouse</option>
-                <option value="SCHOOL">School</option>
-                <option value="OTHER">Other</option>
-              </select>
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="sm:col-span-2 relative">
+            <input
+              type="text"
+              placeholder="Search addresses or digital codes..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition shadow-2xs"
+            />
+            <svg
+              className="size-4 text-gray-400 absolute left-3.5 top-3.5 pointer-events-none"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
           </div>
-        </Card>
+
+          <div>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              aria-label="Filter by address category"
+              className="w-full h-11 px-3.5 text-xs sm:text-sm rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition cursor-pointer shadow-2xs"
+            >
+              <option value="ALL">All Categories</option>
+              <option value="HOME">Home</option>
+              <option value="OFFICE">Office</option>
+              <option value="SHOP">Shop</option>
+              <option value="WAREHOUSE">Warehouse</option>
+              <option value="SCHOOL">School</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
+        </div>
 
         {/* Address Cards Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <SkeletonCard lines={3} />
             <SkeletonCard lines={3} />
             <SkeletonCard lines={3} />
           </div>
         ) : filteredAddresses.length === 0 ? (
-          <Card className="p-12 text-center text-xs text-text-tertiary sm:text-sm">
-            No delivery locations match your search criteria.
-          </Card>
+          <div className="p-8 text-center bg-white dark:bg-gray-900/70 rounded-[28px] border border-gray-100 dark:border-gray-800/80 shadow-xs">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              No delivery locations match your search criteria.
+            </p>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          >
             {filteredAddresses.map((addr) => (
-              <Card
+              <motion.div
                 key={addr.id}
-                className={`flex flex-col justify-between p-5 sm:p-6 transition ${
+                variants={fadeInUp}
+                whileHover={cardHoverMotion.whileHover}
+                transition={cardHoverMotion.transition}
+                className={`p-5 sm:p-6 rounded-[28px] border transition shadow-xs flex flex-col justify-between ${
                   addr.isDefault
-                    ? "border-primary bg-blue-light-50/20 dark:bg-blue-light-950/20"
-                    : ""
+                    ? "border-brand-500/80 bg-brand-50/20 dark:bg-brand-950/20 ring-1 ring-brand-500/20"
+                    : "border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70"
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-3">
-                    <Badge color={getCategoryBadgeColor(addr.category)} size="sm">
+                    <Badge color={getCategoryBadgeColor(addr.category)} variant="light" size="sm">
                       {addr.category}
                     </Badge>
 
                     {addr.isDefault ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary">
-                        <span className="size-1.5 rounded-full bg-primary" />
-                        Default
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-600 dark:text-blue-light-400">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
+                        Default Location
                       </span>
                     ) : (
                       <button
                         type="button"
                         onClick={() => handleSetDefault(addr)}
-                        className="text-[11px] text-text-tertiary hover:text-primary font-medium transition cursor-pointer"
+                        className="text-[11px] text-gray-500 hover:text-brand-600 dark:hover:text-blue-light-400 font-medium transition cursor-pointer"
                       >
                         Set as Default
                       </button>
                     )}
                   </div>
 
-                  <h3 className="text-base font-bold text-text-primary leading-snug">
+                  <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white leading-snug">
                     {addr.areaName}
                   </h3>
 
                   <div className="mt-2 flex items-center gap-2">
-                    <span className="rounded bg-background-gray-secondary px-2 py-0.5 font-mono text-xs font-semibold text-text-secondary">
+                    <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
                       {addr.digitalAddress}
                     </span>
+                    <span className="text-[11px] text-gray-400">GhanaPost GPS</span>
                   </div>
 
                   {addr.deliveryInstructions && (
-                    <p className="mt-3 text-xs text-text-tertiary italic line-clamp-2">
-                      &ldquo;{addr.deliveryInstructions}&rdquo;
+                    <p className="mt-3 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-lg border border-gray-100 dark:border-gray-800/60 leading-relaxed italic">
+                      "{addr.deliveryInstructions}"
                     </p>
                   )}
                 </div>
 
-                <div className="mt-5 flex items-center justify-end gap-2 border-t border-card-border pt-4">
-                  <Button
-                    appearance="outline"
-                    size="sm"
-                    onClick={() => openEditModal(addr)}
-                    className="gap-1.5 text-xs font-semibold"
-                  >
-                    <Edit2 className="size-3.5" />
-                    <span>Edit</span>
-                  </Button>
+                <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs">
+                  <span className="text-gray-400">
+                    Added {new Date(addr.createdAt).toLocaleDateString()}
+                  </span>
 
-                  <Button
-                    appearance="outline"
-                    size="sm"
-                    onClick={() => openDeleteModal(addr)}
-                    className="gap-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400"
-                  >
-                    <Trash2 className="size-3.5" />
-                    <span>Delete</span>
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => openEditModal(addr)}
+                      title="Edit Address"
+                      className="p-1.5 rounded-lg text-gray-500 hover:text-brand-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
+                    >
+                      <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        />
+                      </svg>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => openDeleteModal(addr)}
+                      title="Delete Address"
+                      className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
+                    >
+                      <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-              </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
 
-        {/* MODAL 1: Add Address */}
+        {/* MODAL: Add Delivery Address */}
         <Modal
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           title="Add Delivery Address"
         >
           {formError && (
-            <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
+            <div className="mb-4 p-3 rounded-lg text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400">
               {formError}
             </div>
           )}
 
           <form onSubmit={handleCreateAddress} className="space-y-4">
-            {/* Location Input Method Selection */}
-            <div className="space-y-2">
-              <label className="block text-xs font-semibold text-text-primary">
-                Select Location Method
-              </label>
-              <div className="grid grid-cols-2 gap-2 p-1 rounded-lg border border-card-border bg-background-gray-secondary/60">
-                <button
-                  type="button"
-                  onClick={() => setLocationMode("gps")}
-                  className={cn(
-                    "flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold rounded-md transition cursor-pointer",
-                    locationMode === "gps"
-                      ? "bg-primary text-white shadow-xs"
-                      : "text-text-secondary hover:text-text-primary"
-                  )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Location Type
+                </label>
+                <select
+                  value={formData.category}
+                  onChange={(e) =>
+                    setFormData({ ...formData, category: e.target.value as AddressCategory })
+                  }
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
                 >
-                  <Navigation className="size-3.5 shrink-0" />
-                  <span>Use Current Location</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLocationMode("manual")}
-                  className={cn(
-                    "flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold rounded-md transition cursor-pointer",
-                    locationMode === "manual"
-                      ? "bg-primary text-white shadow-xs"
-                      : "text-text-secondary hover:text-text-primary"
-                  )}
-                >
-                  <MapPin className="size-3.5 shrink-0" />
-                  <span>Type Digital Address</span>
-                </button>
+                  <option value="HOME">Residential Home</option>
+                  <option value="OFFICE">Corporate Office</option>
+                  <option value="SHOP">Commercial Shop / Store</option>
+                  <option value="WAREHOUSE">Warehouse / Facility</option>
+                  <option value="SCHOOL">School / Institution</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Ghana Digital Address
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. GA-492-1029"
+                  value={formData.digitalAddress}
+                  onChange={(e) => setFormData({ ...formData, digitalAddress: e.target.value })}
+                  className="w-full h-9 px-3 text-sm font-mono rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition uppercase"
+                />
               </div>
             </div>
 
-            {locationMode === "gps" && (
-              <div className="space-y-2.5 rounded-xl border border-primary/20 bg-blue-light-50/40 p-3.5 dark:bg-blue-light-950/20 dark:border-blue-900/40">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="block text-xs font-bold text-text-primary">
-                      Current GPS Location
-                    </span>
-                    <span className="text-[11px] text-text-tertiary">
-                      Pinpoint your doorstep location automatically
-                    </span>
-                  </div>
-                  <Button
-                    type="button"
-                    size="sm"
-                    disabled={isLocating}
-                    onClick={handleUseCurrentLocation}
-                    className="gap-1.5 bg-primary hover:bg-brand-600 text-white shadow-xs cursor-pointer shrink-0"
-                  >
-                    {isLocating ? (
-                      <>
-                        <Loader2 className="size-3.5 animate-spin" />
-                        <span>Detecting...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Compass className="size-3.5" />
-                        <span>Detect Location</span>
-                      </>
-                    )}
-                  </Button>
-                </div>
-
-                {gpsCaptured ? (
-                  <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50/80 p-2 text-xs text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300">
-                    <Check className="size-4 shrink-0 text-emerald-600" />
-                    <div>
-                      <div className="font-semibold">GPS Position Captured</div>
-                      <div className="font-mono text-[11px] opacity-80">
-                        {gpsCaptured.lat.toFixed(5)}° N, {gpsCaptured.lng.toFixed(5)}° W (±{Math.round(gpsCaptured.accuracy)}m)
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-[11px] text-text-tertiary">
-                    Tap &quot;Detect Location&quot; to allow your phone or browser to locate your delivery spot.
-                  </p>
-                )}
-              </div>
-            )}
-
             <div>
-              <label className="mb-1 block text-xs font-semibold text-text-primary">
-                GhanaPost Digital Address
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. GA-492-1029"
-                value={formData.digitalAddress}
-                onChange={(e) => setFormData({ ...formData, digitalAddress: e.target.value.toUpperCase() })}
-                className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs font-mono text-text-primary focus:outline-hidden focus:border-primary transition"
-              />
-              <span className="text-[10px] text-text-tertiary mt-0.5 block">
-                {gpsCaptured ? "Automatically derived from your GPS coordinates or enter specific postal code." : "Enter your Ghana Digital Address code (e.g. GA-492-1029)."}
-              </span>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-text-primary">
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Street Name &amp; Area Landmark
               </label>
               <input
                 type="text"
                 required
-                placeholder="e.g. House 14, Boundary Road, East Legon"
+                placeholder="e.g. House 14, Boundary Road"
                 value={formData.areaName}
                 onChange={(e) => setFormData({ ...formData, areaName: e.target.value })}
-                className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
+                className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-text-primary">
-                Location Category
-              </label>
-              <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value as AddressCategory })}
-                className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
-              >
-                <option value="HOME">Residential Home</option>
-                <option value="OFFICE">Office</option>
-                <option value="SHOP">Shop / Retail</option>
-                <option value="WAREHOUSE">Warehouse</option>
-                <option value="SCHOOL">School</option>
-                <option value="OTHER">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-text-primary">
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Drop-Off &amp; Driver Instructions (Optional)
               </label>
               <textarea
                 rows={2}
-                placeholder="e.g. Call 0244950505 upon arrival, leave with security reception..."
+                placeholder="e.g. Call 0241000005 upon arrival, leave with security reception."
                 value={formData.deliveryInstructions}
                 onChange={(e) => setFormData({ ...formData, deliveryInstructions: e.target.value })}
-                className="w-full rounded-lg border border-card-border bg-card-background p-2.5 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
+                className="w-full p-2.5 text-xs sm:text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
               />
             </div>
 
-            <div>
-              <label className="flex items-center gap-2 cursor-pointer text-xs">
-                <input
-                  type="checkbox"
-                  checked={formData.isDefault}
-                  onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
-                  className="size-4 rounded border-card-border text-primary focus:ring-primary cursor-pointer"
-                />
-                <span className="text-text-primary font-medium">Set as my default delivery location for water orders</span>
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="isDefaultAdd"
+                checked={formData.isDefault}
+                onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
+                className="rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+              />
+              <label htmlFor="isDefaultAdd" className="text-xs text-gray-700 dark:text-gray-300">
+                Set as my default delivery location for water orders
               </label>
             </div>
 
-            <div className="flex justify-end gap-2.5 pt-4 border-t border-card-border">
-              <Button
+            <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+              <button
                 type="button"
-                appearance="outline"
-                size="sm"
                 onClick={() => setIsAddModalOpen(false)}
+                className="px-4 py-2 text-xs font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
               >
                 Cancel
-              </Button>
-              <Button
+              </button>
+              <button
                 type="submit"
                 disabled={isSubmitting}
-                size="sm"
+                className="px-4 py-2 text-xs font-medium rounded-lg text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs disabled:opacity-50 cursor-pointer"
               >
-                {isSubmitting ? "Saving..." : "Save Address"}
-              </Button>
+                {isSubmitting ? "Saving..." : "Save Location"}
+              </button>
             </div>
           </form>
         </Modal>
 
-        {/* MODAL 2: Edit Address */}
+        {/* MODAL: Edit Delivery Address */}
         <Modal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           title="Edit Delivery Address"
         >
           {formError && (
-            <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
+            <div className="mb-4 p-3 rounded-lg text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400">
               {formError}
             </div>
           )}
 
           <form onSubmit={handleSaveEdit} className="space-y-4">
-            {/* Quick GPS detect */}
-            <div className="flex items-center justify-between rounded-xl border border-primary/20 bg-blue-light-50/30 p-3 dark:bg-blue-light-950/20">
-              <span className="text-xs font-semibold text-text-primary">
-                Update Location via GPS
-              </span>
-              <Button
-                type="button"
-                size="sm"
-                disabled={isLocating}
-                onClick={handleUseCurrentLocation}
-                className="gap-1.5 bg-primary hover:bg-brand-600 text-white shadow-xs cursor-pointer"
-              >
-                {isLocating ? (
-                  <>
-                    <Loader2 className="size-3.5 animate-spin" />
-                    <span>Detecting...</span>
-                  </>
-                ) : (
-                  <>
-                    <Compass className="size-3.5" />
-                    <span>Detect Location</span>
-                  </>
-                )}
-              </Button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Location Type
+                </label>
+                <select
+                  value={formData.category}
+                  onChange={(e) =>
+                    setFormData({ ...formData, category: e.target.value as AddressCategory })
+                  }
+                  className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
+                >
+                  <option value="HOME">Residential Home</option>
+                  <option value="OFFICE">Corporate Office</option>
+                  <option value="SHOP">Commercial Shop / Store</option>
+                  <option value="WAREHOUSE">Warehouse / Facility</option>
+                  <option value="SCHOOL">School / Institution</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Ghana Digital Address
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.digitalAddress}
+                  onChange={(e) => setFormData({ ...formData, digitalAddress: e.target.value })}
+                  className="w-full h-9 px-3 text-sm font-mono rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition uppercase"
+                />
+              </div>
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-text-primary">
-                GhanaPost Digital Address
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.digitalAddress}
-                onChange={(e) => setFormData({ ...formData, digitalAddress: e.target.value.toUpperCase() })}
-                className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs font-mono text-text-primary focus:outline-hidden focus:border-primary transition"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-text-primary">
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Street Name &amp; Area Landmark
               </label>
               <input
@@ -784,101 +635,83 @@ export default function CustomerAddressesPage() {
                 required
                 value={formData.areaName}
                 onChange={(e) => setFormData({ ...formData, areaName: e.target.value })}
-                className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
+                className="w-full h-9 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-text-primary">
-                Location Category
-              </label>
-              <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value as AddressCategory })}
-                className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
-              >
-                <option value="HOME">Residential Home</option>
-                <option value="OFFICE">Office</option>
-                <option value="SHOP">Shop / Retail</option>
-                <option value="WAREHOUSE">Warehouse</option>
-                <option value="SCHOOL">School</option>
-                <option value="OTHER">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-text-primary">
-                Delivery Instructions (Optional)
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Drop-Off &amp; Driver Instructions (Optional)
               </label>
               <textarea
                 rows={2}
                 value={formData.deliveryInstructions}
                 onChange={(e) => setFormData({ ...formData, deliveryInstructions: e.target.value })}
-                className="w-full rounded-lg border border-card-border bg-card-background p-2.5 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
+                className="w-full p-2.5 text-xs sm:text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 transition"
               />
             </div>
 
-            <div>
-              <label className="flex items-center gap-2 cursor-pointer text-xs">
-                <input
-                  type="checkbox"
-                  checked={formData.isDefault}
-                  onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
-                  className="size-4 rounded border-card-border text-primary focus:ring-primary cursor-pointer"
-                />
-                <span className="text-text-primary font-medium">Set as my primary delivery address</span>
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="isDefaultEdit"
+                checked={formData.isDefault}
+                onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
+                className="rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+              />
+              <label htmlFor="isDefaultEdit" className="text-xs text-gray-700 dark:text-gray-300">
+                Primary delivery location
               </label>
             </div>
 
-            <div className="flex justify-end gap-2.5 pt-4 border-t border-card-border">
-              <Button
+            <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+              <button
                 type="button"
-                appearance="outline"
-                size="sm"
                 onClick={() => setIsEditModalOpen(false)}
+                className="px-4 py-2 text-xs font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
               >
                 Cancel
-              </Button>
-              <Button
+              </button>
+              <button
                 type="submit"
                 disabled={isSubmitting}
-                size="sm"
+                className="px-4 py-2 text-xs font-medium rounded-lg text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs disabled:opacity-50 cursor-pointer"
               >
-                {isSubmitting ? "Saving..." : "Save Changes"}
-              </Button>
+                {isSubmitting ? "Updating..." : "Save Changes"}
+              </button>
             </div>
           </form>
         </Modal>
 
-        {/* MODAL 3: Delete Confirmation */}
+        {/* MODAL: Delete Address */}
         <Modal
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
-          title="Delete Delivery Address"
+          title="Confirm Address Removal"
         >
           <div className="space-y-4">
-            <p className="text-xs text-text-secondary sm:text-sm">
-              Are you sure you want to remove <strong>{activeAddress?.areaName}</strong>? This action cannot be undone.
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Are you sure you want to remove{" "}
+              <strong className="text-gray-900 dark:text-white">{activeAddress?.areaName}</strong>{" "}
+              ({activeAddress?.digitalAddress}) from your delivery address book?
             </p>
 
-            <div className="flex justify-end gap-2.5 pt-4 border-t border-card-border">
-              <Button
+            <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+              <button
                 type="button"
-                appearance="outline"
-                size="sm"
                 onClick={() => setIsDeleteModalOpen(false)}
+                className="px-4 py-2 text-xs font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
               >
                 Cancel
-              </Button>
-              <Button
+              </button>
+              <button
                 type="button"
-                disabled={isSubmitting}
-                size="sm"
                 onClick={handleConfirmDelete}
-                className="bg-rose-600 hover:bg-rose-700 text-white"
+                disabled={isSubmitting}
+                className="px-4 py-2 text-xs font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 active:bg-red-800 transition shadow-theme-xs disabled:opacity-50 cursor-pointer"
               >
-                {isSubmitting ? "Deleting..." : "Confirm Delete"}
-              </Button>
+                {isSubmitting ? "Removing..." : "Remove Location"}
+              </button>
             </div>
           </div>
         </Modal>

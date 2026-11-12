@@ -3,7 +3,6 @@
 import React, { useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { modalBackdropVariants, modalDialogVariants } from "@/lib/animations";
-import { X } from "lucide-react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -46,7 +45,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   const contentClasses = isFullscreen
     ? "w-full h-full rounded-none"
-    : "relative w-full max-w-lg rounded-xl bg-card text-card-foreground border border-border shadow-2xl";
+    : "relative w-full max-w-lg rounded-[28px] bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-2xl";
 
   return (
     <AnimatePresence>
@@ -62,7 +61,7 @@ export const Modal: React.FC<ModalProps> = ({
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-0 h-full w-full bg-black/60 backdrop-blur-xs"
+            className="fixed inset-0 h-full w-full bg-gray-900/55 backdrop-blur-xs"
             onClick={onClose}
           />
 
@@ -77,9 +76,9 @@ export const Modal: React.FC<ModalProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             {(title || showCloseButton) && (
-              <div className="flex items-center justify-between px-6 py-4.5 border-b border-border">
+              <div className="flex items-center justify-between px-6 py-4.5 border-b border-gray-100 dark:border-gray-800">
                 {title ? (
-                  <h3 className="text-sm sm:text-base font-bold text-card-foreground">
+                  <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
                     {title}
                   </h3>
                 ) : (
@@ -91,9 +90,21 @@ export const Modal: React.FC<ModalProps> = ({
                     type="button"
                     onClick={onClose}
                     aria-label="Close modal"
-                    className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                    className="flex size-8 items-center justify-center rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-300 transition-colors cursor-pointer"
                   >
-                    <X className="size-4.5" />
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
                   </button>
                 )}
               </div>

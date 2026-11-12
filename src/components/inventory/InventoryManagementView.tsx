@@ -1,29 +1,19 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
-import { Breadcrumbs } from "@/components/tailgrids/core/breadcrumbs";
-import { Card } from "@/components/tailgrids/core/card";
-import { Badge } from "@/components/tailgrids/core/badge";
-import { Button } from "@/components/tailgrids/core/button";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/tailgrids/core/input-group";
-import {
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRoot,
-  TableRow,
-} from "@/components/tailgrids/core/table";
+import Badge from "@/components/ui/badge/Badge";
+import Alert from "@/components/ui/alert/Alert";
 import { Modal } from "@/components/ui/Modal";
+import Input from "@/components/form/input/InputField";
+import Label from "@/components/form/Label";
+import Select from "@/components/form/Select";
+import TextArea from "@/components/form/input/TextArea";
 import BottleDistributionChart from "@/components/inventory/BottleDistributionChart";
 import BottleCirculationGauge from "@/components/inventory/BottleCirculationGauge";
 import { SkeletonMetrics, SkeletonTable } from "@/components/ui/skeleton";
-import { SearchIcon } from "@/components/common/header/icons";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import {
   BottleInventoryData,
   DispenserItem,
@@ -33,17 +23,6 @@ import {
   StockAction,
   DispenserStatusType,
 } from "@/lib/inventory-store";
-import {
-  Package,
-  Droplets,
-  RotateCcw,
-  Users,
-  Cpu,
-  Plus,
-  AlertTriangle,
-  Check,
-  X,
-} from "lucide-react";
 
 export default function InventoryManagementView({
   role = "MANAGER",
@@ -82,8 +61,6 @@ export default function InventoryManagementView({
   // Dispenser Form State
   const [dispenserNewStatus, setDispenserNewStatus] = useState<DispenserStatusType>("AVAILABLE");
   const [dispenserNotes, setDispenserNotes] = useState("");
-
-  const homeHref = role === "ADMIN" ? "/admin" : "/manager";
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -231,156 +208,158 @@ export default function InventoryManagementView({
         {alerts.length > 0 && (
           <div className="space-y-2">
             {alerts.map((al) => (
-              <div
+              <Alert
                 key={al.id}
-                className={`flex items-center gap-2.5 rounded-xl border p-4 text-xs font-semibold ${
-                  al.severity === "CRITICAL"
-                    ? "border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300"
-                    : "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300"
-                }`}
-              >
-                <AlertTriangle className="size-4 shrink-0" />
-                <span>
-                  <strong>{al.item}:</strong> {al.message}
-                </span>
-              </div>
+                variant={al.severity === "CRITICAL" ? "error" : "warning"}
+                title={al.item}
+                message={al.message}
+              />
             ))}
           </div>
         )}
 
         {/* Success Banner */}
         {successMessage && (
-          <div className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-300">
-            <div className="flex items-center gap-2">
-              <Check className="size-4 shrink-0" />
-              <span>{successMessage}</span>
-            </div>
+          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs text-emerald-800 dark:text-emerald-300 flex items-center justify-between">
+            <span>{successMessage}</span>
             <button
               onClick={() => setSuccessMessage("")}
-              className="text-text-tertiary hover:text-text-primary cursor-pointer p-0.5"
+              className="text-emerald-600 hover:text-emerald-800 font-bold ml-2 cursor-pointer"
             >
-              <X className="size-4" />
+              Dismiss
             </button>
           </div>
         )}
 
-        {/* Breadcrumbs & Page Header */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
                 Inventory &amp; Stock Tracking
               </h1>
-              <Badge color="primary" size="sm">
+              <Badge color="info" size="sm">
                 Operations
               </Badge>
             </div>
-            <p className="mt-1 text-xs text-text-tertiary sm:text-sm">
+            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               Track warehouse bottles, dispenser assets, circulation rates, and stock audits across Ghana.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            <Breadcrumbs
-              dividerType="chevron"
-              items={[
-                { label: "Home", href: homeHref },
-                { label: "Inventory" },
-              ]}
-            />
-            <Button
-              size="sm"
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
               onClick={() => {
                 setFormError("");
                 setIsAdjustModalOpen(true);
               }}
-              className="gap-2 text-xs font-semibold"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-xs cursor-pointer"
             >
-              <Plus className="size-3.5" />
+              <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
               <span>Adjust Stock</span>
-            </Button>
+            </button>
           </div>
         </div>
 
-        {/* 4 KPI Metric Cards (NextAdmin Pro Style) */}
+        {/* 4 KPI Metric Cards */}
         {isLoading ? (
           <SkeletonMetrics count={4} />
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-4">
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+          >
             {/* Card 1: Filled Warehouse Bottles */}
-            <Card beamIndex={0}>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
               <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-medium text-text-secondary">
-                    Filled in Warehouse
-                  </span>
-                  <h3 className="mt-1 text-lg font-bold text-text-primary sm:text-2xl lg:text-3xl">
-                    {bottles?.filledWarehouse ?? 520}
-                  </h3>
-                </div>
-                <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-blue-light-100 text-primary dark:bg-blue-light-950/60 dark:text-blue-light-400">
-                  <Droplets className="size-4 sm:size-5" />
-                </div>
+                <span className="text-xs text-brand-600 dark:text-sky-400 font-medium block">
+                  Filled in Warehouse
+                </span>
+                {(bottles?.filledWarehouse || 0) < 150 ? (
+                  <Badge color="warning" size="sm">Low Stock</Badge>
+                ) : (
+                  <Badge color="success" size="sm">Ready</Badge>
+                )}
               </div>
-              <p className="mt-2 text-[11px] text-text-tertiary">18.9L bottles ready for delivery</p>
-            </Card>
+              <div className="mt-2 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {bottles?.filledWarehouse ?? 520}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">18.9L bottles ready for delivery</span>
+            </motion.div>
 
-            {/* Card 2: Empties in Warehouse */}
-            <Card beamIndex={5}>
+            {/* Card 2: Empty Warehouse Bottles */}
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
               <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-medium text-text-secondary">
-                    Empties in Warehouse
-                  </span>
-                  <h3 className="mt-1 text-lg font-bold text-text-primary sm:text-2xl lg:text-3xl">
-                    {bottles?.emptyWarehouse ?? 280}
-                  </h3>
-                </div>
-                <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 dark:bg-cyan-950/60 dark:text-cyan-400">
-                  <RotateCcw className="size-4 sm:size-5" />
-                </div>
+                <span className="text-xs text-cyan-600 dark:text-cyan-400 font-medium block">
+                  Empties in Warehouse
+                </span>
+                <Badge color="info" size="sm">Awaiting Wash</Badge>
               </div>
-              <p className="mt-2 text-[11px] text-text-tertiary">Awaiting sanitation &amp; refill</p>
-            </Card>
+              <div className="mt-2 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {bottles?.emptyWarehouse ?? 280}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Awaiting sanitation &amp; refill</span>
+            </motion.div>
 
-            {/* Card 3: With Customers */}
-            <Card beamIndex={1}>
+            {/* Card 3: Bottles with Customers */}
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
               <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-medium text-text-secondary">
-                    With Customers
-                  </span>
-                  <h3 className="mt-1 text-lg font-bold text-emerald-600 dark:text-emerald-400 sm:text-2xl lg:text-3xl">
-                    {bottles?.withCustomers ?? 1200}
-                  </h3>
-                </div>
-                <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
-                  <Users className="size-4 sm:size-5" />
-                </div>
+                <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium block">
+                  With Customers
+                </span>
+                <Badge color="success" size="sm">In Field</Badge>
               </div>
-              <p className="mt-2 text-[11px] text-text-tertiary">Circulating with active customers</p>
-            </Card>
+              <div className="mt-2 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {bottles?.withCustomers ?? 1200}
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">Circulating with customers</span>
+            </motion.div>
 
             {/* Card 4: Available Dispensers */}
-            <Card beamIndex={2}>
+            <motion.div
+              variants={fadeInUp}
+              whileHover={cardHoverMotion.whileHover}
+              transition={cardHoverMotion.transition}
+              className="p-5 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+            >
               <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-medium text-text-secondary">
-                    Available Dispensers
-                  </span>
-                  <h3 className="mt-1 text-lg font-bold text-text-primary sm:text-2xl lg:text-3xl">
-                    {availableDispensersCount} Units
-                  </h3>
-                </div>
-                <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400">
-                  <Cpu className="size-4 sm:size-5" />
-                </div>
+                <span className="text-xs text-purple-600 dark:text-purple-400 font-medium block">
+                  Available Dispensers
+                </span>
+                {availableDispensersCount < 5 ? (
+                  <Badge color="warning" size="sm">Restock Soon</Badge>
+                ) : (
+                  <Badge color="info" size="sm">Warehouse</Badge>
+                )}
               </div>
-              <p className="mt-2 text-[11px] text-text-tertiary">
-                {onPlanDispensersCount} deployed on rent-to-own
-              </p>
-            </Card>
-          </div>
+              <div className="mt-2 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+                {availableDispensersCount} Units
+              </div>
+              <span className="text-[11px] text-gray-400 mt-1 block">
+                {onPlanDispensersCount} installed on plans
+              </span>
+            </motion.div>
+          </motion.div>
         )}
 
         {/* Charts Grid: 7 / 5 Column Split */}
@@ -405,236 +384,210 @@ export default function InventoryManagementView({
         </div>
 
         {/* Tab Navigation */}
-        <Card className="p-3">
-          <div className="flex items-center gap-2 overflow-x-auto text-xs">
-            <button
-              type="button"
-              onClick={() => setActiveTab("bottles")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
-                activeTab === "bottles"
-                  ? "bg-primary text-white shadow-xs"
-                  : "text-text-secondary hover:bg-background-gray-secondary hover:text-text-primary"
-              }`}
-            >
-              Bottle Inventory Breakdown
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("dispensers")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
-                activeTab === "dispensers"
-                  ? "bg-primary text-white shadow-xs"
-                  : "text-text-secondary hover:bg-background-gray-secondary hover:text-text-primary"
-              }`}
-            >
-              Dispensers Fleet ({dispensers.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("ledger")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
-                activeTab === "ledger"
-                  ? "bg-primary text-white shadow-xs"
-                  : "text-text-secondary hover:bg-background-gray-secondary hover:text-text-primary"
-              }`}
-            >
-              Stock Audit Ledger ({auditLogs.length})
-            </button>
-          </div>
-        </Card>
+        <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800">
+          <button
+            type="button"
+            onClick={() => setActiveTab("bottles")}
+            className={`pb-3 px-3 text-xs sm:text-sm font-semibold border-b-2 transition cursor-pointer ${
+              activeTab === "bottles"
+                ? "border-brand-500 text-brand-600 dark:text-blue-light-400"
+                : "border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
+            }`}
+          >
+            Bottle Inventory Details
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("dispensers")}
+            className={`pb-3 px-3 text-xs sm:text-sm font-semibold border-b-2 transition cursor-pointer ${
+              activeTab === "dispensers"
+                ? "border-brand-500 text-brand-600 dark:text-blue-light-400"
+                : "border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
+            }`}
+          >
+            Smart Dispensers Fleet ({dispensers.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("ledger")}
+            className={`pb-3 px-3 text-xs sm:text-sm font-semibold border-b-2 transition cursor-pointer ${
+              activeTab === "ledger"
+                ? "border-brand-500 text-brand-600 dark:text-blue-light-400"
+                : "border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
+            }`}
+          >
+            Stock Audit Ledger ({auditLogs.length})
+          </button>
+        </div>
 
         {/* TAB 1: BOTTLE INVENTORY DETAILS */}
         {activeTab === "bottles" && (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <Card className="p-6 space-y-4">
-              <h4 className="text-sm font-bold text-text-primary">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs space-y-3">
+              <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                 Warehouse Stock Breakdown
               </h4>
-              <div className="space-y-3 text-xs">
-                <div className="flex justify-between py-1.5 border-b border-card-border">
-                  <span className="text-text-tertiary">Filled Ready for Dispatch</span>
-                  <span className="font-bold text-text-primary">{bottles?.filledWarehouse ?? 520}</span>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-gray-500">Filled Ready for Dispatch:</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{bottles?.filledWarehouse ?? 520}</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-card-border">
-                  <span className="text-text-tertiary">Empty Returned from Delivery</span>
-                  <span className="font-bold text-text-primary">{bottles?.emptyWarehouse ?? 280}</span>
+                <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-gray-500">Empty Returned from Delivery:</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{bottles?.emptyWarehouse ?? 280}</span>
                 </div>
                 <div className="flex justify-between py-1.5">
-                  <span className="text-text-tertiary">Total in Warehouse</span>
-                  <span className="font-bold text-primary">
+                  <span className="text-gray-500">Total in Warehouse:</span>
+                  <span className="font-bold text-brand-600 dark:text-blue-light-400">
                     {(bottles?.filledWarehouse ?? 520) + (bottles?.emptyWarehouse ?? 280)}
                   </span>
                 </div>
               </div>
-            </Card>
+            </div>
 
-            <Card className="p-6 space-y-4">
-              <h4 className="text-sm font-bold text-text-primary">
+            <div className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs space-y-3">
+              <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                 Field Circulation &amp; Customers
               </h4>
-              <div className="space-y-3 text-xs">
-                <div className="flex justify-between py-1.5 border-b border-card-border">
-                  <span className="text-text-tertiary">Bottles with Customers</span>
-                  <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                    {bottles?.withCustomers ?? 1200}
-                  </span>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-gray-500">Bottles with Customers:</span>
+                  <span className="font-bold text-emerald-600">{bottles?.withCustomers ?? 1200}</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-card-border">
-                  <span className="text-text-tertiary">Estimated Turnover Period</span>
-                  <span className="font-bold text-text-primary">4.2 Days</span>
+                <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-gray-500">Estimated Turnover Period:</span>
+                  <span className="font-bold text-gray-900 dark:text-white">4.2 Days</span>
                 </div>
                 <div className="flex justify-between py-1.5">
-                  <span className="text-text-tertiary">Deposit Protected</span>
-                  <span className="font-bold text-text-primary">100% (GH₵ 80 / bottle)</span>
+                  <span className="text-gray-500">Deposit Protected:</span>
+                  <span className="font-bold text-gray-900 dark:text-white">100% (GH₵ 80 / bottle)</span>
                 </div>
               </div>
-            </Card>
+            </div>
 
-            <Card className="p-6 space-y-4">
-              <h4 className="text-sm font-bold text-text-primary">
+            <div className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs space-y-3">
+              <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                 Exceptions &amp; Loss Prevention
               </h4>
-              <div className="space-y-3 text-xs">
-                <div className="flex justify-between py-1.5 border-b border-card-border">
-                  <span className="text-text-tertiary">Damaged Bottles</span>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-gray-500">Damaged / Broken:</span>
                   <span className="font-bold text-amber-600">{bottles?.damaged ?? 18}</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-card-border">
-                  <span className="text-text-tertiary">Lost / Missing</span>
+                <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-gray-500">Lost / Missing:</span>
                   <span className="font-bold text-rose-600">{bottles?.lost ?? 6}</span>
                 </div>
                 <div className="flex justify-between py-1.5">
-                  <span className="text-text-tertiary">Total Decommissioned</span>
-                  <span className="font-bold text-text-primary">
+                  <span className="text-gray-500">Total Decommissioned:</span>
+                  <span className="font-bold text-gray-900 dark:text-white">
                     {(bottles?.damaged ?? 18) + (bottles?.lost ?? 6)} (1.2% of Fleet)
                   </span>
                 </div>
               </div>
-            </Card>
+            </div>
           </div>
         )}
 
         {/* TAB 2: SMART DISPENSERS FLEET */}
         {activeTab === "dispensers" && (
           <div className="space-y-4">
-            <Card className="p-3">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex-1 max-w-md">
-                  <InputGroup>
-                    <InputGroupAddon className="text-icon-secondary">
-                      <SearchIcon />
-                    </InputGroupAddon>
-                    <InputGroupInput
-                      type="text"
-                      placeholder="Search serial, model, or customer..."
-                      value={dispenserSearch}
-                      onChange={(e) => setDispenserSearch(e.target.value)}
-                      className="text-xs"
-                    />
-                  </InputGroup>
-                </div>
-
-                <div className="w-full sm:w-60">
-                  <select
-                    value={dispenserFilter}
-                    onChange={(e) => setDispenserFilter(e.target.value)}
-                    aria-label="Filter by status"
-                    className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition cursor-pointer"
-                  >
-                    <option value="ALL">All Statuses</option>
-                    <option value="AVAILABLE">Available</option>
-                    <option value="INSTALLED_ON_PLAN">On Rent-to-Own Plan</option>
-                    <option value="INSTALLED_OWNED">Customer Owned</option>
-                    <option value="FAULTY">Faulty</option>
-                    <option value="MAINTENANCE">Maintenance</option>
-                  </select>
-                </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Input
+                  type="text"
+                  placeholder="Search serial, model, or customer..."
+                  value={dispenserSearch}
+                  onChange={(e) => setDispenserSearch(e.target.value)}
+                  className="w-64 text-xs"
+                />
+                <Select
+                  options={[
+                    { value: "ALL", label: "All Statuses" },
+                    { value: "AVAILABLE", label: "Available" },
+                    { value: "INSTALLED_ON_PLAN", label: "On Rent-to-Own Plan" },
+                    { value: "INSTALLED_OWNED", label: "Customer Owned" },
+                    { value: "FAULTY", label: "Faulty" },
+                    { value: "MAINTENANCE", label: "Maintenance" },
+                  ]}
+                  value={dispenserFilter}
+                  onChange={(val) => setDispenserFilter(val)}
+                  className="w-48 text-xs"
+                />
               </div>
-            </Card>
+              <span className="text-xs text-gray-500">
+                Showing {filteredDispensers.length} of {dispensers.length} units
+              </span>
+            </div>
 
             {isLoading ? (
               <SkeletonTable rows={5} columns={5} />
             ) : (
-              <Card className="overflow-hidden p-0">
-                <div className="overflow-x-auto">
-                  <TableRoot>
-                    <TableHeader>
-                      <TableRow className="border-b border-card-border bg-background-gray-secondary/50">
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                          Serial &amp; Model
-                        </TableHead>
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                          Status
-                        </TableHead>
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                          Deployment / Location
-                        </TableHead>
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                          Sensors
-                        </TableHead>
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase text-right">
-                          Actions
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody className="divide-y divide-card-border">
-                      {filteredDispensers.map((disp) => (
-                        <TableRow
-                          key={disp.id}
-                          className="hover:bg-background-gray-secondary/30 transition"
-                        >
-                          <TableCell className="px-5 py-4">
-                            <span className="font-mono font-bold text-xs text-text-primary block">
-                              {disp.serialNumber}
-                            </span>
-                            <span className="text-[11px] text-text-tertiary">{disp.modelName}</span>
-                          </TableCell>
-
-                          <TableCell className="px-5 py-4">
-                            {disp.status === "AVAILABLE" && <Badge color="success" size="sm">Available</Badge>}
-                            {disp.status === "INSTALLED_ON_PLAN" && <Badge color="cyan" size="sm">Rent-to-Own</Badge>}
-                            {disp.status === "INSTALLED_OWNED" && <Badge color="primary" size="sm">Customer Owned</Badge>}
-                            {disp.status === "FAULTY" && <Badge color="error" size="sm">Faulty</Badge>}
-                            {disp.status === "MAINTENANCE" && <Badge color="warning" size="sm">In Maintenance</Badge>}
-                          </TableCell>
-
-                          <TableCell className="px-5 py-4">
-                            {disp.customerName ? (
-                              <div>
-                                <span className="font-semibold text-xs text-text-primary block">
-                                  {disp.customerName}
-                                </span>
-                                <span className="text-[11px] text-text-tertiary">{disp.location}</span>
-                              </div>
-                            ) : (
-                              <span className="text-text-tertiary text-xs italic">{disp.location || "Central Warehouse"}</span>
-                            )}
-                          </TableCell>
-
-                          <TableCell className="px-5 py-4">
-                            <div className="flex items-center gap-3 text-xs">
-                              <span>Water: {disp.waterLevelPercent}%</span>
-                              <span>Battery: {disp.batteryPercent}%</span>
-                              <span className={`size-2 rounded-full ${disp.isOnline ? "bg-emerald-500" : "bg-card-border"}`} />
+              <motion.div
+                variants={fadeInUp}
+                initial="initial"
+                animate="animate"
+                className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+              >
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
+                      <th className="py-3 px-4">Serial &amp; Model</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4">Deployment / Location</th>
+                      <th className="py-3 px-4">Sensors</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                    {filteredDispensers.map((disp) => (
+                      <tr key={disp.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="py-3 px-4">
+                          <span className="font-mono font-bold text-gray-900 dark:text-white block">
+                            {disp.serialNumber}
+                          </span>
+                          <span className="text-gray-500 text-[11px]">{disp.modelName}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                          {disp.status === "AVAILABLE" && <Badge color="success" size="sm">Available</Badge>}
+                          {disp.status === "INSTALLED_ON_PLAN" && <Badge color="info" size="sm">Rent-to-Own</Badge>}
+                          {disp.status === "INSTALLED_OWNED" && <Badge color="primary" size="sm">Customer Owned</Badge>}
+                          {disp.status === "FAULTY" && <Badge color="error" size="sm">Faulty</Badge>}
+                          {disp.status === "MAINTENANCE" && <Badge color="warning" size="sm">In Maintenance</Badge>}
+                        </td>
+                        <td className="py-3 px-4">
+                          {disp.customerName ? (
+                            <div>
+                              <span className="font-semibold text-gray-800 dark:text-gray-200 block">
+                                {disp.customerName}
+                              </span>
+                              <span className="text-gray-400 text-[11px]">{disp.location}</span>
                             </div>
-                          </TableCell>
-
-                          <TableCell className="px-5 py-4 text-right">
-                            <Button
-                              appearance="outline"
-                              size="sm"
-                              onClick={() => openDispenserModal(disp)}
-                              className="text-xs font-semibold"
-                            >
-                              Update Status
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </TableRoot>
-                </div>
-              </Card>
+                          ) : (
+                            <span className="text-gray-500 italic">{disp.location || "Central Warehouse"}</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-3 text-[11px]">
+                            <span>Water: {disp.waterLevelPercent}%</span>
+                            <span>Battery: {disp.batteryPercent}%</span>
+                            <span className={`size-2 rounded-full ${disp.isOnline ? "bg-emerald-500" : "bg-gray-400"}`} />
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <button
+                            type="button"
+                            onClick={() => openDispenserModal(disp)}
+                            className="px-2.5 py-1 text-xs font-semibold rounded-lg text-brand-600 dark:text-blue-light-400 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition cursor-pointer"
+                          >
+                            Update Status
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </motion.div>
             )}
           </div>
         )}
@@ -642,114 +595,85 @@ export default function InventoryManagementView({
         {/* TAB 3: STOCK AUDIT LEDGER */}
         {activeTab === "ledger" && (
           <div className="space-y-4">
-            <Card className="p-3">
-              <div className="flex items-center justify-between">
-                <div className="w-72">
-                  <InputGroup>
-                    <InputGroupAddon className="text-icon-secondary">
-                      <SearchIcon />
-                    </InputGroupAddon>
-                    <InputGroupInput
-                      type="text"
-                      placeholder="Search audit ledger by reason, staff, or item..."
-                      value={ledgerSearch}
-                      onChange={(e) => setLedgerSearch(e.target.value)}
-                      className="text-xs"
-                    />
-                  </InputGroup>
-                </div>
-                <span className="text-xs text-text-tertiary">
-                  {filteredLogs.length} audit records logged
-                </span>
-              </div>
-            </Card>
+            <div className="flex items-center justify-between">
+              <Input
+                type="text"
+                placeholder="Search audit ledger by reason, staff, or item..."
+                value={ledgerSearch}
+                onChange={(e) => setLedgerSearch(e.target.value)}
+                className="w-72 text-xs"
+              />
+              <span className="text-xs text-gray-500">
+                {filteredLogs.length} audit records logged
+              </span>
+            </div>
 
             {isLoading ? (
               <SkeletonTable rows={5} columns={6} />
             ) : (
-              <Card className="overflow-hidden p-0">
-                <div className="overflow-x-auto">
-                  <TableRoot>
-                    <TableHeader>
-                      <TableRow className="border-b border-card-border bg-background-gray-secondary/50">
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                          Date &amp; Time
-                        </TableHead>
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                          Staff Member
-                        </TableHead>
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                          Action
-                        </TableHead>
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                          Item Type
-                        </TableHead>
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                          Change
-                        </TableHead>
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-text-secondary uppercase">
-                          Reason / Notes
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody className="divide-y divide-card-border">
-                      {filteredLogs.map((log) => (
-                        <TableRow
-                          key={log.id}
-                          className="hover:bg-background-gray-secondary/30 transition"
-                        >
-                          <TableCell className="px-5 py-4 font-mono text-xs text-text-tertiary">
-                            {new Date(log.timestamp).toLocaleString("en-GB", {
-                              dateStyle: "medium",
-                              timeStyle: "short",
-                            })}
-                          </TableCell>
-
-                          <TableCell className="px-5 py-4">
-                            <span className="font-semibold text-xs text-text-primary block">
-                              {log.userName}
-                            </span>
-                            <span className="text-[10px] text-text-tertiary">{log.userEmail}</span>
-                          </TableCell>
-
-                          <TableCell className="px-5 py-4">
-                            <Badge
-                              color={log.action === "ADD" ? "success" : "neutral"}
-                              size="sm"
+              <motion.div
+                variants={fadeInUp}
+                initial="initial"
+                animate="animate"
+                className="overflow-hidden rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs"
+              >
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-500 font-semibold bg-gray-50/50 dark:bg-gray-800/50">
+                      <th className="py-3 px-4">Date &amp; Time</th>
+                      <th className="py-3 px-4">Staff Member</th>
+                      <th className="py-3 px-4">Action</th>
+                      <th className="py-3 px-4">Item Type</th>
+                      <th className="py-3 px-4">Change Delta</th>
+                      <th className="py-3 px-4">Reason / Notes</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                    {filteredLogs.map((log) => (
+                      <tr key={log.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="py-3 px-4 text-gray-500 font-mono text-[11px]">
+                          {new Date(log.timestamp).toLocaleString("en-GB", {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          })}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="font-semibold text-gray-800 dark:text-gray-200 block">
+                            {log.userName}
+                          </span>
+                          <span className="text-[10px] text-gray-400">{log.userEmail}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                            {log.action}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">
+                          {log.itemType.replace("_", " ")}
+                        </td>
+                        <td className="py-3 px-4">
+                          {log.delta !== 0 ? (
+                            <span
+                              className={`font-bold font-mono ${
+                                log.delta > 0
+                                  ? "text-emerald-600 dark:text-emerald-400"
+                                  : "text-rose-600 dark:text-rose-400"
+                              }`}
                             >
-                              {log.action}
-                            </Badge>
-                          </TableCell>
-
-                          <TableCell className="px-5 py-4 font-medium text-xs text-text-primary">
-                            {log.itemType.replace("_", " ")}
-                          </TableCell>
-
-                          <TableCell className="px-5 py-4 font-mono font-bold text-xs">
-                            {log.delta !== 0 ? (
-                              <span
-                                className={
-                                  log.delta > 0
-                                    ? "text-emerald-600 dark:text-emerald-400"
-                                    : "text-rose-600 dark:text-rose-400"
-                                }
-                              >
-                                {log.delta > 0 ? `+${log.delta}` : log.delta}
-                              </span>
-                            ) : (
-                              <span className="text-text-tertiary">0</span>
-                            )}
-                          </TableCell>
-
-                          <TableCell className="px-5 py-4 text-xs text-text-secondary max-w-xs truncate">
-                            {log.reason}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </TableRoot>
-                </div>
-              </Card>
+                              {log.delta > 0 ? `+${log.delta}` : log.delta}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">0</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-gray-600 dark:text-gray-400 max-w-xs truncate">
+                          {log.reason}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </motion.div>
             )}
           </div>
         )}
@@ -762,48 +686,45 @@ export default function InventoryManagementView({
         >
           <form onSubmit={handleAdjustSubmit} className="space-y-4">
             {formError && (
-              <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
+              <div className="p-3 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-xl text-xs text-rose-800 dark:text-rose-300">
                 {formError}
               </div>
             )}
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-text-primary">
-                Item to Adjust
-              </label>
-              <select
+              <Label htmlFor="adjust-item-type">Item to Adjust</Label>
+              <Select
+                id="adjust-item-type"
+                options={[
+                  { value: "FILLED_BOTTLES", label: "Filled 18.9L Bottles (Warehouse)" },
+                  { value: "EMPTY_BOTTLES", label: "Empty 18.9L Bottles (Warehouse)" },
+                  { value: "DAMAGED_BOTTLES", label: "Damaged / Broken Bottles" },
+                  { value: "LOST_BOTTLES", label: "Lost / Missing Bottles" },
+                  { value: "DISPENSERS", label: "Smart Dispensers (Units)" },
+                ]}
                 value={adjustItemType}
-                onChange={(e) => setAdjustItemType(e.target.value as InventoryItemType)}
-                className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
-              >
-                <option value="FILLED_BOTTLES">Filled 18.9L Bottles (Warehouse)</option>
-                <option value="EMPTY_BOTTLES">Empty 18.9L Bottles (Warehouse)</option>
-                <option value="DAMAGED_BOTTLES">Damaged Bottles</option>
-                <option value="LOST_BOTTLES">Lost / Missing Bottles</option>
-                <option value="DISPENSERS">Smart Dispensers (Units)</option>
-              </select>
+                onChange={(val) => setAdjustItemType(val as InventoryItemType)}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1 block text-xs font-semibold text-text-primary">
-                  Action
-                </label>
-                <select
+                <Label htmlFor="adjust-action">Action</Label>
+                <Select
+                  id="adjust-action"
+                  options={[
+                    { value: "ADD", label: "Stock In (Add Stock)" },
+                    { value: "DEDUCT", label: "Stock Out (Deduct Stock)" },
+                  ]}
                   value={adjustAction}
-                  onChange={(e) => setAdjustAction(e.target.value as StockAction)}
-                  className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
-                >
-                  <option value="ADD">Stock In (Add Stock)</option>
-                  <option value="DEDUCT">Stock Out (Deduct Stock)</option>
-                </select>
+                  onChange={(val) => setAdjustAction(val as StockAction)}
+                />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold text-text-primary">
-                  Quantity
-                </label>
-                <input
+                <Label htmlFor="adjust-quantity">Quantity</Label>
+                <Input
+                  id="adjust-quantity"
                   type="number"
                   min="1"
                   max="1000"
@@ -811,58 +732,53 @@ export default function InventoryManagementView({
                   onChange={(e) => setAdjustQuantity(e.target.value)}
                   placeholder="e.g. 50"
                   required
-                  className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
                 />
               </div>
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-text-primary">
-                Primary Reason
-              </label>
-              <select
+              <Label htmlFor="adjust-reason">Primary Reason</Label>
+              <Select
+                id="adjust-reason"
+                options={[
+                  { value: "Factory bottling line production run", label: "Factory bottling line production run" },
+                  { value: "Physical stocktake audit reconciliation", label: "Physical stocktake audit reconciliation" },
+                  { value: "Supplier shipment of new bottles received", label: "Supplier shipment of new bottles received" },
+                  { value: "Bottles broken / cracked during transit", label: "Bottles broken / cracked during transit" },
+                  { value: "Customer account reconciliation", label: "Customer account reconciliation" },
+                  { value: "Scrapped obsolete units", label: "Scrapped obsolete units" },
+                ]}
                 value={adjustReason}
-                onChange={(e) => setAdjustReason(e.target.value)}
-                className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
-              >
-                <option value="Factory bottling line production run">Factory bottling line production run</option>
-                <option value="Physical stocktake audit reconciliation">Physical stocktake audit reconciliation</option>
-                <option value="Supplier shipment of new bottles received">Supplier shipment of new bottles received</option>
-                <option value="Bottles broken / cracked during transit">Bottles broken / cracked during transit</option>
-                <option value="Customer account reconciliation">Customer account reconciliation</option>
-                <option value="Scrapped obsolete units">Scrapped obsolete units</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-text-primary">
-                Additional Notes / Batch ID
-              </label>
-              <textarea
-                rows={2}
-                value={adjustNotes}
-                onChange={(e) => setAdjustNotes(e.target.value)}
-                placeholder="Optional batch number, invoice reference, or incident notes..."
-                className="w-full rounded-lg border border-card-border bg-card-background p-2.5 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
+                onChange={(val) => setAdjustReason(val)}
               />
             </div>
 
-            <div className="flex justify-end gap-2.5 pt-4 border-t border-card-border">
-              <Button
+            <div>
+              <Label htmlFor="adjust-notes">Additional Details / Reference</Label>
+              <TextArea
+                id="adjust-notes"
+                placeholder="Batch number, delivery receipt, or inspection notes..."
+                value={adjustNotes}
+                onChange={(e) => setAdjustNotes(e.target.value)}
+                rows={2}
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+              <button
                 type="button"
-                appearance="outline"
-                size="sm"
                 onClick={() => setIsAdjustModalOpen(false)}
+                className="px-4 py-2 text-xs font-semibold rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
               >
                 Cancel
-              </Button>
-              <Button
+              </button>
+              <button
                 type="submit"
                 disabled={isSubmitting}
-                size="sm"
+                className="px-4 py-2 text-xs font-semibold rounded-lg text-white bg-brand-500 hover:bg-brand-600 transition shadow-theme-xs disabled:opacity-50 cursor-pointer"
               >
-                {isSubmitting ? "Adjusting..." : "Confirm Stock Adjustment"}
-              </Button>
+                {isSubmitting ? "Recording..." : "Save Stock Adjustment"}
+              </button>
             </div>
           </form>
         </Modal>
@@ -873,57 +789,57 @@ export default function InventoryManagementView({
           onClose={() => setIsDispenserModalOpen(false)}
           title={`Update Dispenser: ${selectedDispenser?.serialNumber}`}
         >
-          {selectedDispenser && (
-            <form onSubmit={handleDispenserSubmit} className="space-y-4">
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-text-primary">
-                  Dispenser Status
-                </label>
-                <select
-                  value={dispenserNewStatus}
-                  onChange={(e) => setDispenserNewStatus(e.target.value as DispenserStatusType)}
-                  className="h-10 w-full rounded-lg border border-card-border bg-card-background px-3 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
-                >
-                  <option value="AVAILABLE">Available in Warehouse</option>
-                  <option value="INSTALLED_ON_PLAN">Installed on Rent-to-Own Plan</option>
-                  <option value="INSTALLED_OWNED">Customer Owned (Transferred)</option>
-                  <option value="FAULTY">Faulty / Under Inspection</option>
-                  <option value="MAINTENANCE">Scheduled Maintenance</option>
-                </select>
+          <form onSubmit={handleDispenserSubmit} className="space-y-4">
+            {formError && (
+              <div className="p-3 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-xl text-xs text-rose-800 dark:text-rose-300">
+                {formError}
               </div>
+            )}
 
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-text-primary">
-                  Notes
-                </label>
-                <textarea
-                  rows={2}
-                  value={dispenserNotes}
-                  onChange={(e) => setDispenserNotes(e.target.value)}
-                  placeholder="Maintenance details, customer delivery area..."
-                  className="w-full rounded-lg border border-card-border bg-card-background p-2.5 text-xs text-text-primary focus:outline-hidden focus:border-primary transition"
-                />
-              </div>
+            <div>
+              <Label htmlFor="dispenser-status">Dispenser Status</Label>
+              <Select
+                id="dispenser-status"
+                options={[
+                  { value: "AVAILABLE", label: "Available in Warehouse" },
+                  { value: "INSTALLED_ON_PLAN", label: "Installed on Rent-to-Own Plan" },
+                  { value: "INSTALLED_OWNED", label: "Customer Owned" },
+                  { value: "FAULTY", label: "Faulty / Needs Repair" },
+                  { value: "MAINTENANCE", label: "In Maintenance Workshop" },
+                ]}
+                value={dispenserNewStatus}
+                onChange={(val) => setDispenserNewStatus(val as DispenserStatusType)}
+              />
+            </div>
 
-              <div className="flex justify-end gap-2.5 pt-4 border-t border-card-border">
-                <Button
-                  type="button"
-                  appearance="outline"
-                  size="sm"
-                  onClick={() => setIsDispenserModalOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  size="sm"
-                >
-                  {isSubmitting ? "Saving..." : "Save Status"}
-                </Button>
-              </div>
-            </form>
-          )}
+            <div>
+              <Label htmlFor="dispenser-notes">Maintenance &amp; Location Notes</Label>
+              <TextArea
+                id="dispenser-notes"
+                placeholder="Diagnostic details, repair work done, or storage rack..."
+                value={dispenserNotes}
+                onChange={(e) => setDispenserNotes(e.target.value)}
+                rows={3}
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+              <button
+                type="button"
+                onClick={() => setIsDispenserModalOpen(false)}
+                className="px-4 py-2 text-xs font-semibold rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-4 py-2 text-xs font-semibold rounded-lg text-white bg-brand-500 hover:bg-brand-600 transition shadow-theme-xs disabled:opacity-50 cursor-pointer"
+              >
+                {isSubmitting ? "Updating..." : "Save Status"}
+              </button>
+            </div>
+          </form>
         </Modal>
       </div>
     </AppLayout>

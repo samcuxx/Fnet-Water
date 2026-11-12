@@ -1,49 +1,22 @@
 "use client";
 
+import React, { useState, useEffect, useCallback } from "react";
 import AppLayout from "@/components/layout/AppLayout";
-import { Badge } from "@/components/tailgrids/core/badge";
-import Breadcrumbs from "@/components/tailgrids/core/breadcrumbs";
-import { Button } from "@/components/tailgrids/core/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/tailgrids/core/card";
-import {
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRoot,
-  TableRow,
-} from "@/components/tailgrids/core/table";
+import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
 import type { AgentStats } from "@/lib/referral-store";
-import { Gift, Plus, UserPlus, Users, MapPin, Phone, Search, Filter, Droplets, CheckCircle2 } from "lucide-react";
-import { InvoiceIcon, TableIcon, TaskIcon, UserGroupIcon } from "@/components/common/sidebar/icon";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { cn } from "@/utils/cn";
-
-const ACCRA_ZONES = [
-  "All Zones",
-  "East Legon & Adjiringanor",
-  "Airport, Cantonments & Osu",
-  "Spintex Road & Sakumono",
-  "Tema Central & Communities",
-  "Madina, Adenta & Abokobi",
-  "Dansoman & Korle Bu",
-  "Dzorwulu & Roman Ridge",
-];
 
 export default function AgentDashboardPage() {
   const [stats, setStats] = useState<AgentStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [selectedZone, setSelectedZone] = useState("All Zones");
-  const [searchQuery, setSearchQuery] = useState("");
 
   // Onboard modal state
   const [isOnboardModalOpen, setIsOnboardModalOpen] = useState(false);
   const [custName, setCustName] = useState("");
   const [custPhone, setCustPhone] = useState("");
   const [custEmail, setCustEmail] = useState("");
-  const [custArea, setCustArea] = useState(ACCRA_ZONES[1]);
+  const [custArea, setCustArea] = useState("");
   const [isOnboarding, setIsOnboarding] = useState(false);
   const [onboardError, setOnboardError] = useState<string | null>(null);
   const [onboardSuccess, setOnboardSuccess] = useState<string | null>(null);
@@ -97,12 +70,12 @@ export default function AgentDashboardPage() {
         return;
       }
 
-      setOnboardSuccess(`Customer ${custName} registered successfully under ${custArea}!`);
+      setOnboardSuccess(`Customer ${custName} registered successfully under your referral code!`);
       setIsOnboardModalOpen(false);
       setCustName("");
       setCustPhone("");
       setCustEmail("");
-      setCustArea(ACCRA_ZONES[1]);
+      setCustArea("");
       await loadStats();
     } catch {
       setOnboardError("Network error occurred.");
@@ -110,6 +83,16 @@ export default function AgentDashboardPage() {
       setIsOnboarding(false);
     }
   };
+
+  if (loading) {
+    return (
+      <AppLayout role="AGENT">
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500" />
+        </div>
+      </AppLayout>
+    );
+  }
 
   const s = stats || {
     agentId: "usr_agent_001",
@@ -122,437 +105,276 @@ export default function AgentDashboardPage() {
     freeBottlesEarned: 6,
     totalCommissionGHS: 725.0,
     commissionBalanceGHS: 725.0,
-    referees: [
-      {
-        id: "ref_1",
-        customerName: "Emmanuel Quaye",
-        phone: "0243001001",
-        onboardedDate: "2026-02-12",
-        refillsCount: 16,
-        commissionGHS: 80.0,
-        lastOrderDate: "2 days ago",
-        zone: "East Legon & Adjiringanor",
-        status: "ACTIVE" as const,
-      },
-      {
-        id: "ref_2",
-        customerName: "Akua Konadu Law Chambers",
-        phone: "0243001002",
-        onboardedDate: "2026-02-16",
-        refillsCount: 28,
-        commissionGHS: 140.0,
-        lastOrderDate: "Yesterday",
-        zone: "Airport, Cantonments & Osu",
-        status: "ACTIVE" as const,
-      },
-      {
-        id: "ref_3",
-        customerName: "Samuel Danquah",
-        phone: "0243001003",
-        onboardedDate: "2026-02-22",
-        refillsCount: 8,
-        commissionGHS: 40.0,
-        lastOrderDate: "Last week",
-        zone: "Spintex Road & Sakumono",
-        status: "ACTIVE" as const,
-      },
-      {
-        id: "ref_4",
-        customerName: "Grace Ansah",
-        phone: "0244112299",
-        onboardedDate: "2026-03-01",
-        refillsCount: 12,
-        commissionGHS: 60.0,
-        lastOrderDate: "3 days ago",
-        zone: "Tema Central & Communities",
-        status: "ACTIVE" as const,
-      },
-    ],
-    zonesSummary: [
-      { name: "East Legon & Adjiringanor", customersCount: 12, refillsCount: 68 },
-      { name: "Airport, Cantonments & Osu", customersCount: 8, refillsCount: 44 },
-      { name: "Spintex Road & Sakumono", customersCount: 5, refillsCount: 22 },
-      { name: "Tema Central & Communities", customersCount: 3, refillsCount: 11 },
-    ],
+    referees: [],
   };
-
-  // Filter customers by selected Zone and Search Query
-  const filteredReferees = useMemo(() => {
-    return s.referees.filter((r) => {
-      const matchesZone =
-        selectedZone === "All Zones" || (r.zone && r.zone.toLowerCase().includes(selectedZone.toLowerCase()));
-      const matchesSearch =
-        searchQuery === "" ||
-        r.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.phone.includes(searchQuery) ||
-        (r.zone && r.zone.toLowerCase().includes(searchQuery.toLowerCase()));
-      return matchesZone && matchesSearch;
-    });
-  }, [s.referees, selectedZone, searchQuery]);
 
   return (
     <AppLayout role="AGENT">
-      <div className="mt-4 space-y-6 px-2 lg:px-4">
+      <div className="space-y-6">
         {/* Success Alert */}
         {onboardSuccess && (
-          <div className="p-3.5 bg-success-50 text-green-700 border border-success-200 dark:bg-success-950/40 dark:text-green-300 rounded-xl text-xs flex items-center justify-between">
+          <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs text-emerald-800 dark:text-emerald-300 flex items-center justify-between">
             <span>{onboardSuccess}</span>
             <button
               onClick={() => setOnboardSuccess(null)}
-              className="font-bold text-green-600 hover:text-green-800 ml-2 cursor-pointer"
+              className="font-bold text-emerald-600 hover:text-emerald-800 ml-2 cursor-pointer"
             >
               Dismiss
             </button>
           </div>
         )}
 
-        {/* NextAdmin Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
           <div>
-            <div className="mb-2">
-              <Breadcrumbs
-                dividerType="chevron"
-                items={[
-                  { label: "Home", href: "/agent" },
-                  { label: "Portals", href: "/agent" },
-                  { label: "Field Agents & Supervisors" },
-                ]}
-              />
-            </div>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-[28px] leading-8 font-semibold text-text-primary tracking-tight">
-                Field Agents &amp; Supervisors Portal
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                Field Agent Portal &amp; Commissions
               </h1>
-              <Badge color="primary" size="sm">
-                Zone Management
+              <Badge color="warning" size="sm">
+                Sales Agent
               </Badge>
             </div>
-            <p className="mt-1 text-sm leading-5 text-text-tertiary">
-              Manage registered customers across Greater Accra zones, oversee bottle refills, and track commissions.
+            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              Register customers on ground, track referee refills, and manage commissions.
             </p>
           </div>
 
-          <Button
-            size="md"
+          <button
+            type="button"
             onClick={() => {
               setOnboardError(null);
               setIsOnboardModalOpen(true);
             }}
-            className="gap-2 self-start sm:self-auto cursor-pointer shadow-xs"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 active:bg-brand-700 transition shadow-theme-xs self-start sm:self-auto cursor-pointer"
           >
-            <UserPlus className="size-4" />
-            <span>Register Customer</span>
-          </Button>
+            <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+            </svg>
+            <span>Register Customer On Ground</span>
+          </button>
         </div>
 
-        {/* Agent Share Link Banner Card */}
-        <Card className="p-5 sm:p-6 bg-gradient-to-r from-brand-600 via-primary to-brand-700 text-white border-none shadow-md">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-100 block">
-                Supervisor / Agent Code
-              </span>
-              <div className="text-2xl sm:text-3xl font-extrabold font-mono tracking-wider">
-                {s.agentCode}
-              </div>
-              <p className="text-xs text-blue-100 max-w-lg">
-                Earn GH₵ 5.00 cash commission on every refill bottle ordered by your registered zone accounts.
-              </p>
+        {/* Agent Share Link Banner */}
+        <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-700 to-brand-700 text-white shadow-theme-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-200 block">
+              Your Agent Referral Code
+            </span>
+            <div className="text-2xl sm:text-3xl font-extrabold font-mono tracking-wider">
+              {s.agentCode}
             </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                readOnly
-                value={s.referralLink}
-                className="w-56 sm:w-64 h-10 px-3 text-xs font-mono rounded-lg bg-white/15 border border-white/20 text-white placeholder-white/50 focus:outline-none"
-              />
-              <Button
-                appearance="outline"
-                size="sm"
-                onClick={handleCopy}
-                className="bg-white text-primary border-transparent hover:bg-white/90 font-bold cursor-pointer"
-              >
-                {copied ? "Copied!" : "Copy Link"}
-              </Button>
-            </div>
+            <p className="text-xs text-amber-100 max-w-lg">
+              Earn GH₵ 5.00 cash commission on every refill bottle ordered by your registered customers, plus free bottles.
+            </p>
           </div>
-        </Card>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              readOnly
+              value={s.referralLink}
+              className="w-56 sm:w-64 h-10 px-3 text-xs font-mono rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-hidden"
+            />
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="px-4 py-2.5 rounded-xl font-bold text-xs bg-white text-amber-900 hover:bg-amber-50 transition shadow-sm whitespace-nowrap cursor-pointer"
+            >
+              {copied ? "Copied!" : "Copy Link"}
+            </button>
+          </div>
+        </div>
 
         {/* 4 Agent KPI Metric Cards */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-          <Card beamIndex={0}>
-            <CardHeader className="justify-between">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-blue-light-50 text-primary dark:bg-blue-light-950">
-                <UserGroupIcon />
-              </div>
-            </CardHeader>
-            <CardContent className="mt-3.5 sm:mt-5 p-0">
-              <div className="text-lg leading-6 font-bold text-text-primary sm:text-xl md:text-2xl tracking-tight">
-                {s.totalOnboarded}
-              </div>
-            </CardContent>
-            <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
-              <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Customers in Zones</span>
-              <span className="text-[11px] leading-4 sm:text-xs font-semibold text-primary">Managed by you</span>
-            </CardFooter>
-          </Card>
-
-          <Card beamIndex={1}>
-            <CardHeader className="justify-between">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-brand-50 text-brand-500 dark:bg-brand-950">
-                <TaskIcon />
-              </div>
-            </CardHeader>
-            <CardContent className="mt-3.5 sm:mt-5 p-0">
-              <div className="text-lg leading-6 font-bold text-brand-600 dark:text-brand-400 sm:text-xl md:text-2xl tracking-tight">
-                {s.totalRefillsOrdered}
-              </div>
-            </CardContent>
-            <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
-              <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Refill Orders</span>
-              <span className="text-[11px] leading-4 sm:text-xs font-semibold text-brand-600">18.9L bottles</span>
-            </CardFooter>
-          </Card>
-
-          <Card beamIndex={2}>
-            <CardHeader className="justify-between">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-success-50 text-green-600 dark:bg-success-950">
-                <Gift className="size-4.5" />
-              </div>
-            </CardHeader>
-            <CardContent className="mt-3.5 sm:mt-5 p-0">
-              <div className="text-lg leading-6 font-bold text-green-600 sm:text-xl md:text-2xl tracking-tight">
-                {s.freeBottlesEarned}
-              </div>
-            </CardContent>
-            <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
-              <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Free Bottles Earned</span>
-              <span className="text-[11px] leading-4 sm:text-xs font-semibold text-green-600">Reward balance</span>
-            </CardFooter>
-          </Card>
-
-          <Card beamIndex={3}>
-            <CardHeader className="justify-between">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-orange-50 text-orange-500 dark:bg-orange-950">
-                <InvoiceIcon />
-              </div>
-            </CardHeader>
-            <CardContent className="mt-3.5 sm:mt-5 p-0">
-              <div className="text-lg leading-6 font-bold text-orange-600 dark:text-orange-400 sm:text-xl md:text-2xl tracking-tight">
-                GH₵ {s.totalCommissionGHS.toFixed(2)}
-              </div>
-            </CardContent>
-            <CardFooter className="mt-2.5 sm:mt-3 flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between p-0">
-              <span className="text-[11px] leading-4 sm:text-xs font-medium text-text-tertiary">Supervisor Commission</span>
-              <span className="text-[11px] leading-4 sm:text-xs font-semibold text-orange-500">GH₵ 5.00/refill</span>
-            </CardFooter>
-          </Card>
-        </div>
-
-        {/* Zone Supervision Summary Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {(s.zonesSummary || []).map((z, idx) => (
-            <div
-              key={z.name}
-              onClick={() => setSelectedZone(selectedZone === z.name ? "All Zones" : z.name)}
-              className={cn(
-                "p-3 rounded-xl border transition cursor-pointer",
-                selectedZone === z.name
-                  ? "border-primary bg-primary/5 text-primary"
-                  : "border-card-border bg-card-surface-area hover:border-border-secondary"
-              )}
-            >
-              <div className="flex items-center gap-1.5 mb-1">
-                <MapPin className="size-3.5 text-primary shrink-0" />
-                <span className="text-xs font-bold text-text-primary truncate">{z.name}</span>
-              </div>
-              <div className="flex justify-between items-center text-[11px] text-text-tertiary">
-                <span>{z.customersCount} accounts</span>
-                <span className="font-semibold text-primary">{z.refillsCount} refills</span>
-              </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium block">
+              Onboarded Customers
+            </span>
+            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+              {s.totalOnboarded}
             </div>
-          ))}
+            <span className="text-[11px] text-gray-400">Total accounts registered</span>
+          </div>
+
+          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+            <span className="text-xs text-brand-600 dark:text-blue-light-400 font-medium block">
+              Refill Orders Generated
+            </span>
+            <div className="mt-1 text-2xl font-bold text-brand-600 dark:text-blue-light-400">
+              {s.totalRefillsOrdered}
+            </div>
+            <span className="text-[11px] text-gray-400">18.9L bottles ordered</span>
+          </div>
+
+          <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs">
+            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium block">
+              Free Bottles Earned
+            </span>
+            <div className="mt-1 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+              {s.freeBottlesEarned}
+            </div>
+            <span className="text-[11px] text-gray-400">5:1 Reward rule active</span>
+          </div>
+
+          <div className="p-4 rounded-2xl border border-amber-200 dark:border-amber-800/80 bg-amber-50/40 dark:bg-amber-950/20 shadow-theme-xs">
+            <span className="text-xs text-amber-800 dark:text-amber-300 font-bold block">
+              Commission Earned
+            </span>
+            <div className="mt-1 text-2xl font-extrabold text-amber-600 dark:text-amber-400">
+              GH₵ {s.totalCommissionGHS.toFixed(2)}
+            </div>
+            <span className="text-[11px] text-amber-700 dark:text-amber-400">
+              GH₵ 5.00 per refill bottle
+            </span>
+          </div>
         </div>
 
-        {/* Zone Filter & Customers Management Table Card */}
-        <Card id="customers" className="p-0 overflow-hidden">
-          <CardHeader className="p-5 pb-4 border-b border-card-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Referee Customer Accounts Table */}
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-theme-xs space-y-4">
+          <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Customers Under Supervision</CardTitle>
-              <p className="mt-0.5 text-xs text-text-tertiary">
-                Showing {filteredReferees.length} accounts in{" "}
-                <span className="font-semibold text-primary">{selectedZone}</span>
+              <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                Referred Customer Accounts ({s.referees.length})
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Customer refills ordered and commission tracking
               </p>
             </div>
-
-            {/* Filter controls */}
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Zone Select Dropdown */}
-              <div className="flex items-center gap-1.5">
-                <Filter className="size-3.5 text-text-tertiary" />
-                <select
-                  value={selectedZone}
-                  onChange={(e) => setSelectedZone(e.target.value)}
-                  className="h-8 px-2.5 text-xs rounded-lg border border-input-border bg-input-background text-text-primary focus:outline-none focus:border-primary"
-                >
-                  {ACCRA_ZONES.map((zone) => (
-                    <option key={zone} value={zone}>
-                      {zone}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className="size-3.5 text-text-tertiary absolute left-2.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search customer, phone, zone..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-8 pl-8 pr-3 text-xs rounded-lg border border-input-border bg-input-background text-text-primary focus:outline-none focus:border-primary w-44 sm:w-56"
-                />
-              </div>
-            </div>
-          </CardHeader>
-
-          <div className="overflow-x-auto">
-            <TableRoot className="w-full rounded-none border-none">
-              <TableHeader>
-                <TableRow className="border-t border-b border-border-primary bg-background-gray-primary/40">
-                  <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
-                    Customer Name
-                  </TableHead>
-                  <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
-                    Delivery Zone
-                  </TableHead>
-                  <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
-                    Contact Phone
-                  </TableHead>
-                  <TableHead className="px-5 py-3 text-xs font-semibold text-text-secondary">
-                    Refill Volume
-                  </TableHead>
-                  <TableHead className="px-5 py-3 text-right text-xs font-semibold text-text-secondary">
-                    Commission Earned
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody>
-                {filteredReferees.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="py-10 text-center text-xs text-text-tertiary">
-                      No customer accounts found for the selected zone filter.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredReferees.map((r) => (
-                    <TableRow key={r.id} className="hover:bg-background-gray-primary/50 transition-colors">
-                      <TableCell className="px-5 py-3 text-xs font-semibold text-text-primary">
-                        <div>
-                          <div>{r.customerName}</div>
-                          <div className="text-[10px] text-text-tertiary font-normal">
-                            Onboarded: {r.onboardedDate ? new Date(r.onboardedDate).toLocaleDateString() : "Recent"}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="px-5 py-3 text-xs">
-                        <Badge color="primary" size="sm" className="text-[10px]">
-                          {r.zone || "Accra Zone"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="px-5 py-3 font-mono text-xs text-text-secondary">
-                        <a
-                          href={`tel:${r.phone}`}
-                          className="inline-flex items-center gap-1.5 text-primary hover:underline font-mono"
-                        >
-                          <Phone className="size-3" />
-                          <span>{r.phone}</span>
-                        </a>
-                      </TableCell>
-                      <TableCell className="px-5 py-3 text-xs font-bold text-text-primary">
-                        {r.refillsCount} refills
-                      </TableCell>
-                      <TableCell className="px-5 py-3 text-right text-xs font-bold text-green-600">
-                        GH₵ {r.commissionGHS.toFixed(2)}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </TableRoot>
+            <Badge color="success" size="sm">
+              GH₵ 5.00 / Bottle
+            </Badge>
           </div>
-        </Card>
 
-        {/* Modal: Onboard Customer On Ground */}
+          <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-gray-800">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-gray-50/50 dark:bg-gray-800/50 text-gray-500 border-b border-gray-100 dark:border-gray-800">
+                <tr>
+                  <th className="py-2.5 px-3">Customer</th>
+                  <th className="py-2.5 px-3">Phone</th>
+                  <th className="py-2.5 px-3">Onboarded</th>
+                  <th className="py-2.5 px-3">Refills</th>
+                  <th className="py-2.5 px-3 text-right">Commission Earned</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                {s.referees.map((ref) => (
+                  <tr key={ref.id} className="hover:bg-gray-50/30">
+                    <td className="py-2.5 px-3 font-semibold text-gray-900 dark:text-white">
+                      {ref.customerName}
+                    </td>
+                    <td className="py-2.5 px-3 font-mono text-gray-500">
+                      {ref.phone}
+                    </td>
+                    <td className="py-2.5 px-3 text-gray-500">
+                      {new Date(ref.onboardedDate).toLocaleDateString("en-GB", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </td>
+                    <td className="py-2.5 px-3 font-bold text-brand-600 dark:text-blue-light-400">
+                      {ref.refillsCount} bottles
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-bold text-emerald-600 dark:text-emerald-400">
+                      GH₵ {ref.commissionGHS.toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* MODAL: Register Customer On Ground */}
         <Modal
           isOpen={isOnboardModalOpen}
           onClose={() => setIsOnboardModalOpen(false)}
-          title="Register Customer Under Zone"
+          title="Onboard Customer on Ground"
         >
-          <form onSubmit={handleOnboardSubmit} className="space-y-4">
-            {onboardError && (
-              <div className="p-3 rounded-lg bg-error-50 border border-error-200 text-red-600 text-xs">
-                {onboardError}
-              </div>
-            )}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-text-primary">Customer Full Name</label>
+          {onboardError && (
+            <div className="p-3 mb-3 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-xl text-xs text-rose-800 dark:text-rose-300">
+              {onboardError}
+            </div>
+          )}
+
+          <form onSubmit={handleOnboardSubmit} className="space-y-3.5 text-xs">
+            <div>
+              <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                Customer Full Name
+              </label>
               <input
-                required
                 type="text"
-                placeholder="e.g. Kweku Baah"
+                required
+                placeholder="e.g. Kwame Adjei"
                 value={custName}
                 onChange={(e) => setCustName(e.target.value)}
-                className="w-full h-10 px-3 text-xs rounded-lg border border-input-border bg-input-background text-text-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="w-full h-10 px-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500"
               />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-text-primary">Phone Number</label>
-                <input
-                  required
-                  type="tel"
-                  placeholder="024 XXX XXXX"
-                  value={custPhone}
-                  onChange={(e) => setCustPhone(e.target.value)}
-                  className="w-full h-10 px-3 text-xs rounded-lg border border-input-border bg-input-background text-text-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-text-primary">Email (Optional)</label>
-                <input
-                  type="email"
-                  placeholder="kweku@example.com"
-                  value={custEmail}
-                  onChange={(e) => setCustEmail(e.target.value)}
-                  className="w-full h-10 px-3 text-xs rounded-lg border border-input-border bg-input-background text-text-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
+
+            <div>
+              <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                required
+                placeholder="e.g. 0244123456"
+                value={custPhone}
+                onChange={(e) => setCustPhone(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500 font-mono"
+              />
             </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-text-primary">Delivery Zone</label>
-              <select
+
+            <div>
+              <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                Email Address
+              </label>
+              <input
+                type="email"
+                required
+                placeholder="e.g. kwame@gmail.com"
+                value={custEmail}
+                onChange={(e) => setCustEmail(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500"
+              />
+            </div>
+
+            <div>
+              <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                Delivery Area / Street
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. Near Shell Station, Spintex"
                 value={custArea}
                 onChange={(e) => setCustArea(e.target.value)}
-                className="w-full h-10 px-3 text-xs rounded-lg border border-input-border bg-input-background text-text-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-              >
-                {ACCRA_ZONES.filter((z) => z !== "All Zones").map((z) => (
-                  <option key={z} value={z}>
-                    {z}
-                  </option>
-                ))}
-              </select>
+                className="w-full h-10 px-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-hidden focus:border-brand-500"
+              />
             </div>
-            <div className="flex justify-end gap-2 pt-2 border-t border-card-border">
-              <Button variant="ghost" size="sm" onClick={() => setIsOnboardModalOpen(false)}>
+
+            <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-[11px] text-amber-800 dark:text-amber-300">
+              The customer will automatically be bound to your referral code (<strong>{s.agentCode}</strong>). You will earn GH₵ 5.00 on every refill they order!
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+              <button
+                type="button"
+                onClick={() => setIsOnboardModalOpen(false)}
+                className="px-4 py-2 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+              >
                 Cancel
-              </Button>
-              <Button size="sm" type="submit" disabled={isOnboarding}>
-                {isOnboarding ? "Registering..." : "Register Customer"}
-              </Button>
+              </button>
+              <button
+                type="submit"
+                disabled={isOnboarding}
+                className="px-4 py-2 font-bold text-white bg-brand-500 hover:bg-brand-600 rounded-lg shadow-theme-xs disabled:opacity-50 cursor-pointer"
+              >
+                {isOnboarding ? "Registering..." : "Complete Registration"}
+              </button>
             </div>
           </form>
         </Modal>

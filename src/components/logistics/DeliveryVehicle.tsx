@@ -1,8 +1,7 @@
 "use client";
 
-import { Badge } from "@/components/tailgrids/core/badge";
-import { Card, CardHeader, CardTitle } from "@/components/tailgrids/core/card";
 import React from "react";
+import Badge from "@/components/ui/badge/Badge";
 
 interface Vehicle {
   id: string;
@@ -46,31 +45,31 @@ const fleet: Vehicle[] = [
 
 export default function DeliveryVehicle() {
   return (
-    <Card className="p-5 sm:p-6">
-      <CardHeader className="mb-4">
+    <div className="rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 p-5 sm:p-6 shadow-xs">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <CardTitle className="text-base sm:text-lg font-bold">
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
             Delivery Fleet on Route
-          </CardTitle>
-          <p className="text-xs text-text-tertiary mt-0.5">
+          </h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             Live GPS and bottle capacity tracking
           </p>
         </div>
-        <span className="text-xs font-bold text-primary">
+        <span className="text-xs font-bold text-brand-600 dark:text-sky-400">
           3 Active Vehicles
         </span>
-      </CardHeader>
+      </div>
 
       <div className="space-y-3">
         {fleet.map((v) => (
           <div
             key={v.id}
-            className="p-3.5 rounded-lg border border-card-border bg-background-gray-primary text-xs transition-colors hover:border-primary/40"
+            className="p-3.5 rounded-2xl border border-gray-100 dark:border-gray-800/60 bg-gray-50/70 dark:bg-gray-800/30 text-xs transition hover:border-gray-200 dark:hover:border-gray-700"
           >
             <div className="flex items-center justify-between">
-              <div className="font-semibold text-text-primary">
+              <div className="font-semibold text-gray-900 dark:text-white">
                 {v.name} •{" "}
-                <span className="font-mono text-text-tertiary">{v.plate}</span>
+                <span className="font-mono text-gray-500">{v.plate}</span>
               </div>
               <Badge
                 color={v.status === "On Route" ? "success" : "warning"}
@@ -80,17 +79,17 @@ export default function DeliveryVehicle() {
               </Badge>
             </div>
 
-            <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-text-secondary">
+            <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-gray-600 dark:text-gray-400">
               <div>
-                Driver: <strong className="text-text-primary">{v.driver}</strong> • {v.route}
+                Driver: <strong className="text-gray-800 dark:text-gray-200">{v.driver}</strong> • {v.route}
               </div>
-              <div className="font-medium text-primary">
+              <div className="font-medium text-brand-600 dark:text-sky-400">
                 {v.capacity}
               </div>
             </div>
           </div>
         ))}
       </div>
-    </Card>
+    </div>
   );
 }

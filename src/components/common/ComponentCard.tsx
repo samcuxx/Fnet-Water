@@ -32,16 +32,16 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
           ? { y: -3, transition: { duration: 0.2, ease: "easeOut" } }
           : undefined
       }
-      className={`rounded-xl border border-border bg-card text-card-foreground shadow-xs overflow-hidden transition-shadow ${className}`}
+      className={`rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs overflow-hidden transition-shadow ${className}`}
     >
       {/* Card Header */}
-      <div className="px-6 py-5 flex items-center justify-between border-b border-border">
+      <div className="px-6 py-5 flex items-center justify-between border-b border-gray-100/80 dark:border-gray-800/60">
         <div>
-          <h3 className="text-sm sm:text-base font-bold text-card-foreground">
+          <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
             {title}
           </h3>
           {desc && (
-            <p className="mt-0.5 text-xs text-muted-foreground">
+            <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
               {desc}
             </p>
           )}

@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
-import { Breadcrumbs } from "@/components/tailgrids/core/breadcrumbs";
-import { Card } from "@/components/tailgrids/core/card";
-import { Badge } from "@/components/tailgrids/core/badge";
+import Badge from "@/components/ui/badge/Badge";
 import { SkeletonCard } from "@/components/ui/skeleton";
+import { staggerContainer, fadeInUp, cardHoverMotion } from "@/lib/animations";
 import type { StoredProduct } from "@/lib/product-store";
-import { Package, Droplets, CheckCircle, Shield } from "lucide-react";
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<StoredProduct[]>([]);
@@ -35,102 +34,84 @@ export default function AdminProductsPage() {
   return (
     <AppLayout role="ADMIN">
       <div className="space-y-6">
-        {/* Breadcrumbs & Page Header */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100 dark:border-gray-800/80">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
                 Water Products Catalog
               </h1>
               <Badge color="primary" size="sm">
                 Pricing &amp; SKUs
               </Badge>
             </div>
-            <p className="mt-1 text-xs text-text-tertiary sm:text-sm">
+            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               Active pure water products, bottle deposit rates, and packaging specifications in GH₵.
             </p>
-          </div>
-          <div>
-            <Breadcrumbs
-              dividerType="chevron"
-              items={[
-                { label: "Home", href: "/admin" },
-                { label: "Products Catalog" },
-              ]}
-            />
           </div>
         </div>
 
         {/* Products Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <SkeletonCard lines={3} />
             <SkeletonCard lines={3} />
             <SkeletonCard lines={3} />
             <SkeletonCard lines={3} />
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-            {products.map((p, idx) => (
-              <Card
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
+          >
+            {products.map((p) => (
+              <motion.div
                 key={p.id}
-                beamIndex={idx}
-                className="flex flex-col justify-between transition-all hover:border-card-border/80"
+                variants={fadeInUp}
+                {...cardHoverMotion}
+                className="p-5 sm:p-6 rounded-[28px] border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-gray-900/70 shadow-xs flex flex-col justify-between space-y-4 hover:border-gray-200 dark:hover:border-gray-700 transition-all cursor-pointer"
               >
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Badge color="cyan" size="sm">
+                    <Badge color="info" size="sm">
                       {p.type.replace("_", " ")}
                     </Badge>
-                    <div className="flex size-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20" />
+                    <span className="size-2 rounded-full bg-emerald-500" />
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-xl bg-blue-light-100 text-primary dark:bg-blue-light-950/60 dark:text-blue-light-400">
-                      <Droplets className="size-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-bold text-text-primary">
-                        {p.name}
-                      </h3>
-                      <span className="text-[11px] font-mono text-text-tertiary uppercase">
-                        SKU: {p.id}
-                      </span>
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-text-secondary line-clamp-2">
+                  <h3 className="text-base font-bold text-gray-900 dark:text-white mt-1">
+                    {p.name}
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
                     {p.description}
                   </p>
                 </div>
 
-                <div className="mt-4 space-y-2.5 border-t border-card-border pt-4 text-xs">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-text-tertiary">Unit Price</span>
-                    <span className="text-lg font-bold text-primary">
+                <div className="space-y-2 pt-3 border-t border-gray-100 dark:border-gray-800 text-xs">
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-gray-500">Unit Price:</span>
+                    <span className="text-lg font-bold text-brand-600 dark:text-sky-400">
                       GH₵ {p.price.toFixed(2)}
                     </span>
                   </div>
-
                   {p.depositFee > 0 && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-text-tertiary">Bottle Deposit</span>
-                      <span className="font-semibold text-text-secondary">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Bottle Deposit:</span>
+                      <span className="font-semibold text-gray-800 dark:text-gray-200">
                         GH₵ {p.depositFee.toFixed(2)}
                       </span>
                     </div>
                   )}
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-text-tertiary">Inventory Status</span>
-                    <Badge color="success" size="sm">
-                      In Stock
-                    </Badge>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Inventory Status:</span>
+                    <span className="text-emerald-600 font-semibold">In Stock</span>
                   </div>
                 </div>
-              </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </AppLayout>

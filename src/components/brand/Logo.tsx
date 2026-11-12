@@ -10,7 +10,6 @@ export interface LogoProps {
   href?: string;
   showTagline?: boolean;
   variant?: "default" | "light" | "dark";
-  title?: string;
 }
 
 export function LogoIcon({ className = "size-8" }: { className?: string }) {
@@ -109,7 +108,6 @@ export default function Logo({
   href = "/",
   showTagline = false,
   variant = "default",
-  title = "FNET WATER",
 }: LogoProps) {
   const sizeClasses = {
     sm: { icon: "size-7", text: "text-base", sub: "text-[9px]" },
@@ -126,21 +124,21 @@ export default function Logo({
       ? "text-gray-900"
       : variant === "dark"
       ? "text-white"
-      : "text-foreground";
+      : "text-gray-900 dark:text-white";
 
   const secondaryTextColor =
     variant === "light"
       ? "text-brand-600"
       : variant === "dark"
       ? "text-sky-400"
-      : "text-primary";
+      : "text-brand-600 dark:text-sky-400";
 
   const taglineColor =
     variant === "light"
       ? "text-gray-500"
       : variant === "dark"
       ? "text-gray-400"
-      : "text-muted-foreground";
+      : "text-gray-500 dark:text-gray-400";
 
   const content = (
     <div className={`inline-flex items-center gap-2.5 sm:gap-3 ${className}`}>
@@ -150,7 +148,7 @@ export default function Logo({
           <span
             className={`font-sans font-extrabold tracking-tight ${selectedSize.text} leading-none ${primaryTextColor}`}
           >
-            FNET <span className={secondaryTextColor}>WATER</span>
+            F NET <span className={secondaryTextColor}>WATER HUB</span>
           </span>
           {showTagline && (
             <span

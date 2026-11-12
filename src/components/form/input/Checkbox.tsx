@@ -26,7 +26,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   return (
     <label
       htmlFor={id}
-      className={`inline-flex items-center gap-2.5 text-xs sm:text-sm text-foreground select-none ${
+      className={`inline-flex items-center gap-2.5 text-xs sm:text-sm text-gray-700 dark:text-gray-300 select-none ${
         disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
       } ${className}`}
     >
@@ -37,7 +37,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
         defaultChecked={defaultChecked}
         disabled={disabled}
         onChange={handleChange}
-        className="size-4 rounded-sm border-input text-primary focus:ring-ring/20 bg-background"
+        className="size-4 rounded-sm border-gray-300 dark:border-gray-700 text-brand-600 focus:ring-brand-500/20 dark:bg-gray-800"
       />
       {label && <span>{label}</span>}
     </label>
