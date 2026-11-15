@@ -185,7 +185,7 @@ export default function HomePage() {
                 >
                   <Image
                     src="/images/landing/hero-commercial.jpg"
-                    alt="F Net Water Pure Water Delivery Experience"
+                    alt="FNet Water Pure Water Delivery Experience"
                     fill
                     priority
                     sizes="(max-width: 1024px) 100vw, 45vw"
@@ -681,7 +681,7 @@ export default function HomePage() {
               <div className="relative rounded-3xl overflow-hidden shadow-xl border-4 border-white aspect-[4/3] sm:aspect-[16/11]">
                 <Image
                   src="/images/landing/dispenser-lifestyle.jpg"
-                  alt="F Net Water Smart Dispenser Lifestyle"
+                  alt="FNet Water Smart Dispenser Lifestyle"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover object-center"
@@ -887,7 +887,7 @@ export default function HomePage() {
               <div className="relative rounded-3xl overflow-hidden shadow-xl border-4 border-white aspect-[4/3] sm:aspect-[16/11]">
                 <Image
                   src="/images/landing/logistics-fleet.jpg"
-                  alt="F Net Water Delivery Fleet"
+                  alt="FNet Water Delivery Fleet"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover object-center"
@@ -1102,7 +1102,7 @@ export default function HomePage() {
               <div>Phone: <a href="tel:+233244950505" className="hover:text-white transition">0244 95 05 05</a> / <a href="tel:+233550222888" className="hover:text-white transition">0550 222 888</a></div>
               <div>Hours: Mon – Sat, 6:00 AM – 7:00 PM</div>
               <div className="pt-2 text-[11px] text-gray-500">
-                &copy; {new Date().getFullYear()} F Net Water Hub. All rights reserved.
+                &copy; {new Date().getFullYear()} FNet Water Hub. All rights reserved.
               </div>
             </div>
           </div>

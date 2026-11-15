@@ -1,4 +1,4 @@
-# F Net Water Hub
+# FNet Water Hub
 
 > Ghana's premier automated water delivery, smart dispenser leasing, and fleet logistics management platform.
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-**F Net Water Hub** is a full-stack, enterprise-grade water distribution platform engineered specifically for Ghanaian homes, corporate offices, and logistics teams. It streamlines pure water delivery, empty bottle return accounting, rent-to-own dispenser contracts with IoT telemetry, agent client onboarding, and automated Mobile Money payments.
+**FNet Water Hub** is a full-stack, enterprise-grade water distribution platform engineered specifically for Ghanaian homes, corporate offices, and logistics teams. It streamlines pure water delivery, empty bottle return accounting, rent-to-own dispenser contracts with IoT telemetry, agent client onboarding, and automated Mobile Money payments.
 
 ---
 

@@ -1,12 +1,12 @@
-# F NET WATER HUB — COMPLETE COOLIFY & DOCKER PRODUCTION DEPLOYMENT GUIDE
+# FNet Water HUB — COMPLETE COOLIFY & DOCKER PRODUCTION DEPLOYMENT GUIDE
 
-This document is the official, definitive guide to deploying the **F Net Water Hub** platform onto a self-hosted production server using **Coolify** (v4.x) and **Docker**.
+This document is the official, definitive guide to deploying the **FNet Water Hub** platform onto a self-hosted production server using **Coolify** (v4.x) and **Docker**.
 
 ---
 
 ## 1. ARCHITECTURAL OVERVIEW
 
-The F Net Water Hub is engineered for high reliability, fast page loads, and low resource overhead:
+The FNet Water Hub is engineered for high reliability, fast page loads, and low resource overhead:
 
 - **Frontend & API**: Next.js 15 (React 19, TypeScript) compiled in **Standalone Output Mode**, reducing container image footprint to under ~180MB.
 - **Database**: PostgreSQL 16 Alpine with Prisma ORM (16 models, 6 enums) using multi-platform binary targets (`native`, `linux-musl-openssl-3.0.x`, `debian-openssl-3.0.x`).
@@ -36,7 +36,7 @@ Before beginning the deployment in Coolify, ensure you have:
 
 ## 3. DEPLOYMENT METHODS IN COOLIFY
 
-You can deploy F Net Water Hub in Coolify using either of the two standard workflows:
+You can deploy FNet Water Hub in Coolify using either of the two standard workflows:
 
 - **Method A (Recommended — All-in-One)**: Deploy via **Docker Compose** (Web + PostgreSQL together in one stack).
 - **Method B (Modular)**: Deploy a **Coolify PostgreSQL Database** first, then deploy the Next.js app as a **Standalone Application**.
@@ -217,7 +217,7 @@ docker exec -it fnet_water_web npx tsx prisma/seed.ts
 
 Output should confirm:
 ```
-Seeding F Net Water Hub database with Ghana operational data...
+Seeding FNet Water Hub database with Ghana operational data...
 Created 5 core persona accounts: Admin, Manager, Driver, Agent, Customer.
 Created 3 core product catalog items in GHS.
 Created warehouse bottle inventory and smart dispenser assets.

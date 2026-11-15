@@ -42,7 +42,7 @@ export default function CustomerReferralsPage() {
   const handleWhatsAppShare = () => {
     if (!stats) return;
     const text = encodeURIComponent(
-      `Hello! Order fresh 18.9L pure water delivered to your doorstep with F Net Water Hub. Use my link to get started: ${stats.referralLink}`
+      `Hello! Order fresh 18.9L pure water delivered to your doorstep with FNet Water Hub. Use my link to get started: ${stats.referralLink}`
     );
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };

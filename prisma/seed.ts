@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Seeding F Net Water Hub database with Ghana operational data...");
+  console.log("Seeding FNet Water Hub database with Ghana operational data...");
 
   // 1. Clean existing records in correct relation order
   await prisma.notification.deleteMany();
@@ -302,7 +302,7 @@ async function main() {
         userId: admin.id,
         role: UserRole.ADMIN,
         title: "Daily Operations Ready",
-        message: "F Net Water Hub Ghana system online. 450 filled bottles available.",
+        message: "FNet Water Hub Ghana system online. 450 filled bottles available.",
         type: NotificationType.INFO,
         linkUrl: "/admin/inventory",
       },

@@ -1,6 +1,6 @@
-# F NET WATER HUB — COMPLETE CLIENT HANDOVER & USER REVIEW GUIDE
+# FNet Water HUB — COMPLETE CLIENT HANDOVER & USER REVIEW GUIDE
 
-Welcome to the **F Net Water Hub** platform, Ghana's premier automated water delivery, smart dispenser leasing, and logistics management system. This guide provides complete documentation, credentials, feature walkthroughs, and deployment instructions for executive stakeholders, operation managers, fleet drivers, field agents, and customers.
+Welcome to the **FNet Water Hub** platform, Ghana's premier automated water delivery, smart dispenser leasing, and logistics management system. This guide provides complete documentation, credentials, feature walkthroughs, and deployment instructions for executive stakeholders, operation managers, fleet drivers, field agents, and customers.
 
 ---
 

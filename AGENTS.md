@@ -1,4 +1,4 @@
-# F NET WATER HUB — AGENT RULES & CONTRACT
+# FNet Water HUB — AGENT RULES & CONTRACT
 
 This file binds all autonomous and subagent operations in this workspace. Refer to [PROJECT_RULES.md](file:///c:/Users/samue/Documents/Github/fnetWater/PROJECT_RULES.md) and [GEMINI.md](file:///c:/Users/samue/Documents/Github/fnetWater/GEMINI.md) for full engineering specifications.
 

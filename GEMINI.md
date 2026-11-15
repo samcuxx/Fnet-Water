@@ -1,4 +1,4 @@
-# F NET WATER HUB — ACTIVE AGENT DIRECTIVE & CONTRACT
+# FNet Water HUB — ACTIVE AGENT DIRECTIVE & CONTRACT
 
 This file is automatically loaded by Antigravity and binds all coding, design, and architecture decisions in this repository.
 

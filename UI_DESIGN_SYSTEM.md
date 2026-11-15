@@ -1,4 +1,4 @@
-# F NET WATER HUB — UI DESIGN SYSTEM & NEXT.JS TEMPLATE COMPONENT GUIDE
+# FNet Water HUB — UI DESIGN SYSTEM & NEXT.JS TEMPLATE COMPONENT GUIDE
 
 This guide documents the design system and component usage rules derived directly from `ui_template` (TailAdmin React v2.3.0) and adapted for **Next.js (App Router)**. All developers and agents must adhere strictly to these patterns and components.
 

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useSidebar } from "@/context/SidebarContext";
 import ThemeToggleButton from "@/components/common/ThemeToggleButton";
 import NotificationDropdown from "@/components/header/NotificationDropdown";
+import RoleSwitcherDropdown from "@/components/header/RoleSwitcherDropdown";
 import Logo from "@/components/brand/Logo";
 
 export const AppHeader: React.FC = () => {
@@ -19,7 +20,7 @@ export const AppHeader: React.FC = () => {
     if (pathname.startsWith("/agent")) return "Zone Supervisor & Agent Hub";
     if (pathname.startsWith("/customer")) return "Customer Portal";
     if (pathname.startsWith("/notifications")) return "Notification Center";
-    return "F Net Water Hub";
+    return "FNet Water Hub";
   };
 
   const isCustomerPortal = pathname.startsWith("/customer");
@@ -68,8 +69,11 @@ export const AppHeader: React.FC = () => {
         </div>
       </div>
 
-      {/* Right: Actions, Notification Center & Theme Toggle */}
-      <div className="flex items-center gap-2.5">
+      {/* Right: Actions, Role Switcher, Notification Center & Theme Toggle */}
+      <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Fast Role Switcher */}
+        <RoleSwitcherDropdown />
+
         {isCustomerPortal && (
           <Link
             href="/customer/order"

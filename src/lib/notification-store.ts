@@ -134,7 +134,7 @@ const DEFAULT_SEED_SMS_LOGS: SmsLogRecord[] = [
   {
     id: "sms_001",
     recipientPhone: "0241000005",
-    message: "F Net Water Hub: Order #FNW-8821 confirmed! Total: GH₵ 100.00. We will notify you when a driver is dispatched.",
+    message: "FNet Water Hub: Order #FNW-8821 confirmed! Total: GH₵ 100.00. We will notify you when a driver is dispatched.",
     status: "DELIVERED",
     type: "ORDER_CONFIRMATION",
     sentAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
@@ -142,7 +142,7 @@ const DEFAULT_SEED_SMS_LOGS: SmsLogRecord[] = [
   {
     id: "sms_002",
     recipientPhone: "0241000005",
-    message: "F Net Water Hub: Driver Kwame Asante is on the way with your water delivery for Order #FNW-8821.",
+    message: "FNet Water Hub: Driver Kwame Asante is on the way with your water delivery for Order #FNW-8821.",
     status: "DELIVERED",
     type: "DELIVERY_DISPATCH",
     sentAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
@@ -150,7 +150,7 @@ const DEFAULT_SEED_SMS_LOGS: SmsLogRecord[] = [
   {
     id: "sms_003",
     recipientPhone: "0241000003",
-    message: "F Net Water Hub: New delivery assigned for Order #FNW-8824 at Cantonments. Please check your driver run.",
+    message: "FNet Water Hub: New delivery assigned for Order #FNW-8824 at Cantonments. Please check your driver run.",
     status: "DELIVERED",
     type: "DRIVER_ASSIGNMENT",
     sentAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
@@ -158,7 +158,7 @@ const DEFAULT_SEED_SMS_LOGS: SmsLogRecord[] = [
   {
     id: "sms_004",
     recipientPhone: "0241000002",
-    message: "F Net Water Hub ALERT: Warehouse filled bottle inventory has dropped to 85 units (below threshold).",
+    message: "FNet Water Hub ALERT: Warehouse filled bottle inventory has dropped to 85 units (below threshold).",
     status: "DELIVERED",
     type: "INVENTORY_ALERT",
     sentAt: new Date(Date.now() - 1000 * 60 * 60 * 1).toISOString(),

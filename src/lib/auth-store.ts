@@ -114,7 +114,7 @@ const DEFAULT_SEED_USERS: StoredUser[] = [
   },
   {
     id: "usr_driver_001",
-    name: "Kwame Mensah",
+    name: "Kwame Asante",
     email: "driver@fnetwater.com",
     phone: "0241000003",
     passwordHash: bcrypt.hashSync("driver123", 10),

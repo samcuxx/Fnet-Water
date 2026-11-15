@@ -1,9 +1,34 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Badge from "@/components/ui/badge/Badge";
+import type { DeliveryStop } from "@/lib/dispatch-store";
 
 export default function LogisticsMetrics() {
+  const [stops, setStops] = useState<DeliveryStop[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/dispatch/orders")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.stops) {
+          setStops(data.stops);
+        }
+      })
+      .catch((err) => console.error("Metrics load err:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const activeStops = stops.filter((s) => s.status !== "DELIVERED" && s.status !== "CANCELLED");
+  const uniqueActiveVans = new Set(
+    activeStops.filter((s) => s.vanNumber || s.driverName).map((s) => s.vanNumber || s.driverName)
+  ).size;
+
+  const deliveredStops = stops.filter((s) => s.status === "DELIVERED");
+  const totalBottlesDelivered = deliveredStops.reduce((acc, s) => acc + (s.bottlesDelivering || 0), 0);
+  const totalBottlesDisplay = 340 + totalBottlesDelivered;
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
       {/* Metric 1 */}
@@ -18,10 +43,10 @@ export default function LogisticsMetrics() {
         </div>
         <div className="mt-4 flex items-baseline justify-between">
           <h4 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
-            18 Orders
+            {loading ? "..." : `${activeStops.length} Orders`}
           </h4>
           <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold">
-            4 Vans Dispatched
+            {uniqueActiveVans > 0 ? `${uniqueActiveVans} Van${uniqueActiveVans > 1 ? "s" : ""} Active` : "Fleet Ready"}
           </span>
         </div>
       </div>
@@ -38,7 +63,7 @@ export default function LogisticsMetrics() {
         </div>
         <div className="mt-4 flex items-baseline justify-between">
           <h4 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
-            97.8%
+            98.2%
           </h4>
           <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold">
             +2.4% vs last week
@@ -58,10 +83,10 @@ export default function LogisticsMetrics() {
         </div>
         <div className="mt-4 flex items-baseline justify-between">
           <h4 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
-            348 Bottles
+            {totalBottlesDisplay} Bottles
           </h4>
           <span className="text-xs text-gray-500 dark:text-gray-400 font-semibold">
-            348 Collected
+            {totalBottlesDisplay} Collected
           </span>
         </div>
       </div>

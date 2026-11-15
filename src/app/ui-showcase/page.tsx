@@ -84,7 +84,7 @@ export default function UiShowcasePage() {
               Component Design System & Library
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              TailAdmin React 2.3 components ported to Next.js App Router for F Net Water Hub.
+              TailAdmin React 2.3 components ported to Next.js App Router for FNet Water Hub.
             </p>
           </div>
 

@@ -1,6 +1,6 @@
-# F NET WATER HUB — ENGINEERING RULES & QUALITY CONTRACT
+# FNet Water HUB — ENGINEERING RULES & QUALITY CONTRACT
 
-This document defines the strict, binding operational rules for the engineering, architecture, design system, and user experience of **F Net Water Hub**. Every code change, component migration, state structure, and user interface element must strictly comply with these guidelines.
+This document defines the strict, binding operational rules for the engineering, architecture, design system, and user experience of **FNet Water Hub**. Every code change, component migration, state structure, and user interface element must strictly comply with these guidelines.
 
 ---
 
@@ -132,7 +132,7 @@ Following the principles of the **Anti-Slop Standard** (`https://github.com/miqd
 
 ### Rule 6.3: Unified Brand Logo Standard (No Random Placeholders)
 - Never generate temporary letters in gradient boxes (e.g. an "F" in a square).
-- Always use the official F Net Water Hub logo component:
+- Always use the official FNet Water Hub logo component:
   - Component: `src/components/brand/Logo.tsx` (`<Logo />` or `<LogoIcon />`)
   - Static SVG assets: `public/images/logo/logo.svg`, `logo-dark.svg`, and `logo-icon.svg`.
 
@@ -167,7 +167,7 @@ Every completed module report must conclude with a structured **Reviewer Testing
 
 ## 8. NON-TECHNICAL END-USER LANGUAGE & ZERO JARGON STANDARD
 
-All applications and modules in F Net Water Hub are used by everyday Ghanaian consumers, logistics managers, and commercial van drivers. Technical jargon, developer shorthands, and robotic terminology are strictly forbidden in UI text.
+All applications and modules in FNet Water Hub are used by everyday Ghanaian consumers, logistics managers, and commercial van drivers. Technical jargon, developer shorthands, and robotic terminology are strictly forbidden in UI text.
 
 ### Rule 8.1: Strict Ban on Robotic Phrases
 - Banned: `1:1 swap`, `1:1 bottle swap` -> Required: **"Bottle exchange"**, **"Returning empties"**, or **"Empty bottle return"**.

@@ -1,4 +1,4 @@
-# F NET WATER HUB — MASTER DEVELOPMENT TO-DO LIST
+# FNet Water HUB — MASTER DEVELOPMENT TO-DO LIST
 
 > **Status Indicator Guide:**  
 > - `[ ]` Pending  
@@ -12,7 +12,7 @@
   - [x] Initialize Next.js (App Router, React 19, TypeScript) project.
   - [x] Configure `@/*` path alias in `tsconfig.json`.
   - [x] Configure `next.config.ts` with `output: 'standalone'` for Docker and SVGR.
-  - [x] Set up `src/app/layout.tsx` with metadata, "F Net Water Hub" title, and brand favicon.
+  - [x] Set up `src/app/layout.tsx` with metadata, "FNet Water Hub" title, and brand favicon.
 - [x] **1.2 Brand Color & Styling Configuration**
   - [x] Configure Tailwind v4 `@theme` in `src/app/globals.css` with brand primary (`#0057B8`), light cyan (`#00AEEF`), and white (`#FFFFFF`).
   - [x] Import `Inter` font (professional typography) and typography scales.
@@ -244,7 +244,7 @@
 - [ ] **9.2 Digital Invoices & Receipts**
   - [ ] Invoices list table with status badges (`Paid`, `Pending`, `Overdue`).
   - [ ] Single Invoice / Receipt view (`/invoice/:id`):
-    - F Net Water Hub official header and Ghana Digital Address.
+    - FNet Water Hub official header and Ghana Digital Address.
     - Customer details and itemized pricing in GH₵.
     - Paystack transaction reference code.
     - Print / Download PDF layout with `@media print` styling.

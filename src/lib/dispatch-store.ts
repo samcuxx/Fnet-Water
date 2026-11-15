@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { isDatabaseConnected } from "@/lib/auth-store";
-import { getOrderById, updateOrderStatus, StoredOrder, OrderStatus } from "@/lib/order-store";
+import { getOrderById, updateOrderStatus, StoredOrder, OrderStatus, getAllOrders } from "@/lib/order-store";
 import { getCustomerProfile, updateCustomerProfileData } from "@/lib/customer-store";
 import { syncDeliveryExchangeToInventory } from "@/lib/inventory-store";
 import { createNotification } from "@/lib/notification-store";
@@ -262,9 +262,119 @@ export async function getActiveDrivers(): Promise<DriverProfile[]> {
 }
 
 /**
+ * Synchronize a new order into the dispatch stops map
+ */
+export async function syncOrderToDispatch(ord: StoredOrder): Promise<DeliveryStop> {
+  const totalBottles = ord.items.reduce((acc, it) => acc + (it.quantity || 0), 0);
+  const stop: DeliveryStop = {
+    id: `stop_${ord.id}`,
+    orderId: ord.id,
+    orderNumber: ord.orderNumber,
+    customerName: ord.customerName || "Customer",
+    customerPhone: ord.customerPhone || "0241000005",
+    deliveryAddress: ord.deliveryAddressText || "Accra Central",
+    digitalAddress: ord.deliveryDigitalAddress || "GA-492-1029",
+    deliverySlot: ord.deliverySlot || "Morning (8am - 12pm)",
+    bottlesDelivering: totalBottles > 0 ? totalBottles : 1,
+    expectedEmpty: ord.hasEmptyBottleExchange ? (totalBottles > 0 ? totalBottles : 1) : 0,
+    hasEmptyBottleExchange: ord.hasEmptyBottleExchange,
+    status: ord.status,
+    driverId: ord.assignedDriverId,
+    driverName: ord.assignedDriverName,
+    vanNumber: ord.assignedDriverName ? "Van 01 (GT-4421-23)" : undefined,
+    amount: ord.totalAmount,
+    paymentMethod: ord.paymentMethod,
+    paymentStatus: ord.paymentStatus,
+    deliveryInstructions: ord.deliveryInstructions,
+    assignedAt: ord.assignedDriverId ? (ord.updatedAt || ord.createdAt) : undefined,
+    createdAt: ord.createdAt,
+  };
+  memoryStops.set(ord.id, stop);
+  return stop;
+}
+
+/**
+ * Updates a delivery stop status in memory
+ */
+export async function updateStopStatus(
+  orderId: string,
+  status: OrderStatus,
+  driverId?: string,
+  driverName?: string
+): Promise<void> {
+  let stop = memoryStops.get(orderId);
+  if (!stop) {
+    const ord = await getOrderById(orderId);
+    if (ord) {
+      stop = await syncOrderToDispatch(ord);
+    }
+  }
+  if (stop) {
+    stop.status = status;
+    if (driverId) stop.driverId = driverId;
+    if (driverName) stop.driverName = driverName;
+    if (status === "ASSIGNED") stop.assignedAt = new Date().toISOString();
+    if (status === "OUT_FOR_DELIVERY") stop.startedAt = new Date().toISOString();
+    if (status === "DELIVERED") {
+      stop.completedAt = new Date().toISOString();
+      stop.paymentStatus = "PAID";
+    }
+    memoryStops.set(orderId, stop);
+  }
+}
+
+/**
+ * Synchronize all orders from order-store into dispatch memory stops
+ */
+export async function syncStopsWithOrders(): Promise<void> {
+  const allOrders = await getAllOrders();
+  for (const ord of allOrders) {
+    const existing = memoryStops.get(ord.id);
+    if (!existing) {
+      const totalBottles = ord.items.reduce((acc, it) => acc + (it.quantity || 0), 0);
+      const stop: DeliveryStop = {
+        id: `stop_${ord.id}`,
+        orderId: ord.id,
+        orderNumber: ord.orderNumber,
+        customerName: ord.customerName || "Customer",
+        customerPhone: ord.customerPhone || "0241000005",
+        deliveryAddress: ord.deliveryAddressText || "Accra Central",
+        digitalAddress: ord.deliveryDigitalAddress || "GA-492-1029",
+        deliverySlot: ord.deliverySlot || "Morning (8am - 12pm)",
+        bottlesDelivering: totalBottles > 0 ? totalBottles : 1,
+        expectedEmpty: ord.hasEmptyBottleExchange ? (totalBottles > 0 ? totalBottles : 1) : 0,
+        hasEmptyBottleExchange: ord.hasEmptyBottleExchange,
+        status: ord.status,
+        driverId: ord.assignedDriverId,
+        driverName: ord.assignedDriverName,
+        vanNumber: ord.assignedDriverName ? "Van 01 (GT-4421-23)" : undefined,
+        amount: ord.totalAmount,
+        paymentMethod: ord.paymentMethod,
+        paymentStatus: ord.paymentStatus,
+        deliveryInstructions: ord.deliveryInstructions,
+        assignedAt: ord.assignedDriverId ? (ord.updatedAt || ord.createdAt) : undefined,
+        createdAt: ord.createdAt,
+      };
+      memoryStops.set(ord.id, stop);
+    } else {
+      existing.status = ord.status;
+      if (ord.assignedDriverId) {
+        existing.driverId = ord.assignedDriverId;
+        existing.driverName = ord.assignedDriverName;
+        if (!existing.vanNumber) existing.vanNumber = "Van 01 (GT-4421-23)";
+      }
+      if (ord.paymentStatus) {
+        existing.paymentStatus = ord.paymentStatus;
+      }
+    }
+  }
+}
+
+/**
  * Get all dispatch delivery orders
  */
 export async function getAllDispatchStops(statusFilter?: string): Promise<DeliveryStop[]> {
+  await syncStopsWithOrders();
   const stops = Array.from(memoryStops.values());
   const filtered = statusFilter && statusFilter !== "ALL"
     ? stops.filter((s) => s.status === statusFilter)
@@ -391,11 +501,15 @@ export async function assignOrderToDriver(
  * Get assigned stops for a specific driver
  */
 export async function getDriverStops(driverId: string): Promise<DeliveryStop[]> {
+  await syncStopsWithOrders();
   const stops = Array.from(memoryStops.values()).filter(
-    (s) => s.driverId === driverId || !s.driverId || driverId === "usr_driver_001"
+    (s) =>
+      (s.driverId === driverId || s.driverName?.toLowerCase().includes("kwame")) &&
+      s.status !== "PENDING" &&
+      s.status !== "CANCELLED"
   );
   return stops.sort((a, b) => {
-    // Pending/Assigned first, Delivered last
+    // Assigned and in-transit first, Delivered last
     if (a.status === "DELIVERED" && b.status !== "DELIVERED") return 1;
     if (a.status !== "DELIVERED" && b.status === "DELIVERED") return -1;
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();

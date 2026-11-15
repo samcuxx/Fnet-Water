@@ -100,7 +100,7 @@ export async function sendSms(
  * Convenience helper to send an OTP
  */
 export async function sendOtpSms(phone: string, otpCode: string): Promise<SendSmsResponse> {
-  const message = `Your F Net Water Hub verification code is: ${otpCode}. Valid for 10 minutes. Do not share this code.`;
+  const message = `Your FNet Water Hub verification code is: ${otpCode}. Valid for 10 minutes. Do not share this code.`;
   const res = await sendSms(phone, message);
   recordSmsDispatch(phone, message, "OTP_VERIFICATION", res.status === "success" ? "DELIVERED" : "FAILED");
   return res;
@@ -114,7 +114,7 @@ export async function sendOrderConfirmationSms(
   orderNumber: string,
   totalAmount: number
 ): Promise<SendSmsResponse> {
-  const message = `F Net Water Hub: Order #${orderNumber} confirmed! Total: GH₵ ${totalAmount.toFixed(
+  const message = `FNet Water Hub: Order #${orderNumber} confirmed! Total: GH₵ ${totalAmount.toFixed(
     2
   )}. We will notify you when a driver is dispatched.`;
   const res = await sendSms(phone, message);
@@ -130,7 +130,7 @@ export async function sendDriverDispatchSms(
   driverName: string,
   orderNumber: string
 ): Promise<SendSmsResponse> {
-  const message = `F Net Water Hub: Driver ${driverName} is on the way with your water delivery for Order #${orderNumber}.`;
+  const message = `FNet Water Hub: Driver ${driverName} is on the way with your water delivery for Order #${orderNumber}.`;
   const res = await sendSms(customerPhone, message);
   recordSmsDispatch(customerPhone, message, "DELIVERY_DISPATCH", res.status === "success" ? "DELIVERED" : "FAILED");
   return res;
@@ -144,7 +144,7 @@ export async function sendDeliveryCompletedSms(
   orderNumber: string,
   bottlesDelivered: number
 ): Promise<SendSmsResponse> {
-  const message = `F Net Water Hub: Order #${orderNumber} completed. ${bottlesDelivered} bottles delivered. Thank you for choosing pure hydration!`;
+  const message = `FNet Water Hub: Order #${orderNumber} completed. ${bottlesDelivered} bottles delivered. Thank you for choosing pure hydration!`;
   const res = await sendSms(customerPhone, message);
   recordSmsDispatch(customerPhone, message, "DELIVERY_COMPLETED", res.status === "success" ? "DELIVERED" : "FAILED");
   return res;
@@ -158,7 +158,7 @@ export async function sendRewardEarnedSms(
   customerName: string,
   freeBottleBalance: number
 ): Promise<SendSmsResponse> {
-  const message = `F Net Water Hub: Congratulations ${customerName}! 5 friends joined and ordered. You earned 1 Free Water Bottle refill credit! Total balance: ${freeBottleBalance}.`;
+  const message = `FNet Water Hub: Congratulations ${customerName}! 5 friends joined and ordered. You earned 1 Free Water Bottle refill credit! Total balance: ${freeBottleBalance}.`;
   const res = await sendSms(customerPhone, message);
   recordSmsDispatch(customerPhone, message, "REWARD_EARNED", res.status === "success" ? "DELIVERED" : "FAILED");
   return res;
@@ -172,7 +172,7 @@ export async function sendDriverAssignedSms(
   orderNumber: string,
   deliveryAddress: string
 ): Promise<SendSmsResponse> {
-  const message = `F Net Water Hub: New delivery assigned for Order #${orderNumber} at ${deliveryAddress}. Please check your driver dispatch queue.`;
+  const message = `FNet Water Hub: New delivery assigned for Order #${orderNumber} at ${deliveryAddress}. Please check your driver dispatch queue.`;
   const res = await sendSms(driverPhone, message);
   recordSmsDispatch(driverPhone, message, "DRIVER_ASSIGNMENT", res.status === "success" ? "DELIVERED" : "FAILED");
   return res;
@@ -185,7 +185,7 @@ export async function sendLowInventoryAlertSms(
   managerPhone: string,
   bottleCount: number
 ): Promise<SendSmsResponse> {
-  const message = `F Net Water Hub ALERT: Warehouse filled bottle inventory has dropped to ${bottleCount} units (below threshold). Please review production queue.`;
+  const message = `FNet Water Hub ALERT: Warehouse filled bottle inventory has dropped to ${bottleCount} units (below threshold). Please review production queue.`;
   const res = await sendSms(managerPhone, message);
   recordSmsDispatch(managerPhone, message, "INVENTORY_ALERT", res.status === "success" ? "DELIVERED" : "FAILED");
   return res;
@@ -199,7 +199,7 @@ export async function sendTamperAlertSms(
   serialNumber: string,
   location: string
 ): Promise<SendSmsResponse> {
-  const message = `F Net Water Hub ALERT: Dispenser #${serialNumber} reported a sensor tilt / tamper alert at ${location}. Immediate inspection recommended.`;
+  const message = `FNet Water Hub ALERT: Dispenser #${serialNumber} reported a sensor tilt / tamper alert at ${location}. Immediate inspection recommended.`;
   const res = await sendSms(adminPhone, message);
   recordSmsDispatch(adminPhone, message, "TAMPER_ALERT", res.status === "success" ? "DELIVERED" : "FAILED");
   return res;

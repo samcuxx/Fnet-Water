@@ -138,6 +138,82 @@ const DEFAULT_SEED_ORDERS: StoredOrder[] = [
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     updatedAt: new Date(Date.now() - 86400000).toISOString(),
   },
+  {
+    id: "ord_003",
+    orderNumber: "FNW-8824",
+    userId: "usr_customer_002",
+    customerName: "Grace Osei",
+    customerPhone: "0277998877",
+    deliveryAddressId: "addr_003",
+    deliveryAddressText: "Plot 8, Roman Ridge",
+    deliveryDigitalAddress: "GA-112-9904",
+    deliverySlot: "Afternoon (12pm - 4pm)",
+    deliveryDate: new Date().toISOString(),
+    deliveryInstructions: "Ring top bell",
+    hasEmptyBottleExchange: true,
+    subtotal: 50.0,
+    depositFee: 0.0,
+    deliveryFee: 0.0,
+    discountAmount: 0.0,
+    totalAmount: 50.0,
+    status: "ASSIGNED",
+    paymentStatus: "UNPAID",
+    paymentMethod: "CASH_ON_DELIVERY",
+    paymentReference: "PAY-COD-8824",
+    freeBottlesRedeemed: 0,
+    assignedDriverId: "usr_driver_001",
+    assignedDriverName: "Kwame Asante (Fleet Driver)",
+    items: [
+      {
+        id: "item_003",
+        productId: "prod_001",
+        productName: "18.9L Pure Refill Bottle",
+        quantity: 2,
+        unitPrice: 25.0,
+        depositPrice: 0.0,
+        totalPrice: 50.0,
+      },
+    ],
+    createdAt: new Date(Date.now() - 7200000).toISOString(),
+    updatedAt: new Date(Date.now() - 3600000).toISOString(),
+  },
+  {
+    id: "ord_004",
+    orderNumber: "FNW-8825",
+    userId: "usr_customer_003",
+    customerName: "Kwesi Appiah",
+    customerPhone: "0244123456",
+    deliveryAddressId: "addr_004",
+    deliveryAddressText: "Floor 3, Silicon Accra Hub, Dzorwulu",
+    deliveryDigitalAddress: "GA-183-9021",
+    deliverySlot: "Afternoon (12pm - 4pm)",
+    deliveryDate: new Date().toISOString(),
+    deliveryInstructions: "Leave with security desk",
+    hasEmptyBottleExchange: true,
+    subtotal: 125.0,
+    depositFee: 0.0,
+    deliveryFee: 0.0,
+    discountAmount: 0.0,
+    totalAmount: 125.0,
+    status: "PENDING",
+    paymentStatus: "PAID",
+    paymentMethod: "MOBILE_MONEY",
+    paymentReference: "PAY-MM-8825",
+    freeBottlesRedeemed: 0,
+    items: [
+      {
+        id: "item_004",
+        productId: "prod_001",
+        productName: "18.9L Pure Refill Bottle",
+        quantity: 5,
+        unitPrice: 25.0,
+        depositPrice: 0.0,
+        totalPrice: 125.0,
+      },
+    ],
+    createdAt: new Date(Date.now() - 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 3600000).toISOString(),
+  },
 ];
 
 const globalForOrders = globalThis as unknown as {
@@ -358,6 +434,14 @@ export async function createCustomerOrder(data: {
   }
 
   memoryOrders.set(newOrder.id, newOrder);
+
+  // Sync to dispatch delivery queue immediately
+  try {
+    const { syncOrderToDispatch } = await import("@/lib/dispatch-store");
+    await syncOrderToDispatch(newOrder);
+  } catch (err) {
+    console.warn("[OrderStore] Dispatch sync notice:", err);
+  }
 
   // Trigger customer notification & SMS confirmation
   createNotification({

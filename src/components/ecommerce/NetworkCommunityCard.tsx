@@ -28,7 +28,7 @@ export default function NetworkCommunityCard() {
         <div className="flex items-center gap-2 mb-3">
           <span className="flex size-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-[11px] font-bold uppercase tracking-wider text-sky-200">
-            F Net Water Network
+            FNet Water Network
           </span>
         </div>
 

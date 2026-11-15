@@ -1,10 +1,10 @@
-**F NET WATER HUB**
+**FNet Water HUB**
 
 **WEB APPLICATION**
 
 **1\. PROJECT OVERVIEW**
 
-F Net Water Hub is a technology-driven water supply and dispenser management platform designed to make water ordering, delivery, customer management, inventory management, dispenser management, payments, and business operations easier to manage digitally.
+FNet Water Hub is a technology-driven water supply and dispenser management platform designed to make water ordering, delivery, customer management, inventory management, dispenser management, payments, and business operations easier to manage digitally.
 
 The first phase of the project will focus exclusively on developing a **responsive web application** that can be accessed from computers, tablets, and mobile browsers.
 
@@ -22,7 +22,7 @@ The system will be designed with scalability in mind so that the future mobile a
 
 The web application will be developed to:
 
-- Digitize F Net Water Hub's daily operations.
+- Digitize FNet Water Hub's daily operations.
 - Allow customers to conveniently order water online.
 - Manage water deliveries and delivery locations.
 - Track bottles and dispensers.
@@ -33,7 +33,7 @@ The web application will be developed to:
 - Provide business reports and analytics.
 - Improve inventory visibility.
 - Provide centralized administrative control.
-- Create a foundation for the future F Net Water Hub mobile application.
+- Create a foundation for the future FNet Water Hub mobile application.
 
 **3\. WEB APPLICATION USER ROLES**
 
@@ -605,7 +605,7 @@ The web application will be responsive and optimized for:
 - Tablets
 - Mobile web browsers
 
-The interface will follow the F Net Water Hub brand identity.
+The interface will follow the FNet Water Hub brand identity.
 
 **Brand Colors**
 
@@ -741,7 +741,7 @@ Production-ready web application.
 
 At the completion of Phase 1, the client will receive:
 
-- Responsive F Net Water Hub web application
+- Responsive FNet Water Hub web application
 - Customer portal
 - Driver portal
 - Agent portal

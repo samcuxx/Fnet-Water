@@ -21,7 +21,7 @@ export function LogoIcon({ className = "size-8" }: { className?: string }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      aria-label="F Net Water Hub Icon"
+      aria-label="FNet Water Hub Icon"
     >
       <defs>
         {/* Ocean Deep Gradient Base */}

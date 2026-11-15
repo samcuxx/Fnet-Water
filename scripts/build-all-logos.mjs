@@ -358,7 +358,7 @@ async function buildAll() {
 
   // 3. Write site.webmanifest
   const manifestContent = JSON.stringify({
-    name: "F Net Water Hub",
+    name: "FNet Water Hub",
     short_name: "F-Net Water",
     icons: [
       {

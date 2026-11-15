@@ -1,4 +1,4 @@
-# F NET WATER HUB — MASTER DEVELOPMENT PLAN (FULL-STACK NEXT.JS, POSTGRESQL & MNOTIFY)
+# FNet Water HUB — MASTER DEVELOPMENT PLAN (FULL-STACK NEXT.JS, POSTGRESQL & MNOTIFY)
 
 **Platform:** Web Application (Phase 1)  
 **Tech Stack:** Next.js (App Router, React 19, TypeScript)  
@@ -63,7 +63,7 @@ flowchart TD
 
 ### 1. Objectives & Scope
 - Initialize the production **Next.js (App Router)** fullstack project with TypeScript, React 19, and Tailwind CSS v4.
-- Configure Tailwind v4 `@theme` with official F Net Water Hub brand colors:
+- Configure Tailwind v4 `@theme` with official FNet Water Hub brand colors:
   - Primary Blue: `#0057B8`
   - Light Blue: `#00AEEF`
   - Pure White: `#FFFFFF`
@@ -104,7 +104,7 @@ flowchart TD
 ### 5. Reviewer Acceptance Testing (User UAT)
 1. Ensure Docker Desktop is running and start the database: `docker compose up -d db`.
 2. Run `npm.cmd run dev` and open `http://localhost:3000`.
-3. Verify page loads with F Net Water Hub brand styling and metadata.
+3. Verify page loads with FNet Water Hub brand styling and metadata.
 4. Run `npx prisma studio` to inspect the pre-seeded users and products.
 
 ---
@@ -414,7 +414,7 @@ flowchart TD
     - Handles `charge.success`: updates order status to `PAID`, updates installment plan payments, triggers referral qualification, and dispatches mNotify receipt SMS.
 - **Digital Invoices & Receipts**:
   - Itemized invoice view (`/invoice/:id`) based on `ui_template` SingleInvoice:
-    - Official F Net Water Hub header, Ghana Digital Address, contact info.
+    - Official FNet Water Hub header, Ghana Digital Address, contact info.
     - Customer billing details.
     - Itemized breakdown in GH₵ (products, bottle deposit, delivery fee, discounts).
     - Paystack transaction reference code.

@@ -32,7 +32,7 @@ export default function AuthPageLayout({ children }: AuthPageLayoutProps) {
         >
           <Image
             src="/images/auth/auth-illustration.jpg"
-            alt="F Net Water Hub Pure Water Delivery"
+            alt="FNet Water Hub Pure Water Delivery"
             fill
             priority
             sizes="(max-width: 1024px) 100vw, 52vw"
@@ -84,7 +84,7 @@ export default function AuthPageLayout({ children }: AuthPageLayoutProps) {
 
           {/* Copyright & Country Note */}
           <div className="pt-6 mt-8 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400">
-            <span>&copy; {new Date().getFullYear()} F Net Water Hub</span>
+            <span>&copy; {new Date().getFullYear()} FNet Water Hub</span>
             <span className="font-semibold text-gray-500">Ghana</span>
           </div>
         </div>
