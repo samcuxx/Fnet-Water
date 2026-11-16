@@ -1,6 +1,6 @@
 # FNet Water HUB — AGENT RULES & CONTRACT
 
-This file binds all autonomous and subagent operations in this workspace. Refer to [PROJECT_RULES.md](file:///c:/Users/samue/Documents/Github/fnetWater/PROJECT_RULES.md) and [GEMINI.md](file:///c:/Users/samue/Documents/Github/fnetWater/GEMINI.md) for full engineering specifications.
+This file binds all autonomous and subagent operations in this workspace. Refer to [PROJECT_RULES.md](./docs/PROJECT_RULES.md) and [GEMINI.md](./docs/GEMINI.md) for full engineering specifications.
 
 ## 7 COMMANDMENTS FOR EVERY MODULE:
 1. **Archetype Fidelity**: Every screen must originate directly from `ui_template` (`AuthPageLayout` for auth, `Ecommerce.tsx` for executive dashboards, `Logistics.tsx` for dispatch/operations).

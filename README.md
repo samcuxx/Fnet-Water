@@ -72,7 +72,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 The repository is fully configured for automated self-hosted deployment on **Coolify** using Docker.
 
 For the complete, step-by-step production runbook, see:
-👉 [**COOLIFY_PRODUCTION_GUIDE.md**](./COOLIFY_PRODUCTION_GUIDE.md)
+👉 [**COOLIFY_PRODUCTION_GUIDE.md**](./docs/COOLIFY_PRODUCTION_GUIDE.md)
 
 Quick deploy via Docker Compose:
 ```bash
@@ -81,16 +81,11 @@ docker compose -f docker-compose.coolify.yml up -d --build
 
 ---
 
-## Automated Verification & Testing
-
-The platform includes a comprehensive regression test suite covering all 12 modules:
+## Verification & Build
 
 ```bash
 # TypeScript compiler verification (0 errors)
-npx tsc --noEmit
-
-# Run full platform regression suite (224/224 tests passing)
-npx tsx test-full-system-modules-1-to-12.ts
+npx.cmd tsc --noEmit
 
 # Production Next.js build verification
 npm run build
@@ -110,8 +105,18 @@ npm run build
 
 ---
 
-## Documentation Links
+## Documentation Library
 
-- [**Coolify Production Deployment Guide**](./COOLIFY_PRODUCTION_GUIDE.md)
-- [**User Review Guide & Walkthroughs**](./USER_REVIEW_GUIDE.md)
-- [**Master Development To-Do List**](./TODO_LIST.md)
+All project planning, architecture specifications, deployment guides, and design tokens are grouped in the [`/docs`](./docs) directory:
+
+| Document | Description |
+| :--- | :--- |
+| [**Coolify Production Guide**](./docs/COOLIFY_PRODUCTION_GUIDE.md) | Step-by-step Coolify PaaS setup, SSL, and Docker deployment runbook. |
+| [**User Review Guide**](./docs/USER_REVIEW_GUIDE.md) | Persona walkthroughs, credentials, and feature verification scenarios. |
+| [**Development Plan**](./docs/DEVELOPMENT_PLAN.md) | Master development roadmap and multi-module implementation specifications. |
+| [**Project Rules & Standards**](./docs/PROJECT_RULES.md) | Engineering commandments, UX rules, security policies, and UI standards. |
+| [**UI Design System**](./docs/UI_DESIGN_SYSTEM.md) | Design system tokens, color palettes, ApexCharts specs, and component hierarchy. |
+| [**FNet Water Hub Overview**](./docs/F%20NET%20WATER%20HUB.md) | High-level system blueprint, entity relationships, and operational flows. |
+| [**Master To-Do List**](./docs/TODO_LIST.md) | Granular development checklist and module completion tracking. |
+| [**Mobile App PRD**](./docs/MOBILE_APP_PRD.md) | Phase 2 mobile client specification and decoupled REST API architecture. |
+| [**Gemini Context**](./docs/GEMINI.md) | Model architecture guidelines and developer reference prompts. |
