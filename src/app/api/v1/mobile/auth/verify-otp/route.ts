@@ -43,19 +43,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Find existing user or automatically provision new Customer
-    let user = await findUserByIdentifier(normalizedPhone);
-
+    // Find existing user in database or seed store
+    const user = await findUserByIdentifier(normalizedPhone);
     if (!user) {
-      // Auto-provision new customer account for mobile sign-up
-      const generatedEmail = `customer_${normalizedPhone.slice(-6)}@fnetwater.com`;
-      user = await registerNewUser({
-        name: "Valued Customer",
-        phone: normalizedPhone,
-        email: generatedEmail,
-        password: `momo_pass_${Date.now()}`,
-        role: "CUSTOMER",
-      });
+      return mobileError(
+        "USER_NOT_FOUND",
+        "No registered account was found with this phone number. Please register for a customer account.",
+        404
+      );
     }
 
     if (user.status === "INACTIVE") {
