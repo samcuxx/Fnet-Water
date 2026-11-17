@@ -1,5 +1,5 @@
 import { generateOtp, normalizeGhanaPhone, sendOtpSms } from "@/lib/mnotify";
-import { storeOtp, findUserByIdentifier } from "@/lib/auth-store";
+import { storeOtp } from "@/lib/auth-store";
 import { mobileSuccess, mobileError } from "@/lib/mobile-auth";
 import { z } from "zod";
 
@@ -32,16 +32,6 @@ export async function POST(request: Request) {
         "INVALID_PHONE",
         "Please provide a valid Ghanaian phone number (e.g. 024 123 4567).",
         400
-      );
-    }
-
-    // 1. Authoritative check: User MUST exist in database or seed store to sign in via Phone + OTP!
-    const user = await findUserByIdentifier(normalizedPhone);
-    if (!user) {
-      return mobileError(
-        "USER_NOT_FOUND",
-        "No registered account was found with this phone number. Please check your number or create a new customer account.",
-        404
       );
     }
 
