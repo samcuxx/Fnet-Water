@@ -291,6 +291,25 @@ export async function createNotification(
   }
 
   memoryNotifications.set(newRecord.id, newRecord);
+
+  // Non-blocking native mobile push dispatch if userId is specified
+  if (data.userId) {
+    import("@/lib/device-store")
+      .then(({ sendPushNotificationToUser }) =>
+        sendPushNotificationToUser(data.userId!, {
+          title: data.title,
+          body: data.message,
+          data: {
+            notificationId: newRecord.id,
+            type: data.type,
+            linkUrl: data.linkUrl || undefined,
+            ...(data.metadata || {}),
+          },
+        })
+      )
+      .catch(() => {});
+  }
+
   return newRecord;
 }
 

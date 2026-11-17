@@ -63,13 +63,30 @@ function checkTcpPort(host = "127.0.0.1", port = 5432, timeoutMs = 80): Promise<
   });
 }
 
+function getDatabaseTarget(): { host: string; port: number } {
+  const urlStr = process.env.DATABASE_URL;
+  if (urlStr) {
+    try {
+      const parsed = new URL(urlStr);
+      return {
+        host: parsed.hostname || "127.0.0.1",
+        port: parsed.port ? parseInt(parsed.port, 10) : 5432,
+      };
+    } catch {
+      // Fallback to default local PostgreSQL port
+    }
+  }
+  return { host: "127.0.0.1", port: 5432 };
+}
+
 export async function isDatabaseConnected(): Promise<boolean> {
   const now = Date.now();
   if (dbReachability && now - dbReachability.checkedAt < PROBE_INTERVAL_MS) {
     return dbReachability.connected;
   }
 
-  const isPortOpen = await checkTcpPort("127.0.0.1", 5432, 80);
+  const { host, port } = getDatabaseTarget();
+  const isPortOpen = await checkTcpPort(host, port, 150);
   if (!isPortOpen) {
     dbReachability = { connected: false, checkedAt: now };
     return false;
@@ -78,7 +95,7 @@ export async function isDatabaseConnected(): Promise<boolean> {
   try {
     const probe = prisma.$queryRaw`SELECT 1`;
     const timeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("Database probe timeout")), 200)
+      setTimeout(() => reject(new Error("Database probe timeout")), 400)
     );
     await Promise.race([probe, timeout]);
     dbReachability = { connected: true, checkedAt: now };
@@ -301,7 +318,8 @@ export async function storeOtp(
  */
 export async function verifyStoredOtp(
   phone: string,
-  code: string
+  code: string,
+  consume = true
 ): Promise<boolean> {
   const normalized = normalizeGhanaPhone(phone);
 
@@ -310,7 +328,9 @@ export async function verifyStoredOtp(
   const now = Date.now();
 
   if (record && record.code === code && record.expiresAt > now) {
-    record.isVerified = true;
+    if (consume) {
+      record.isVerified = true;
+    }
     return true;
   }
 
@@ -328,10 +348,12 @@ export async function verifyStoredOtp(
       });
 
       if (dbRecord) {
-        await prisma.otpVerification.update({
-          where: { id: dbRecord.id },
-          data: { isVerified: true },
-        });
+        if (consume) {
+          await prisma.otpVerification.update({
+            where: { id: dbRecord.id },
+            data: { isVerified: true },
+          });
+        }
         return true;
       }
     } catch {

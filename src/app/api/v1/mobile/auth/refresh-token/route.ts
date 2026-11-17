@@ -1,12 +1,14 @@
+import { z } from "zod";
+import { getUserById } from "@/lib/auth-store";
 import {
-  mobileSuccess,
+  ACCESS_TOKEN_TTL_SECONDS,
+  isMobileAllowedRole,
   mobileError,
-  verifyMobileToken,
+  mobileSuccess,
   signMobileAccessToken,
   signMobileRefreshToken,
+  verifyMobileToken,
 } from "@/lib/mobile-auth";
-import { findUserByIdentifier } from "@/lib/auth-store";
-import { z } from "zod";
 
 const refreshTokenSchema = z.object({
   refreshToken: z.string().min(10, "Refresh token is required"),
@@ -39,11 +41,19 @@ export async function POST(request: Request) {
       );
     }
 
-    const user = await findUserByIdentifier(payload.sub || payload.id);
+    const user = await getUserById(payload.sub || payload.id);
     if (!user || user.status === "INACTIVE") {
       return mobileError(
         "USER_NOT_FOUND",
         "User account associated with this token is invalid or deactivated.",
+        403
+      );
+    }
+
+    if (!isMobileAllowedRole(user.role)) {
+      return mobileError(
+        "ROLE_NOT_ALLOWED_ON_MOBILE",
+        "Admin and Manager accounts must use the web portal.",
         403
       );
     }
@@ -62,7 +72,7 @@ export async function POST(request: Request) {
       {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
-        expiresIn: 86400,
+        expiresIn: ACCESS_TOKEN_TTL_SECONDS,
       },
       200,
       "Session tokens refreshed successfully."

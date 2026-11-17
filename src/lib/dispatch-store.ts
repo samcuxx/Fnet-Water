@@ -60,6 +60,7 @@ export interface BottleExchangeRecord {
   lostCount: number;
   cashCollected: number;
   customerNotes?: string;
+  proofOfDeliveryUrl?: string;
   createdAt: string;
 }
 
@@ -259,6 +260,16 @@ export async function getActiveDrivers(): Promise<DriverProfile[]> {
   }
 
   return Array.from(memoryDrivers.values());
+}
+
+/**
+ * Get a single driver profile by userId
+ */
+export async function getDriverProfile(driverId: string): Promise<DriverProfile | null> {
+  const drivers = await getActiveDrivers();
+  const found = drivers.find((d) => d.id === driverId);
+  if (found) return found;
+  return memoryDrivers.get(driverId) || drivers[0] || null;
 }
 
 /**
@@ -571,16 +582,19 @@ export async function completeStopBottleExchange(data: {
   filledDelivered: number;
   emptyCollected: number;
   damagedCount: number;
+  lostCount?: number;
   cashCollected: number;
   customerNotes?: string;
+  proofOfDeliveryUrl?: string;
 }): Promise<{ stop: DeliveryStop; exchange: BottleExchangeRecord }> {
   // 1. Update Order status in order-store
+  const existingOrder = await getOrderById(data.orderId);
   await updateOrderStatus(data.orderId, "DELIVERED");
 
   // 2. Update Stop
   let stop = memoryStops.get(data.orderId);
   if (!stop) {
-    const ord = await getOrderById(data.orderId);
+    const ord = existingOrder;
     stop = {
       id: `stop_${Date.now()}`,
       orderId: data.orderId,
@@ -608,30 +622,31 @@ export async function completeStopBottleExchange(data: {
   }
   memoryStops.set(data.orderId, stop);
 
+  const resolvedCustomerId = existingOrder?.userId || "usr_customer_001";
+
   // 3. Create Bottle Exchange Record
   const exchange: BottleExchangeRecord = {
     id: `bx_${Date.now()}`,
     deliveryId: stop.id,
     orderId: data.orderId,
     driverId: data.driverId,
-    customerId: "usr_customer_001",
+    customerId: resolvedCustomerId,
     filledDelivered: data.filledDelivered,
     emptyCollected: data.emptyCollected,
     damagedCount: data.damagedCount,
-    lostCount: 0,
+    lostCount: data.lostCount ?? 0,
     cashCollected: data.cashCollected,
     customerNotes: data.customerNotes,
+    proofOfDeliveryUrl: data.proofOfDeliveryUrl,
     createdAt: new Date().toISOString(),
   };
   memoryExchanges.set(exchange.id, exchange);
 
   // 4. Update Customer held bottles count
   try {
-    const ord = await getOrderById(data.orderId);
-    const userId = ord?.userId || "usr_customer_001";
-    const profile = await getCustomerProfile(userId);
+    const profile = await getCustomerProfile(resolvedCustomerId);
     const updatedHeld = Math.max(0, (profile.bottlesHeld || 0) + data.filledDelivered - data.emptyCollected);
-    await updateCustomerProfileData(userId, { bottlesHeld: updatedHeld });
+    await updateCustomerProfileData(resolvedCustomerId, { bottlesHeld: updatedHeld });
   } catch {
     // Non-fatal
   }
@@ -668,12 +683,14 @@ export async function completeStopBottleExchange(data: {
           data: {
             deliveryId: delivery.id,
             driverId: data.driverId,
-            customerId: "usr_customer_001",
+            customerId: resolvedCustomerId,
             filledDelivered: data.filledDelivered,
             emptyCollected: data.emptyCollected,
             damagedCount: data.damagedCount,
+            lostCount: data.lostCount ?? 0,
             cashCollected: data.cashCollected,
             customerNotes: data.customerNotes,
+            proofOfDeliveryUrl: data.proofOfDeliveryUrl,
           },
         });
       }
@@ -684,6 +701,7 @@ export async function completeStopBottleExchange(data: {
 
   // Trigger customer delivery completion notification & SMS
   createNotification({
+    userId: resolvedCustomerId,
     role: "CUSTOMER",
     title: `Delivery Completed: ${stop.orderNumber}`,
     message: `Your water delivery has been completed. ${data.filledDelivered} bottles delivered, ${data.emptyCollected} empties returned.`,

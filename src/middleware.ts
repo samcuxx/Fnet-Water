@@ -1,7 +1,7 @@
 import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 
-export default withAuth(
+const authMiddleware = withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
     const path = req.nextUrl.pathname;
@@ -111,8 +111,35 @@ function getRoleDashboard(role?: string): string {
   }
 }
 
+export default function middleware(req: NextRequest, event: NextFetchEvent) {
+  if (req.nextUrl.pathname.startsWith("/api/v1/mobile")) {
+    const corsHeaders: Record<string, string> = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+      "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+    };
+
+    if (req.method === "OPTIONS") {
+      return new NextResponse(null, { status: 204, headers: corsHeaders });
+    }
+
+    const res = NextResponse.next();
+    for (const [key, value] of Object.entries(corsHeaders)) {
+      res.headers.set(key, value);
+    }
+    return res;
+  }
+
+  return (authMiddleware as (req: NextRequest, event: NextFetchEvent) => ReturnType<typeof NextResponse.next>)(
+    req,
+    event
+  );
+}
+
 export const config = {
   matcher: [
+    "/api/v1/mobile/:path*",
     "/admin/:path*",
     "/manager/:path*",
     "/driver/:path*",

@@ -1,16 +1,21 @@
+import { z } from "zod";
 import { normalizeGhanaPhone } from "@/lib/mnotify";
 import { findUserByIdentifier, verifyStoredOtp, registerNewUser } from "@/lib/auth-store";
 import {
-  mobileSuccess,
+  ACCESS_TOKEN_TTL_SECONDS,
+  buildMobileUserPayload,
+  getRequestOrigin,
+  isMobileAllowedRole,
   mobileError,
+  mobileSuccess,
   signMobileAccessToken,
   signMobileRefreshToken,
 } from "@/lib/mobile-auth";
-import { z } from "zod";
 
 const verifyOtpSchema = z.object({
   phone: z.string().min(8, "Phone number is too short"),
   otpCode: z.string().length(5, "Verification code must be exactly 5 digits"),
+  autoProvisionCustomer: z.boolean().optional(),
 });
 
 export async function POST(request: Request) {
@@ -30,10 +35,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const { phone, otpCode } = parseResult.data;
+    const { phone, otpCode, autoProvisionCustomer = false } = parseResult.data;
     const normalizedPhone = normalizeGhanaPhone(phone);
 
-    // Verify OTP code against memory/DB store
     const isValid = await verifyStoredOtp(normalizedPhone, otpCode);
     if (!isValid) {
       return mobileError(
@@ -43,17 +47,23 @@ export async function POST(request: Request) {
       );
     }
 
-    // Find existing user or automatically provision new Customer
     let user = await findUserByIdentifier(normalizedPhone);
 
     if (!user) {
-      // Auto-provision new customer account for mobile sign-up
-      const generatedEmail = `customer_${normalizedPhone.slice(-6)}@fnetwater.com`;
+      if (!autoProvisionCustomer) {
+        return mobileError(
+          "ACCOUNT_NOT_FOUND",
+          "No account is registered with this phone number. Please create an account.",
+          404
+        );
+      }
+
+      const generatedEmail = `customer_${normalizedPhone.slice(-6)}_${Date.now().toString().slice(-4)}@fnetwater.com`;
       user = await registerNewUser({
         name: "Valued Customer",
         phone: normalizedPhone,
         email: generatedEmail,
-        password: `momo_pass_${Date.now()}`,
+        password: `otp_pass_${Date.now()}`,
         role: "CUSTOMER",
       });
     }
@@ -61,12 +71,21 @@ export async function POST(request: Request) {
     if (user.status === "INACTIVE") {
       return mobileError(
         "ACCOUNT_DEACTIVATED",
-        "Your account has been deactivated. Please contact customer care.",
+        "Your account has been deactivated. Please contact support.",
         403
       );
     }
 
-    // Generate tokens
+    // Strictly block ADMIN and MANAGER roles from mobile access
+    if (!isMobileAllowedRole(user.role)) {
+      return mobileError(
+        "ROLE_NOT_ALLOWED_ON_MOBILE",
+        `${user.role === "MANAGER" ? "Operations Manager" : "Administrator"} accounts are available on the web portal only.`,
+        403,
+        { role: user.role, webOnly: true }
+      );
+    }
+
     const accessToken = signMobileAccessToken({
       id: user.id,
       role: user.role,
@@ -74,30 +93,15 @@ export async function POST(request: Request) {
       name: user.name,
       email: user.email,
     });
-
     const refreshToken = signMobileRefreshToken({ id: user.id });
+    const enrichedUser = await buildMobileUserPayload(user, getRequestOrigin(request));
 
     return mobileSuccess(
       {
         accessToken,
         refreshToken,
-        expiresIn: 86400,
-        user: {
-          id: user.id,
-          name: user.name,
-          phone: user.phone,
-          email: user.email,
-          role: user.role,
-          customerProfile:
-            user.role === "CUSTOMER"
-              ? {
-                  customerCode: user.customerCode || "CUST-001",
-                  bottlesHeld: user.bottlesHeld ?? 0,
-                  freeBottleBalance: 0,
-                  referralCode: `FNET-${user.phone.slice(-4)}`,
-                }
-              : undefined,
-        },
+        expiresIn: ACCESS_TOKEN_TTL_SECONDS,
+        user: enrichedUser,
       },
       200,
       "Authentication successful."

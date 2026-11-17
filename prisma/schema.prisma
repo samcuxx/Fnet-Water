@@ -90,6 +90,7 @@ model User {
   assignedDeliveries Delivery[]       @relation("DriverDeliveries")
   notifications      Notification[]
   auditLogs          AuditLog[]
+  pushTokens         DevicePushToken[]
 
   @@index([email])
   @@index([phone])
@@ -106,6 +107,8 @@ model CustomerProfile {
   freeBottleBalance  Int               @default(0)
   referralCode       String            @unique
   referredById       String?
+  zone               String?
+  onboardedByAgentId String?
   referrer           CustomerProfile?  @relation("CustomerReferrals", fields: [referredById], references: [id])
   referralsMade      CustomerProfile[] @relation("CustomerReferrals")
   createdAt          DateTime          @default(now())
@@ -238,9 +241,10 @@ model BottleExchange {
   emptyCollected  Int      @default(0)
   damagedCount    Int      @default(0)
   lostCount       Int      @default(0)
-  cashCollected   Float    @default(0) // in GH₵
-  customerNotes   String?
-  createdAt       DateTime @default(now())
+  cashCollected      Float    @default(0) // in GH₵
+  customerNotes      String?
+  proofOfDeliveryUrl String?
+  createdAt          DateTime @default(now())
 
   @@index([driverId])
   @@index([customerId])
@@ -391,4 +395,18 @@ model OtpVerification {
   createdAt  DateTime @default(now())
 
   @@index([phone])
+}
+
+model DevicePushToken {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token       String   @unique
+  platform    String   @default("UNKNOWN")
+  deviceModel String?
+  appVersion  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
 }
