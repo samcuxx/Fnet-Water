@@ -1,4 +1,6 @@
 import net from "net";
+import fs from "fs";
+import path from "path";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { normalizeGhanaPhone } from "@/lib/mnotify";
@@ -13,6 +15,7 @@ export interface StoredUser {
   role: RoleType;
   status: StatusType;
   createdAt: string;
+  avatar?: string;
   // Customer-specific fields
   customerCode?: string;
   bottlesHeld?: number;
@@ -250,21 +253,67 @@ interface OtpRecord {
   isVerified: boolean;
 }
 
+const PERSISTED_USERS_FILE = path.join(
+  process.cwd(),
+  "public",
+  "uploads",
+  "persisted-users.json"
+);
+
+function loadPersistedUsers(): StoredUser[] {
+  try {
+    if (fs.existsSync(PERSISTED_USERS_FILE)) {
+      const raw = fs.readFileSync(PERSISTED_USERS_FILE, "utf-8");
+      const list = JSON.parse(raw);
+      if (Array.isArray(list) && list.length > 0) {
+        return list;
+      }
+    }
+  } catch (err) {
+    console.warn("[auth-store] Could not load persisted users from disk:", err);
+  }
+  return DEFAULT_SEED_USERS;
+}
+
+export function saveUsersToDisk() {
+  try {
+    const dir = path.dirname(PERSISTED_USERS_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const usersArray = Array.from(memoryUsers.values());
+    fs.writeFileSync(
+      PERSISTED_USERS_FILE,
+      JSON.stringify(usersArray, null, 2),
+      "utf-8"
+    );
+  } catch (err) {
+    console.warn("[auth-store] Could not save users to disk:", err);
+  }
+}
+
 const globalForAuth = globalThis as unknown as {
   memoryUsers?: Map<string, StoredUser>;
   memoryOtps?: Map<string, OtpRecord>;
 };
 
 const memoryUsers: Map<string, StoredUser> = (() => {
+  const initialData = loadPersistedUsers();
   if (globalForAuth.memoryUsers) {
-    for (const u of DEFAULT_SEED_USERS) {
+    for (const u of initialData) {
       if (!globalForAuth.memoryUsers.has(u.id)) {
         globalForAuth.memoryUsers.set(u.id, { ...u });
       }
     }
     return globalForAuth.memoryUsers;
   }
-  const map = new Map<string, StoredUser>(DEFAULT_SEED_USERS.map((u) => [u.id, { ...u }]));
+  const map = new Map<string, StoredUser>(initialData.map((u) => [u.id, { ...u }]));
+  // Always ensure all default seed users exist
+  for (const seed of DEFAULT_SEED_USERS) {
+    if (!map.has(seed.id)) {
+      map.set(seed.id, { ...seed });
+    }
+  }
   if (process.env.NODE_ENV !== "production") {
     globalForAuth.memoryUsers = map;
   }
@@ -394,6 +443,7 @@ export async function findUserByIdentifier(identifier: string): Promise<StoredUs
           role: dbUser.role as RoleType,
           status: dbUser.status as StatusType,
           createdAt: dbUser.createdAt.toISOString(),
+          avatar: dbUser.avatar || undefined,
         };
       }
     } catch {
@@ -484,6 +534,7 @@ export async function registerNewUser(data: {
   }
 
   memoryUsers.set(newUser.id, newUser);
+  saveUsersToDisk();
   return newUser;
 }
 
@@ -629,6 +680,7 @@ export async function updateUserStatus(
   if (user) {
     user.status = status;
     memoryUsers.set(userId, { ...user });
+    saveUsersToDisk();
     return user;
   }
 
@@ -646,6 +698,7 @@ export async function updateUserDetails(
     phone?: string;
     role?: RoleType;
     deliveryArea?: string;
+    avatar?: string;
   }
 ): Promise<StoredUser | null> {
   const dbOnline = await isDatabaseConnected();
@@ -658,10 +711,11 @@ export async function updateUserDetails(
           email: data.email?.toLowerCase(),
           phone: data.phone ? normalizeGhanaPhone(data.phone) : undefined,
           role: data.role,
+          avatar: data.avatar !== undefined ? data.avatar : undefined,
         },
       });
 
-      return {
+      const updatedUser: StoredUser = {
         id: updated.id,
         name: updated.name,
         email: updated.email,
@@ -671,7 +725,12 @@ export async function updateUserDetails(
         status: updated.status as StatusType,
         createdAt: updated.createdAt.toISOString(),
         deliveryArea: data.deliveryArea,
+        avatar: updated.avatar || undefined,
       };
+      memoryUsers.set(updated.id, updatedUser);
+      saveUsersToDisk();
+
+      return updatedUser;
     } catch {
       // Memory fallback
     }
@@ -684,7 +743,9 @@ export async function updateUserDetails(
     if (data.phone) user.phone = normalizeGhanaPhone(data.phone);
     if (data.role) user.role = data.role;
     if (data.deliveryArea !== undefined) user.deliveryArea = data.deliveryArea;
+    if (data.avatar !== undefined) user.avatar = data.avatar;
     memoryUsers.set(userId, { ...user });
+    saveUsersToDisk();
     return user;
   }
 
@@ -715,6 +776,7 @@ export async function getUserById(userId: string): Promise<StoredUser | null> {
           customerCode: dbUser.customerProfile?.customerCode,
           bottlesHeld: dbUser.customerProfile?.bottlesHeld,
           dispenserPlan: "Refill Standard",
+          avatar: dbUser.avatar || undefined,
         };
       }
     } catch {
@@ -752,6 +814,7 @@ export async function updateUserPassword(
   if (user) {
     user.passwordHash = passwordHash;
     memoryUsers.set(userId, { ...user });
+    saveUsersToDisk();
     return true;
   }
 
@@ -773,6 +836,7 @@ export async function deleteUserRecord(userId: string): Promise<boolean> {
         where: { id: userId },
       });
       memoryUsers.delete(userId);
+      saveUsersToDisk();
       return true;
     } catch {
       // Memory fallback
@@ -781,6 +845,7 @@ export async function deleteUserRecord(userId: string): Promise<boolean> {
 
   if (memoryUsers.has(userId)) {
     memoryUsers.delete(userId);
+    saveUsersToDisk();
     return true;
   }
 

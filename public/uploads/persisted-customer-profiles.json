@@ -1,0 +1,123 @@
+{
+  "usr_customer_001": {
+    "id": "cp_001",
+    "userId": "usr_customer_001",
+    "customerCode": "CUST-8802",
+    "ghanaCardNumber": "GHA-882910492-7",
+    "bottlesHeld": 4,
+    "freeBottleBalance": 0,
+    "referralCode": "FNW-AMA01",
+    "totalReferrals": 5,
+    "dispenserPlan": "Aquamaster Dual-Tap (Rent-to-Own)",
+    "dispenserPaidMonths": 8,
+    "dispenserTotalMonths": 12
+  },
+  "usr_customer_002": {
+    "id": "cp_1794948187585",
+    "userId": "usr_customer_002",
+    "customerCode": "CUST-8361",
+    "bottlesHeld": 2,
+    "freeBottleBalance": 0,
+    "referralCode": "FNW-QDLLF",
+    "totalReferrals": 0,
+    "dispenserPlan": "None (Refill Only)",
+    "dispenserPaidMonths": 0,
+    "dispenserTotalMonths": 12
+  },
+  "usr_1794948190158": {
+    "id": "cp_1794948191325",
+    "userId": "usr_1794948190158",
+    "customerCode": "CUST-1942",
+    "bottlesHeld": 2,
+    "freeBottleBalance": 0,
+    "referralCode": "FNW-9W4QJ",
+    "totalReferrals": 0,
+    "dispenserPlan": "None (Refill Only)",
+    "dispenserPaidMonths": 0,
+    "dispenserTotalMonths": 12
+  },
+  "usr_1794948192741": {
+    "id": "cp_1794948192743",
+    "userId": "usr_1794948192741",
+    "customerCode": "CUST-2419",
+    "bottlesHeld": 2,
+    "freeBottleBalance": 0,
+    "referralCode": "FNW-8DCVK",
+    "totalReferrals": 0,
+    "dispenserPlan": "None (Refill Only)",
+    "dispenserPaidMonths": 0,
+    "dispenserTotalMonths": 12
+  },
+  "usr_1794984077939": {
+    "id": "cp_1794984079176",
+    "userId": "usr_1794984077939",
+    "customerCode": "CUST-1004",
+    "bottlesHeld": 2,
+    "freeBottleBalance": 0,
+    "referralCode": "FNW-IAOMX",
+    "totalReferrals": 0,
+    "dispenserPlan": "None (Refill Only)",
+    "dispenserPaidMonths": 0,
+    "dispenserTotalMonths": 12
+  },
+  "usr_customer_007": {
+    "id": "cp_1795008831196",
+    "userId": "usr_customer_007",
+    "customerCode": "CUST-9442",
+    "bottlesHeld": 2,
+    "freeBottleBalance": 0,
+    "referralCode": "FNW-8M0R7",
+    "totalReferrals": 0,
+    "dispenserPlan": "None (Refill Only)",
+    "dispenserPaidMonths": 0,
+    "dispenserTotalMonths": 12
+  },
+  "usr_1795042264723": {
+    "id": "cp_1795042264724",
+    "userId": "usr_1795042264723",
+    "customerCode": "CUST-9592",
+    "bottlesHeld": 2,
+    "freeBottleBalance": 0,
+    "referralCode": "FNW-9N8YN",
+    "totalReferrals": 0,
+    "dispenserPlan": "None (Refill Only)",
+    "dispenserPaidMonths": 0,
+    "dispenserTotalMonths": 12
+  },
+  "usr_1795042289589": {
+    "id": "cp_1795042289590",
+    "userId": "usr_1795042289589",
+    "customerCode": "CUST-3897",
+    "bottlesHeld": 2,
+    "freeBottleBalance": 0,
+    "referralCode": "FNW-ZV4W2",
+    "totalReferrals": 0,
+    "dispenserPlan": "None (Refill Only)",
+    "dispenserPaidMonths": 0,
+    "dispenserTotalMonths": 12
+  },
+  "usr_1795095312656": {
+    "id": "cp_1795095312658",
+    "userId": "usr_1795095312656",
+    "customerCode": "CUST-7865",
+    "bottlesHeld": 2,
+    "freeBottleBalance": 0,
+    "referralCode": "FNW-XV5WU",
+    "totalReferrals": 0,
+    "dispenserPlan": "None (Refill Only)",
+    "dispenserPaidMonths": 0,
+    "dispenserTotalMonths": 12
+  },
+  "usr_1795095376710": {
+    "id": "cp_1795095376711",
+    "userId": "usr_1795095376710",
+    "customerCode": "CUST-9385",
+    "bottlesHeld": 2,
+    "freeBottleBalance": 0,
+    "referralCode": "FNW-7QC72",
+    "totalReferrals": 0,
+    "dispenserPlan": "None (Refill Only)",
+    "dispenserPaidMonths": 0,
+    "dispenserTotalMonths": 12
+  }
+}

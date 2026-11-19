@@ -3,7 +3,12 @@ import { isDatabaseConnected } from "@/lib/auth-store";
 import { getProductById } from "@/lib/product-store";
 import { getCustomerProfile, updateCustomerProfileData } from "@/lib/customer-store";
 import { createNotification } from "@/lib/notification-store";
-import { sendOrderConfirmationSms } from "@/lib/mnotify";
+import {
+  sendOrderConfirmationSms,
+  sendDriverAssignedSms,
+  sendDriverDispatchSms,
+  sendDeliveryCompletedSms,
+} from "@/lib/mnotify";
 
 export type OrderStatus =
   | "PENDING"
@@ -695,8 +700,47 @@ export async function updateOrderStatus(
   if (driverId) ord.assignedDriverId = driverId;
   if (driverName) ord.assignedDriverName = driverName;
 
-  if (status === "DELIVERED") {
+  if (status === "ASSIGNED") {
+    createNotification({
+      userId: ord.userId,
+      role: "CUSTOMER",
+      title: `Driver Assigned: ${ord.orderNumber}`,
+      message: `Driver ${driverName || "Kwame Asante"} has been assigned to deliver your water order.`,
+      type: "DELIVERY",
+      linkUrl: "/customer/orders",
+      metadata: { orderId: ord.id, orderNumber: ord.orderNumber },
+    }).catch(() => {});
+    if (ord.customerPhone) {
+      sendDriverAssignedSms(ord.customerPhone, driverName || "Kwame Asante", ord.orderNumber).catch(() => {});
+    }
+  } else if (status === "OUT_FOR_DELIVERY") {
+    createNotification({
+      userId: ord.userId,
+      role: "CUSTOMER",
+      title: `Water Out for Delivery: ${ord.orderNumber}`,
+      message: `Your water delivery is on its way to ${ord.deliveryAddressText}. Driver: ${driverName || ord.assignedDriverName || "Kwame Asante"}.`,
+      type: "DELIVERY",
+      linkUrl: "/customer/orders",
+      metadata: { orderId: ord.id, orderNumber: ord.orderNumber },
+    }).catch(() => {});
+    if (ord.customerPhone) {
+      sendDriverDispatchSms(ord.customerPhone, driverName || ord.assignedDriverName || "Kwame Asante", ord.orderNumber).catch(() => {});
+    }
+  } else if (status === "DELIVERED") {
     ord.paymentStatus = "PAID";
+    createNotification({
+      userId: ord.userId,
+      role: "CUSTOMER",
+      title: `Delivery Completed: ${ord.orderNumber}`,
+      message: `Your water delivery for order ${ord.orderNumber} has been successfully completed.`,
+      type: "DELIVERY",
+      linkUrl: "/customer/orders",
+      metadata: { orderId: ord.id, orderNumber: ord.orderNumber },
+    }).catch(() => {});
+    if (ord.customerPhone) {
+      const bottleCount = ord.items.reduce((acc, it) => acc + it.quantity, 0);
+      sendDeliveryCompletedSms(ord.customerPhone, ord.orderNumber, bottleCount).catch(() => {});
+    }
     if (ord.userId) {
       try {
         const { qualifyReferralOnOrderPayment } = await import("@/lib/referral-store");
@@ -705,6 +749,16 @@ export async function updateOrderStatus(
         console.warn("[Referral] Delivery qualification notice:", err);
       }
     }
+  } else if (status === "CANCELLED") {
+    createNotification({
+      userId: ord.userId,
+      role: "CUSTOMER",
+      title: `Order Cancelled: ${ord.orderNumber}`,
+      message: `Your water delivery order ${ord.orderNumber} has been cancelled.`,
+      type: "ORDER",
+      linkUrl: "/customer/orders",
+      metadata: { orderId: ord.id, orderNumber: ord.orderNumber },
+    }).catch(() => {});
   }
 
   memoryOrders.set(ord.id, { ...ord });

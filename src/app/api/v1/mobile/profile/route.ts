@@ -4,7 +4,9 @@ import {
   findUserByIdentifier,
   updateUserDetails,
   updateUserPassword,
+  deleteUserRecord,
 } from "@/lib/auth-store";
+import { unregisterDevicePushToken } from "@/lib/device-store";
 import { updateCustomerProfileData } from "@/lib/customer-store";
 import { normalizeGhanaPhone } from "@/lib/mnotify";
 import {
@@ -21,6 +23,8 @@ const updateProfileSchema = z.object({
   email: z.string().email("Please enter a valid email address.").optional(),
   phone: z.string().min(9, "Please enter a valid phone number.").optional(),
   deliveryArea: z.string().optional(),
+  avatar: z.string().optional(),
+  avatarUrl: z.string().optional(),
   ghanaCardNumber: z.string().optional(),
   currentPassword: z.string().optional(),
   newPassword: z.string().min(6, "New password must be at least 6 characters.").optional(),
@@ -104,12 +108,20 @@ export async function PATCH(request: Request) {
       }
     }
 
+    const newAvatar =
+      data.avatarUrl !== undefined
+        ? data.avatarUrl
+        : data.avatar !== undefined
+        ? data.avatar
+        : currentUser.avatar;
+
     const updated = await updateUserDetails(currentUser.id, {
       name: data.name?.trim() || currentUser.name,
       email: data.email?.trim().toLowerCase() || currentUser.email,
       phone: data.phone ? normalizeGhanaPhone(data.phone) : currentUser.phone,
       deliveryArea:
         data.deliveryArea !== undefined ? data.deliveryArea.trim() : currentUser.deliveryArea,
+      avatar: newAvatar,
     });
 
     if (!updated) {
@@ -127,5 +139,41 @@ export async function PATCH(request: Request) {
   } catch (error) {
     console.error("[Mobile API profile PATCH error]:", error);
     return mobileError("SERVER_ERROR", "Failed to update profile.", 500);
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const authResult = await verifyMobileAuth(request);
+    if (!authResult.ok) return authResult.response;
+
+    const rawBody = await request.json().catch(() => ({}));
+    if (rawBody?.confirmation !== undefined && rawBody.confirmation !== "DELETE") {
+      return mobileError(
+        "INVALID_CONFIRMATION",
+        'Please type "DELETE" in capital letters to confirm account deletion.',
+        400
+      );
+    }
+
+    const currentUser = authResult.dbUser;
+    if (currentUser.id === "usr_admin_001") {
+      return mobileError("FORBIDDEN", "Primary admin account cannot be deleted.", 403);
+    }
+
+    await unregisterDevicePushToken(currentUser.id).catch(() => {});
+    const deleted = await deleteUserRecord(currentUser.id);
+    if (!deleted) {
+      return mobileError("SERVER_ERROR", "Failed to delete account.", 500);
+    }
+
+    return mobileSuccess(
+      { deleted: true },
+      200,
+      "Your account and associated profile data have been permanently deleted."
+    );
+  } catch (error) {
+    console.error("[Mobile API profile DELETE error]:", error);
+    return mobileError("SERVER_ERROR", "Failed to process account deletion.", 500);
   }
 }

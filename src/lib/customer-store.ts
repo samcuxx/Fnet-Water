@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { prisma } from "@/lib/prisma";
 import { isDatabaseConnected } from "@/lib/auth-store";
 
@@ -86,21 +88,89 @@ const DEFAULT_SEED_CUSTOMER_PROFILES: Record<string, StoredCustomerProfile> = {
   },
 };
 
+const PERSISTED_ADDRESSES_FILE = path.join(
+  process.cwd(),
+  "public",
+  "uploads",
+  "persisted-addresses.json"
+);
+
+const PERSISTED_PROFILES_FILE = path.join(
+  process.cwd(),
+  "public",
+  "uploads",
+  "persisted-customer-profiles.json"
+);
+
+function loadPersistedAddresses(): StoredAddress[] {
+  try {
+    if (fs.existsSync(PERSISTED_ADDRESSES_FILE)) {
+      const raw = fs.readFileSync(PERSISTED_ADDRESSES_FILE, "utf-8");
+      const list = JSON.parse(raw);
+      if (Array.isArray(list) && list.length > 0) return list;
+    }
+  } catch {}
+  return DEFAULT_SEED_ADDRESSES;
+}
+
+export function saveAddressesToDisk() {
+  try {
+    const dir = path.dirname(PERSISTED_ADDRESSES_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(
+      PERSISTED_ADDRESSES_FILE,
+      JSON.stringify(Array.from(memoryAddresses.values()), null, 2),
+      "utf-8"
+    );
+  } catch {}
+}
+
+function loadPersistedProfiles(): Record<string, StoredCustomerProfile> {
+  try {
+    if (fs.existsSync(PERSISTED_PROFILES_FILE)) {
+      const raw = fs.readFileSync(PERSISTED_PROFILES_FILE, "utf-8");
+      const obj = JSON.parse(raw);
+      if (obj && typeof obj === "object") return obj;
+    }
+  } catch {}
+  return DEFAULT_SEED_CUSTOMER_PROFILES;
+}
+
+export function saveCustomerProfilesToDisk() {
+  try {
+    const dir = path.dirname(PERSISTED_PROFILES_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    const obj: Record<string, StoredCustomerProfile> = {};
+    for (const [k, v] of memoryCustomerProfiles.entries()) {
+      obj[k] = v;
+    }
+    fs.writeFileSync(
+      PERSISTED_PROFILES_FILE,
+      JSON.stringify(obj, null, 2),
+      "utf-8"
+    );
+  } catch {}
+}
+
 const globalForCustomer = globalThis as unknown as {
   memoryAddresses?: Map<string, StoredAddress>;
   memoryCustomerProfiles?: Map<string, StoredCustomerProfile>;
 };
 
 const memoryAddresses: Map<string, StoredAddress> = (() => {
+  const initial = loadPersistedAddresses();
   if (globalForCustomer.memoryAddresses) {
-    for (const addr of DEFAULT_SEED_ADDRESSES) {
+    for (const addr of initial) {
       if (!globalForCustomer.memoryAddresses.has(addr.id)) {
         globalForCustomer.memoryAddresses.set(addr.id, { ...addr });
       }
     }
     return globalForCustomer.memoryAddresses;
   }
-  const map = new Map<string, StoredAddress>(DEFAULT_SEED_ADDRESSES.map((a) => [a.id, { ...a }]));
+  const map = new Map<string, StoredAddress>(initial.map((a) => [a.id, { ...a }]));
+  for (const seed of DEFAULT_SEED_ADDRESSES) {
+    if (!map.has(seed.id)) map.set(seed.id, { ...seed });
+  }
   if (process.env.NODE_ENV !== "production") {
     globalForCustomer.memoryAddresses = map;
   }
@@ -108,8 +178,9 @@ const memoryAddresses: Map<string, StoredAddress> = (() => {
 })();
 
 const memoryCustomerProfiles: Map<string, StoredCustomerProfile> = (() => {
+  const initial = loadPersistedProfiles();
   if (globalForCustomer.memoryCustomerProfiles) {
-    for (const [uid, cp] of Object.entries(DEFAULT_SEED_CUSTOMER_PROFILES)) {
+    for (const [uid, cp] of Object.entries(initial)) {
       if (!globalForCustomer.memoryCustomerProfiles.has(uid)) {
         globalForCustomer.memoryCustomerProfiles.set(uid, { ...cp });
       }
@@ -117,8 +188,11 @@ const memoryCustomerProfiles: Map<string, StoredCustomerProfile> = (() => {
     return globalForCustomer.memoryCustomerProfiles;
   }
   const map = new Map<string, StoredCustomerProfile>(
-    Object.entries(DEFAULT_SEED_CUSTOMER_PROFILES).map(([uid, cp]) => [uid, { ...cp }])
+    Object.entries(initial).map(([uid, cp]) => [uid, { ...cp }])
   );
+  for (const [uid, cp] of Object.entries(DEFAULT_SEED_CUSTOMER_PROFILES)) {
+    if (!map.has(uid)) map.set(uid, { ...cp });
+  }
   if (process.env.NODE_ENV !== "production") {
     globalForCustomer.memoryCustomerProfiles = map;
   }
@@ -237,6 +311,7 @@ export async function updateCustomerProfileData(
   if (data.bottlesHeld !== undefined) profile.bottlesHeld = data.bottlesHeld;
   if (data.freeBottleBalance !== undefined) profile.freeBottleBalance = data.freeBottleBalance;
   memoryCustomerProfiles.set(userId, profile);
+  saveCustomerProfilesToDisk();
   return profile;
 }
 
@@ -359,6 +434,7 @@ export async function createCustomerAddress(
   }
 
   memoryAddresses.set(newAddress.id, newAddress);
+  saveAddressesToDisk();
   return newAddress;
 }
 
@@ -430,6 +506,7 @@ export async function updateCustomerAddress(
     if (data.gpsLatitude !== undefined) addr.gpsLatitude = data.gpsLatitude;
     if (data.gpsLongitude !== undefined) addr.gpsLongitude = data.gpsLongitude;
     memoryAddresses.set(addressId, { ...addr });
+    saveAddressesToDisk();
     return addr;
   }
 
@@ -447,6 +524,7 @@ export async function deleteCustomerAddress(addressId: string, userId: string): 
         where: { id: addressId },
       });
       memoryAddresses.delete(addressId);
+      saveAddressesToDisk();
       return true;
     } catch {
       // Fallback
@@ -456,6 +534,7 @@ export async function deleteCustomerAddress(addressId: string, userId: string): 
   const addr = memoryAddresses.get(addressId);
   if (addr && addr.userId === userId) {
     memoryAddresses.delete(addressId);
+    saveAddressesToDisk();
     return true;
   }
 

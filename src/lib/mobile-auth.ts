@@ -127,6 +127,15 @@ export function verifyMobileToken(token: string): MobileJwtPayload | null {
  * Build consistent mobile user payload enriched with role-specific profile
  */
 export async function buildMobileUserPayload(user: StoredUser, originUrl?: string) {
+  const origin = originUrl || process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const avatarFullUrl = user.avatar
+    ? user.avatar.startsWith("http://") ||
+      user.avatar.startsWith("https://") ||
+      user.avatar.startsWith("data:")
+      ? user.avatar
+      : `${origin.replace(/\/+$/, "")}${user.avatar.startsWith("/") ? "" : "/"}${user.avatar}`
+    : null;
+
   const base = {
     id: user.id,
     name: user.name,
@@ -135,6 +144,8 @@ export async function buildMobileUserPayload(user: StoredUser, originUrl?: strin
     role: user.role,
     status: user.status,
     deliveryArea: user.deliveryArea || "East Legon, Accra",
+    avatar: user.avatar || null,
+    avatarUrl: avatarFullUrl || user.avatar || null,
     createdAt: user.createdAt,
   };
 
@@ -275,11 +286,14 @@ export async function verifyMobileAuth(
  * Helper to resolve request origin cleanly
  */
 export function getRequestOrigin(request: Request): string {
-  const origin = request.headers.get("origin");
-  if (origin) return origin;
-  const host = request.headers.get("host");
+  const host =
+    request.headers.get("x-forwarded-host") || request.headers.get("host");
   if (host) {
-    const proto = request.headers.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
+    const proto =
+      request.headers.get("x-forwarded-proto") ||
+      (host.includes("localhost") || host.includes("127.0.0.1")
+        ? "http"
+        : "https");
     return `${proto}://${host}`;
   }
   return process.env.NEXTAUTH_URL || "http://localhost:3000";

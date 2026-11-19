@@ -495,7 +495,9 @@ export async function assignOrderToDriver(
     }
 
     // Customer status notification
+    const customerUserId = (await getOrderById(orderId))?.userId;
     createNotification({
+      userId: customerUserId,
       role: "CUSTOMER",
       title: `Driver Assigned: ${stop.orderNumber}`,
       message: `Driver ${driverName} (${driverVan}) has been assigned to deliver your water.`,
@@ -556,7 +558,9 @@ export async function startDeliveryRoute(orderId: string): Promise<DeliveryStop 
   }
 
   if (stop) {
+    const customerUserId = (await getOrderById(orderId))?.userId;
     createNotification({
+      userId: customerUserId,
       role: "CUSTOMER",
       title: `Water Out for Delivery: ${stop.orderNumber}`,
       message: `Driver ${stop.driverName || "Kwame Asante"} is en route to ${stop.deliveryAddress}.`,
