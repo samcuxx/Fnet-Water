@@ -47,7 +47,8 @@
     "passwordHash": "$2a$10$MISiVvJGKqWYs.NCV3pSbeJhAdXtW3H5DttzScBnBEvCbWR4w3DhG",
     "role": "AGENT",
     "status": "ACTIVE",
-    "createdAt": "2026-02-12T14:20:00.000Z"
+    "createdAt": "2026-02-12T14:20:00.000Z",
+    "avatar": "http://10.185.53.205:3000/uploads/avatars/avatar-usr_agent_001-1795154526235.jpg"
   },
   {
     "id": "usr_agent_002",
