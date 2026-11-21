@@ -54,7 +54,7 @@ export default function AuthPageLayout({ children }: AuthPageLayoutProps) {
         <div className="w-full max-w-[440px] lg:max-w-[480px] mx-auto flex flex-col justify-between h-full">
           {/* Header Bar: Brand Logo & Back to Home */}
           <div className="flex items-center justify-between gap-3 mb-6 sm:mb-8">
-            <Logo size="sm" href="/" />
+            <Logo size="lg" href="/" />
 
             <Link
               href="/"

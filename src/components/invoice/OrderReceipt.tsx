@@ -32,8 +32,8 @@ export default function OrderReceipt({
     <div className="bg-white dark:bg-gray-900 rounded-[28px] border border-gray-100 dark:border-gray-800/80 overflow-hidden shadow-xs text-gray-900 dark:text-white print:border-none print:shadow-none print:bg-white print:text-black print:rounded-none">
       {/* Top Header Bar */}
       <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 print:bg-transparent print:border-b-2 print:border-black">
-        <div className="flex items-center gap-3">
-          <LogoIcon className="size-9 shrink-0" />
+        <div className="flex items-center gap-3.5">
+          <LogoIcon className="size-12 shrink-0" />
           <div>
             <h3 className="font-bold text-base sm:text-lg text-gray-900 dark:text-white print:text-black leading-tight">
               F-Net Water Hub

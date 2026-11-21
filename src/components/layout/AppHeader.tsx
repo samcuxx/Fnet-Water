@@ -57,7 +57,7 @@ export const AppHeader: React.FC = () => {
 
         {/* Mobile Brand Logo */}
         <div className="xl:hidden">
-          <Logo variant="default" size="sm" />
+          <Logo variant="default" size="md" />
         </div>
 
         {/* Desktop Breadcrumb / Section indicator */}

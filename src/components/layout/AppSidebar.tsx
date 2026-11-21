@@ -348,7 +348,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ role = "ADMIN" }) => {
         }`}
       >
         <div className="flex items-center justify-center overflow-hidden">
-          <Logo size="sm" variant="dark" iconOnly={!isSidebarVisible} />
+          <Logo size="md" variant="dark" iconOnly={!isSidebarVisible} />
         </div>
 
         {isSidebarVisible && isMobileOpen && (
