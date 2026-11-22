@@ -8,7 +8,7 @@
     "gpsLatitude": 5.6508,
     "gpsLongitude": -0.1554,
     "deliveryInstructions": "Ring gate bell or call 0241000005 on arrival",
-    "isDefault": true,
+    "isDefault": false,
     "createdAt": "2026-02-20T12:00:00.000Z"
   },
   {
@@ -20,7 +20,7 @@
     "gpsLatitude": 5.6125,
     "gpsLongitude": -0.1983,
     "deliveryInstructions": "Leave 19L refills with ground floor security reception",
-    "isDefault": false,
+    "isDefault": true,
     "createdAt": "2026-02-22T14:30:00.000Z"
   },
   {
