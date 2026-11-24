@@ -367,7 +367,7 @@ export async function createCustomerOrder(data: {
     discountAmount: pricing.discountAmount,
     totalAmount: pricing.totalAmount,
     status: "PENDING",
-    paymentStatus: data.paymentStatus || (data.paymentMethod === "CASH_ON_DELIVERY" ? "UNPAID" : "PAID"),
+    paymentStatus: data.paymentStatus || (data.paymentMethod === "CASH_ON_DELIVERY" || pricing.totalAmount === 0 ? (pricing.totalAmount === 0 ? "PAID" : "UNPAID") : "UNPAID"),
     paymentMethod: data.paymentMethod,
     paymentReference: `PAY-${data.paymentMethod.slice(0, 4)}-${randNum}`,
     freeBottlesRedeemed,
@@ -417,7 +417,7 @@ export async function createCustomerOrder(data: {
             discountAmount: pricing.discountAmount,
             totalAmount: pricing.totalAmount,
             status: "PENDING",
-            paymentStatus: data.paymentStatus || (data.paymentMethod === "CASH_ON_DELIVERY" ? "UNPAID" : "PAID"),
+            paymentStatus: data.paymentStatus || (data.paymentMethod === "CASH_ON_DELIVERY" || pricing.totalAmount === 0 ? (pricing.totalAmount === 0 ? "PAID" : "UNPAID") : "UNPAID"),
             paymentMethod: data.paymentMethod === "MOBILE_MONEY" ? "PAYSTACK_MOMO" : data.paymentMethod === "CARD" ? "PAYSTACK_CARD" : "CASH_ON_DELIVERY",
             freeBottlesRedeemed,
             items: {

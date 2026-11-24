@@ -7,7 +7,8 @@ import {
   PaymentChannel,
   TransactionType,
 } from "@/lib/transaction-store";
-import { updateOrderPaymentStatus, getOrderByReference } from "@/lib/order-store";
+import { updateOrderPaymentStatus, getOrderByReference, createCustomerOrder } from "@/lib/order-store";
+import { getCustomerAddresses } from "@/lib/customer-store";
 import { recordInstallmentPayment } from "@/lib/dispenser-store";
 
 export async function POST(req: Request) {
@@ -86,8 +87,45 @@ export async function POST(req: Request) {
 
       // 5. Fulfill Order if linked
       const targetOrderId = metadata.orderId || existing?.orderId;
-      if (targetOrderId) {
+      const orderPayload =
+        (metadata.orderPayload as any) || (existing?.metadata?.orderPayload as any);
+
+      if (targetOrderId && targetOrderId !== "pending") {
         await updateOrderPaymentStatus(targetOrderId, "PAID", reference);
+      } else if (orderPayload) {
+        // Place order now that online payment is verified
+        const targetUserId = metadata.userId || existing?.customerProfileId;
+        if (targetUserId) {
+          const addresses = await getCustomerAddresses(targetUserId);
+          const selectedAddress =
+            addresses.find((a) => a.id === orderPayload.deliveryAddressId) ||
+            addresses.find((a) => a.isDefault) ||
+            addresses[0];
+
+          if (selectedAddress) {
+            const placedOrder = await createCustomerOrder({
+              userId: targetUserId,
+              customerName: metadata.userName || "Customer",
+              customerPhone: metadata.userPhone || "",
+              deliveryAddressId: selectedAddress.id,
+              deliveryAddressText: selectedAddress.areaName,
+              deliveryDigitalAddress: selectedAddress.digitalAddress,
+              deliverySlot: orderPayload.deliverySlot || "Morning (8am - 12pm)",
+              deliveryDate: orderPayload.deliveryDate || new Date().toISOString(),
+              deliveryInstructions: orderPayload.deliveryInstructions,
+              hasEmptyBottleExchange: Boolean(orderPayload.hasEmptyBottleExchange),
+              redeemFreeRefill: Boolean(orderPayload.redeemFreeRefill),
+              paymentMethod: orderPayload.paymentMethod || channel,
+              paymentStatus: "PAID",
+              items: orderPayload.items || [],
+            });
+
+            if (placedOrder && existing) {
+              existing.orderId = placedOrder.id;
+              existing.orderNumber = placedOrder.orderNumber;
+            }
+          }
+        }
       } else {
         const order = await getOrderByReference(reference);
         if (order && order.paymentStatus !== "PAID") {

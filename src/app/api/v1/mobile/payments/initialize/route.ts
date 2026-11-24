@@ -28,6 +28,27 @@ const initPaymentSchema = z.object({
     .enum(["MTN_MOMO", "TELECEL_CASH", "AT_MONEY", "CARD", "BANK_TRANSFER"])
     .default("MTN_MOMO"),
   callbackUrl: z.string().optional(),
+  orderPayload: z
+    .object({
+      items: z.array(
+        z.object({
+          productId: z.string().min(1),
+          quantity: z.coerce.number().int().positive(),
+        })
+      ),
+      deliveryAddressId: z.string().optional(),
+      deliverySlot: z.enum([
+        "Morning (8am - 12pm)",
+        "Afternoon (12pm - 4pm)",
+        "Evening (4pm - 7pm)",
+      ]).default("Morning (8am - 12pm)"),
+      deliveryDate: z.string().optional(),
+      deliveryInstructions: z.string().optional(),
+      hasEmptyBottleExchange: z.boolean().default(true),
+      redeemFreeRefill: z.boolean().default(false),
+      paymentMethod: z.enum(["MOBILE_MONEY", "CARD", "CASH_ON_DELIVERY", "BANK_TRANSFER"]).default("MOBILE_MONEY"),
+    })
+    .optional(),
 });
 
 export async function POST(request: Request) {
@@ -50,7 +71,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { amount, type, orderId, orderNumber, planId, channel, callbackUrl } = parsed.data;
+    const { amount, type, orderId, orderNumber, planId, channel, callbackUrl, orderPayload } = parsed.data;
     const user = authResult.dbUser;
     const email = user.email || `${user.phone}@fnetwater.com`;
     const reference = `FNW-TX-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -71,6 +92,7 @@ export async function POST(request: Request) {
         planId,
         type,
         source: "mobile",
+        orderPayload,
       },
     });
 
@@ -98,6 +120,7 @@ export async function POST(request: Request) {
       metadata: {
         accessCode: paystackRes.data.access_code,
         source: "mobile",
+        orderPayload,
       },
     });
 

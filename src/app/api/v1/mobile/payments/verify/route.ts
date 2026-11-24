@@ -4,7 +4,12 @@ import {
   PaymentChannel,
   updateTransactionStatus,
 } from "@/lib/transaction-store";
-import { getOrderByReference, updateOrderPaymentStatus } from "@/lib/order-store";
+import {
+  createCustomerOrder,
+  getOrderByReference,
+  updateOrderPaymentStatus,
+} from "@/lib/order-store";
+import { getCustomerAddresses } from "@/lib/customer-store";
 import { recordInstallmentPayment } from "@/lib/dispenser-store";
 import { mobileError, mobileSuccess, verifyMobileAuth } from "@/lib/mobile-auth";
 
@@ -54,9 +59,47 @@ export async function GET(request: Request) {
     }
 
     const targetOrderId = existing?.orderId || (data.metadata?.orderId as string | undefined);
+    const orderPayload =
+      (existing?.metadata?.orderPayload as any) || (data.metadata?.orderPayload as any);
+
     let order = null;
     if (targetOrderId) {
       order = await updateOrderPaymentStatus(targetOrderId, "PAID", reference);
+    } else if (orderPayload && (!existing?.orderId || existing?.orderId === "pending")) {
+      // Create and place the order NOW that online payment has succeeded!
+      const user = authResult.dbUser;
+      const addresses = await getCustomerAddresses(user.id);
+      const selectedAddress =
+        addresses.find((a) => a.id === orderPayload.deliveryAddressId) ||
+        addresses.find((a) => a.isDefault) ||
+        addresses[0];
+
+      if (selectedAddress) {
+        order = await createCustomerOrder({
+          userId: user.id,
+          customerName: user.name,
+          customerPhone: user.phone,
+          deliveryAddressId: selectedAddress.id,
+          deliveryAddressText: selectedAddress.areaName,
+          deliveryDigitalAddress: selectedAddress.digitalAddress,
+          deliverySlot: orderPayload.deliverySlot || "Morning (8am - 12pm)",
+          deliveryDate: orderPayload.deliveryDate || new Date().toISOString(),
+          deliveryInstructions: orderPayload.deliveryInstructions,
+          hasEmptyBottleExchange: Boolean(orderPayload.hasEmptyBottleExchange),
+          redeemFreeRefill: Boolean(orderPayload.redeemFreeRefill),
+          paymentMethod: orderPayload.paymentMethod || (channel === "CARD" ? "CARD" : "MOBILE_MONEY"),
+          paymentStatus: "PAID",
+          items: orderPayload.items || [],
+        });
+
+        if (order) {
+          order.paymentReference = reference;
+          if (updatedTx) {
+            updatedTx.orderId = order.id;
+            updatedTx.orderNumber = order.orderNumber;
+          }
+        }
+      }
     } else {
       order = await getOrderByReference(reference);
       if (order && order.paymentStatus !== "PAID") {
